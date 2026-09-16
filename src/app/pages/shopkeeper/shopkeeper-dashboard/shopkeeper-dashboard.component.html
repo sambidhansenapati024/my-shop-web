@@ -1,0 +1,402 @@
+<div class="dashboard-page">
+
+  <!-- Animated Background -->
+  <div class="page-background">
+    <div class="background-grid"></div>
+
+    <div class="background-glow glow-blue"></div>
+    <div class="background-glow glow-green"></div>
+
+    <span class="background-dot dot-1"></span>
+    <span class="background-dot dot-2"></span>
+    <span class="background-dot dot-3"></span>
+    <span class="background-dot dot-4"></span>
+
+    <span class="floating-icon icon-1">🛒</span>
+    <span class="floating-icon icon-2">📦</span>
+    <span class="floating-icon icon-3">🥛</span>
+    <span class="floating-icon icon-4">🍚</span>
+  </div>
+
+
+  <main class="dashboard-content">
+
+    <!-- Heading -->
+    <section class="page-heading">
+
+      <div>
+        <span class="heading-badge">
+          <span class="badge-dot"></span>
+          SHOPKEEPER PANEL
+        </span>
+
+        <h1>
+          Shop <span>Dashboard</span>
+        </h1>
+
+        <p>
+          Manage today's orders and keep your shop running smoothly.
+        </p>
+      </div>
+
+      <a
+        routerLink="/admin/orders"
+        class="view-orders-button">
+
+        <span>📦</span>
+        View Orders
+
+      </a>
+
+    </section>
+
+
+    <!-- Quick Stats -->
+    <section class="stats-grid">
+
+      <!-- New Orders -->
+      <div class="stat-card blue-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            📥
+          </div>
+
+          <span class="stat-label">
+            NEW ORDERS
+          </span>
+
+        </div>
+
+        <div class="stat-bottom">
+
+          <strong>0</strong>
+
+          <span class="stat-description">
+            Waiting for action
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Preparing -->
+      <div class="stat-card orange-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            🛍️
+          </div>
+
+          <span class="stat-label">
+            PREPARING
+          </span>
+
+        </div>
+
+        <div class="stat-bottom">
+
+          <strong>0</strong>
+
+          <span class="stat-description">
+            Orders being packed
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Ready -->
+      <div class="stat-card green-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            ✅
+          </div>
+
+          <span class="stat-label">
+            READY
+          </span>
+
+        </div>
+
+        <div class="stat-bottom">
+
+          <strong>0</strong>
+
+          <span class="stat-description">
+            Ready for pickup
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Completed -->
+      <div class="stat-card purple-card">
+
+        <div class="stat-top">
+
+          <div class="stat-icon">
+            ✓
+          </div>
+
+          <span class="stat-label">
+            COMPLETED
+          </span>
+
+        </div>
+
+        <div class="stat-bottom">
+
+          <strong>0</strong>
+
+          <span class="stat-description">
+            Completed orders
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Main Dashboard Grid -->
+    <section class="dashboard-grid">
+
+
+      <!-- Recent Orders -->
+      <div class="dashboard-card orders-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="card-label">
+              ORDERS
+            </span>
+
+            <h2>Recent Orders</h2>
+          </div>
+
+          <a
+            routerLink="/admin/orders"
+            class="card-link">
+
+            View all
+            <span>→</span>
+
+          </a>
+
+        </div>
+
+
+        <!-- Empty State -->
+        <div class="empty-orders">
+
+          <div class="empty-icon">
+            📦
+          </div>
+
+          <h3>No orders yet</h3>
+
+          <p>
+            New customer orders will appear here.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Quick Actions -->
+      <div class="dashboard-card actions-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="card-label">
+              QUICK ACCESS
+            </span>
+
+            <h2>Quick Actions</h2>
+          </div>
+
+        </div>
+
+
+        <div class="quick-actions">
+
+          <a
+            routerLink="/admin/orders"
+            class="quick-action">
+
+            <div class="quick-icon blue-action">
+              📦
+            </div>
+
+            <div class="quick-content">
+
+              <strong>
+                Manage Orders
+              </strong>
+
+              <span>
+                View and process customer orders
+              </span>
+
+            </div>
+
+            <span class="quick-arrow">
+              →
+            </span>
+
+          </a>
+
+
+          <div class="action-divider"></div>
+
+
+          <div class="quick-action disabled-action">
+
+            <div class="quick-icon green-action">
+              👥
+            </div>
+
+            <div class="quick-content">
+
+              <strong>
+                Customers
+              </strong>
+
+              <span>
+                Customer management
+              </span>
+
+            </div>
+
+            <span class="coming-soon">
+              Soon
+            </span>
+
+          </div>
+
+
+          <div class="action-divider"></div>
+
+
+          <div class="quick-action disabled-action">
+
+            <div class="quick-icon purple-action">
+              📄
+            </div>
+
+            <div class="quick-content">
+
+              <strong>
+                Bills
+              </strong>
+
+              <span>
+                View generated bills
+              </span>
+
+            </div>
+
+            <span class="coming-soon">
+              Soon
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Today's Activity -->
+    <section class="activity-card">
+
+      <div class="activity-header">
+
+        <div>
+          <span class="card-label">
+            TODAY
+          </span>
+
+          <h2>Shop Activity</h2>
+        </div>
+
+        <div class="live-indicator">
+          <span></span>
+          Live
+        </div>
+
+      </div>
+
+
+      <div class="activity-items">
+
+        <div class="activity-item">
+
+          <div class="activity-icon blue-activity">
+            📥
+          </div>
+
+          <div>
+            <strong>New Orders</strong>
+            <span>Customer orders received today</span>
+          </div>
+
+          <b>0</b>
+
+        </div>
+
+
+        <div class="activity-item">
+
+          <div class="activity-icon green-activity">
+            ✅
+          </div>
+
+          <div>
+            <strong>Ready for Pickup</strong>
+            <span>Orders waiting for customers</span>
+          </div>
+
+          <b>0</b>
+
+        </div>
+
+
+        <div class="activity-item">
+
+          <div class="activity-icon purple-activity">
+            💰
+          </div>
+
+          <div>
+            <strong>Payments</strong>
+            <span>Payment tracking will appear here</span>
+          </div>
+
+          <b>—</b>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>

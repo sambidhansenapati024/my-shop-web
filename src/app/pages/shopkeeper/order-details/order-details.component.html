@@ -1,0 +1,636 @@
+<div class="order-details-page">
+
+  <!-- Header -->
+  <section class="page-header">
+
+    <div class="header-left">
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="goBack()">
+        ←
+      </button>
+
+      <div>
+        <span class="page-label">
+          ORDER MANAGEMENT
+        </span>
+
+        <h1>
+          Order Details
+        </h1>
+
+        @if (order) {
+          <p>
+            {{ order.orderNumber }}
+          </p>
+        } @else if (orderId) {
+          <p>
+            Order #{{ orderId }}
+          </p>
+        }
+      </div>
+
+    </div>
+
+    @if (order) {
+      <span
+        class="status-badge"
+        [ngClass]="getStatusClass(order.status)">
+        {{ getStatusLabel(order.status) }}
+      </span>
+    }
+
+  </section>
+
+
+  @if (errorMessage) {
+
+    <div class="error-message">
+      <span>⚠️</span>
+      {{ errorMessage }}
+    </div>
+
+  }
+
+
+  @if (isLoading) {
+
+    <section class="loading-card">
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading order details...
+      </p>
+
+    </section>
+
+  }
+
+
+  @if (!isLoading && order) {
+
+    <!-- Customer Information -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+          <span class="card-icon">👤</span>
+
+          <div>
+            <h2>Customer Information</h2>
+            <p>Customer details for this order</p>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="customer-grid">
+
+        <div class="info-item">
+
+          <span class="info-label">
+            CUSTOMER NAME
+          </span>
+
+          <strong>
+            {{ order.customerName }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span class="info-label">
+            MOBILE NUMBER
+          </span>
+
+          <strong>
+            {{ order.customerMobile }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span class="info-label">
+            EMAIL
+          </span>
+
+          <strong>
+            {{ order.customerEmail }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Order Information -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <span class="card-icon">
+            📦
+          </span>
+
+          <div>
+            <h2>Order Information</h2>
+            <p>Basic information about the order</p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="order-info-grid">
+
+        <div class="info-item">
+
+          <span class="info-label">
+            ORDER NUMBER
+          </span>
+
+          <strong>
+            {{ order.orderNumber }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span class="info-label">
+            ORDER TYPE
+          </span>
+
+          <strong>
+            {{ getOrderTypeLabel(order.orderType) }}
+          </strong>
+
+        </div>
+
+
+        <div class="info-item">
+
+          <span class="info-label">
+            CREATED
+          </span>
+
+          <strong>
+            {{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Grocery Items -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <span class="card-icon">
+            🛒
+          </span>
+
+          <div>
+            <h2>Grocery Items</h2>
+            <p>
+              Enter the actual selling price while preparing the order
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      @if (order.items?.length) {
+
+        <div class="items-table-wrapper">
+
+          <table class="items-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  ITEM
+                </th>
+
+                <th>
+                  QUANTITY
+                </th>
+
+                <th>
+                  UNIT PRICE
+                </th>
+
+                <th>
+                  TOTAL
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                item of order.items;
+                track $index
+              ) {
+
+                <tr>
+
+                  <td>
+
+                    <div class="item-name">
+                      {{ item.itemName }}
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <span class="quantity-value">
+                      {{ item.quantity }}
+                      {{ item.unit }}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <div class="price-input-wrapper">
+
+                      <span>
+                        ₹
+                      </span>
+
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        [(ngModel)]="item.unitPrice"
+                        placeholder="0.00">
+
+                    </div>
+
+                  </td>
+
+
+                  <td>
+
+                    <strong class="item-total">
+                      ₹{{ getItemTotal(item) | number:'1.2-2' }}
+                    </strong>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      } @else {
+
+        <div class="empty-items">
+
+          <span>
+            🛒
+          </span>
+
+          <p>
+            No manual items are available for this order.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- Uploaded Photo -->
+    @if (order.photoUrl) {
+
+      <section class="content-card">
+
+        <div class="card-header">
+
+          <div class="card-title">
+
+            <span class="card-icon">
+              📷
+            </span>
+
+            <div>
+              <h2>Uploaded Grocery List</h2>
+              <p>
+                Customer's uploaded list
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="photo-section">
+
+          <a
+            [href]="order.photoUrl"
+            target="_blank"
+            rel="noopener noreferrer">
+
+            <img
+              [src]="order.photoUrl"
+              alt="Customer grocery list">
+
+          </a>
+
+
+          <div class="photo-info">
+
+            <span class="photo-badge">
+              PHOTO ORDER
+            </span>
+
+            @if (order.photoNote) {
+
+              <p>
+                <strong>Customer note:</strong>
+                {{ order.photoNote }}
+              </p>
+
+            }
+
+            <a
+              [href]="order.photoUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="view-photo-button">
+              Open Full Photo ↗
+            </a>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- Preparation -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <span class="card-icon">
+            📋
+          </span>
+
+          <div>
+            <h2>Order Preparation</h2>
+            <p>
+              Update the order while packing
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="preparation-actions">
+
+        <button
+          type="button"
+          class="action-button preparing-button"
+          (click)="markAsPreparing()">
+
+          <span>
+            📦
+          </span>
+
+          Mark as Preparing
+
+        </button>
+
+
+        <button
+          type="button"
+          class="action-button ready-button"
+          (click)="markAsReady()">
+
+          <span>
+            ✓
+          </span>
+
+          Ready for Pickup
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Bill Summary -->
+    <section class="content-card billing-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <span class="card-icon">
+            🧾
+          </span>
+
+          <div>
+            <h2>Bill & Payment</h2>
+            <p>
+              Review the final bill and payment status
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="bill-summary">
+
+        <div class="bill-row">
+
+          <span>
+            Total Amount
+          </span>
+
+          <strong>
+            ₹{{ getBillTotal() | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div class="bill-row payment-row">
+
+          <span>
+            Amount Paid
+          </span>
+
+          <div class="payment-input-wrapper">
+
+            <span>
+              ₹
+            </span>
+
+            <input
+              type="number"
+              min="0"
+              [ngModel]="paidAmount"
+              (ngModelChange)="setPaymentAmount($event)"
+              placeholder="0.00">
+
+          </div>
+
+        </div>
+
+
+        <div class="bill-row">
+
+          <span>
+            Remaining Amount
+          </span>
+
+          <strong>
+            ₹{{ getRemainingAmount() | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div class="payment-status">
+
+          <span>
+            Payment Status
+          </span>
+
+          <strong>
+            {{ getPaymentStatus() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="billing-actions">
+
+        <button
+          type="button"
+          class="generate-bill-button"
+          (click)="generateBill()">
+
+          <span>
+            🧾
+          </span>
+
+          {{ isBillGenerated ? 'Bill Generated' : 'Generate Bill' }}
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Final Actions -->
+    <section class="final-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        (click)="goBack()">
+
+        ← Back to Orders
+
+      </button>
+
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="generateBill()">
+
+        🧾 Generate Bill
+
+      </button>
+
+    </section>
+
+  }
+
+
+  @if (!isLoading && !order && !errorMessage) {
+
+    <section class="empty-order-card">
+
+      <div class="empty-icon">
+        📦
+      </div>
+
+      <h2>
+        Order Details
+      </h2>
+
+      <p>
+        Order information will appear here when the backend is connected.
+      </p>
+
+      <button
+        type="button"
+        class="primary-button"
+        (click)="goBack()">
+
+        ← Back to Orders
+
+      </button>
+
+    </section>
+
+  }
+
+</div>

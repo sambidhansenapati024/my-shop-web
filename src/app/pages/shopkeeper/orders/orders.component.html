@@ -1,0 +1,444 @@
+<div class="orders-page">
+
+  <!-- Animated Background -->
+  <div class="page-background">
+    <div class="background-grid"></div>
+
+    <div class="background-glow glow-blue"></div>
+    <div class="background-glow glow-green"></div>
+
+    <span class="background-dot dot-1"></span>
+    <span class="background-dot dot-2"></span>
+    <span class="background-dot dot-3"></span>
+    <span class="background-dot dot-4"></span>
+
+    <span class="floating-icon icon-1">📦</span>
+    <span class="floating-icon icon-2">🛒</span>
+    <span class="floating-icon icon-3">🥛</span>
+    <span class="floating-icon icon-4">🍚</span>
+  </div>
+
+
+  <main class="orders-content">
+
+    <!-- Page Heading -->
+    <section class="page-heading">
+
+      <div>
+        <span class="heading-badge">
+          <span class="badge-dot"></span>
+          SHOP ORDERS
+        </span>
+
+        <h1>
+          Manage <span>Orders</span>
+        </h1>
+
+        <p>
+          View and process customer grocery orders.
+        </p>
+      </div>
+
+      <a
+        routerLink="/admin/dashboard"
+        class="back-button">
+
+        <span>←</span>
+        Dashboard
+
+      </a>
+
+    </section>
+
+
+    <!-- Filters -->
+    <section class="orders-toolbar">
+
+      <div class="filter-tabs">
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'ALL'"
+          (click)="setFilter('ALL')">
+
+          All
+
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'RECEIVED'"
+          (click)="setFilter('RECEIVED')">
+
+          New
+
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'PREPARING'"
+          (click)="setFilter('PREPARING')">
+
+          Preparing
+
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'READY'"
+          (click)="setFilter('READY')">
+
+          Ready
+
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'BILLED'"
+          (click)="setFilter('BILLED')">
+
+          Billed
+
+        </button>
+
+
+        <button
+          type="button"
+          [class.active]="selectedFilter === 'COMPLETED'"
+          (click)="setFilter('COMPLETED')">
+
+          Completed
+
+        </button>
+
+      </div>
+
+
+      <!-- Search -->
+      <div class="search-box">
+
+        <span class="search-icon">
+          ⌕
+        </span>
+
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search order or customer..."
+          aria-label="Search orders">
+
+        @if (searchText) {
+
+          <button
+            type="button"
+            class="clear-search"
+            (click)="clearSearch()">
+
+            ×
+
+          </button>
+
+        }
+
+      </div>
+
+    </section>
+
+
+    <!-- Results Header -->
+    <div class="results-header">
+
+      <div>
+
+        <span class="results-label">
+          ORDERS
+        </span>
+
+        <strong>
+          {{ filteredOrders.length }}
+        </strong>
+
+        <span>
+          {{ filteredOrders.length === 1 ? 'order' : 'orders' }}
+        </span>
+
+      </div>
+
+      <span class="current-filter">
+        {{ selectedFilter === 'ALL'
+          ? 'All orders'
+          : getStatusLabel(selectedFilter) }}
+      </span>
+
+    </div>
+
+
+    <!-- Empty State -->
+    @if (filteredOrders.length === 0) {
+
+      <section class="empty-state">
+
+        <div class="empty-icon">
+          📦
+        </div>
+
+        <h2>
+          No orders found
+        </h2>
+
+        @if (searchText) {
+
+          <p>
+            No orders match
+            <strong>"{{ searchText }}"</strong>.
+          </p>
+
+          <button
+            type="button"
+            class="empty-button"
+            (click)="clearSearch()">
+
+            Clear Search
+
+          </button>
+
+        } @else if (selectedFilter !== 'ALL') {
+
+          <p>
+            There are no
+            {{ getStatusLabel(selectedFilter).toLowerCase() }}
+            orders right now.
+          </p>
+
+          <button
+            type="button"
+            class="empty-button"
+            (click)="setFilter('ALL')">
+
+            View All Orders
+
+          </button>
+
+        } @else {
+
+          <p>
+            New customer orders will appear here.
+          </p>
+
+          <a
+            routerLink="/admin/dashboard"
+            class="empty-button">
+
+            Back to Dashboard
+
+          </a>
+
+        }
+
+      </section>
+
+    }
+
+
+    <!-- Orders List -->
+    @if (filteredOrders.length > 0) {
+
+      <section class="orders-list">
+
+        @for (
+          order of filteredOrders;
+          track order.id
+        ) {
+
+          <article class="order-card">
+
+            <!-- Order Header -->
+            <div class="order-header">
+
+              <div class="order-number-section">
+
+                <div class="order-icon">
+                  📦
+                </div>
+
+                <div>
+
+                  <span class="order-label">
+                    ORDER
+                  </span>
+
+                  <h2>
+                    {{ order.orderNumber }}
+                  </h2>
+
+                </div>
+
+              </div>
+
+
+              <span
+                class="status-badge"
+                [class]="getStatusClass(order.status)">
+
+                <span class="status-dot"></span>
+
+                {{ getStatusLabel(order.status) }}
+
+              </span>
+
+            </div>
+
+
+            <!-- Order Information -->
+            <div class="order-information">
+
+              <div class="customer-info">
+
+                <div class="customer-avatar">
+                  {{
+                    order.customerName
+                      .trim()
+                      .charAt(0)
+                      .toUpperCase()
+                  }}
+                </div>
+
+                <div>
+
+                  <span>
+                    Customer
+                  </span>
+
+                  <strong>
+                    {{ order.customerName }}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <div class="info-item">
+
+                <span>
+                  Order Type
+                </span>
+
+                <strong>
+                  {{
+                    getOrderTypeLabel(order.orderType)
+                  }}
+                </strong>
+
+              </div>
+
+
+              <div class="info-item">
+
+                <span>
+                  Items
+                </span>
+
+                <strong>
+                  {{ order.itemCount }}
+                  {{
+                    order.itemCount === 1
+                      ? 'item'
+                      : 'items'
+                  }}
+                </strong>
+
+              </div>
+
+
+              <div class="info-item">
+
+                <span>
+                  Date
+                </span>
+
+                <strong>
+                  {{ order.createdAt }}
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <!-- Order Footer -->
+            <div class="order-footer">
+
+              <div class="order-type">
+
+                @if (
+                  order.orderType === 'PHOTO'
+                ) {
+
+                  <span class="type-icon photo-type">
+                    📷
+                  </span>
+
+                  <span>
+                    Customer uploaded a grocery list
+                  </span>
+
+                } @else {
+
+                  <span class="type-icon manual-type">
+                    ✍️
+                  </span>
+
+                  <span>
+                    Items added manually
+                  </span>
+
+                }
+
+              </div>
+
+
+              <a
+                [routerLink]="[
+                  '/admin/orders',
+                  order.id
+                ]"
+                class="open-order-button">
+
+                Open Order
+                <span>→</span>
+
+              </a>
+
+            </div>
+
+          </article>
+
+        }
+
+      </section>
+
+    }
+
+
+    <!-- Bottom Note -->
+    <div class="orders-note">
+
+      <span class="note-icon">
+        💡
+      </span>
+
+      <p>
+        Open an order to view the customer's items,
+        check the grocery photo, and start preparing it.
+      </p>
+
+    </div>
+
+  </main>
+
+</div>

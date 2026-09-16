@@ -1,0 +1,300 @@
+<div class="customers-page">
+
+  <!-- Header -->
+  <section class="page-header">
+
+    <div>
+      <span class="page-label">
+        CUSTOMER MANAGEMENT
+      </span>
+
+      <h1>
+        Customers
+      </h1>
+
+      <p>
+        View customers and their order history
+      </p>
+    </div>
+
+  </section>
+
+
+  <!-- Search -->
+  <section class="search-card">
+
+    <div class="search-wrapper">
+
+      <span class="search-icon">
+        🔍
+      </span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search by name, mobile number or email">
+
+      @if (searchText) {
+
+        <button
+          type="button"
+          class="clear-search"
+          (click)="clearSearch()">
+          ×
+        </button>
+
+      }
+
+    </div>
+
+  </section>
+
+
+  <!-- Error -->
+  @if (errorMessage) {
+
+    <div class="error-message">
+
+      <span>
+        ⚠️
+      </span>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+      <button
+        type="button"
+        (click)="retry()">
+        Retry
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- Loading -->
+  @if (isLoading) {
+
+    <section class="loading-card">
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading customers...
+      </p>
+
+    </section>
+
+  }
+
+
+  <!-- Customer List -->
+  @if (!isLoading && filteredCustomers.length > 0) {
+
+    <section class="customers-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            Customer List
+          </h2>
+
+          <p>
+            {{ filteredCustomers.length }} customer(s)
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <div class="customers-table-wrapper">
+
+        <table class="customers-table">
+
+          <thead>
+
+            <tr>
+
+              <th>
+                CUSTOMER
+              </th>
+
+              <th>
+                MOBILE
+              </th>
+
+              <th>
+                EMAIL
+              </th>
+
+              <th>
+                ORDERS
+              </th>
+
+              <th>
+                OUTSTANDING
+              </th>
+
+              <th>
+                ACTION
+              </th>
+
+            </tr>
+
+          </thead>
+
+
+          <tbody>
+
+            @for (
+              customer of filteredCustomers;
+              track customer.id
+            ) {
+
+              <tr>
+
+                <td>
+
+                  <div class="customer-cell">
+
+                    <div class="customer-avatar">
+
+                      {{
+                        customer.name
+                          .trim()
+                          .charAt(0)
+                          .toUpperCase()
+                      }}
+
+                    </div>
+
+                    <strong>
+                      {{ customer.name }}
+                    </strong>
+
+                  </div>
+
+                </td>
+
+
+                <td>
+                  {{ customer.mobileNumber }}
+                </td>
+
+
+                <td>
+                  {{ customer.email }}
+                </td>
+
+
+                <td>
+
+                  <span class="order-count">
+                    {{ customer.totalOrders }}
+                  </span>
+
+                </td>
+
+
+                <td>
+
+                  @if (customer.outstandingAmount > 0) {
+
+                    <strong class="outstanding">
+                      ₹{{ customer.outstandingAmount | number:'1.2-2' }}
+                    </strong>
+
+                  } @else {
+
+                    <span class="no-outstanding">
+                      ₹0.00
+                    </span>
+
+                  }
+
+                </td>
+
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="view-button"
+                    (click)="openCustomer(customer)">
+
+                    View
+
+                    <span>
+                      →
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  }
+
+
+  <!-- Empty State -->
+  @if (!isLoading && filteredCustomers.length === 0) {
+
+    <section class="empty-card">
+
+      <div class="empty-icon">
+        👥
+      </div>
+
+      @if (searchText.trim()) {
+
+        <h2>
+          No Customers Found
+        </h2>
+
+        <p>
+          No customer matches
+          "{{ searchText }}".
+        </p>
+
+        <button
+          type="button"
+          class="clear-button"
+          (click)="clearSearch()">
+
+          Clear Search
+
+        </button>
+
+      } @else {
+
+        <h2>
+          No Customers Yet
+        </h2>
+
+        <p>
+          Customers will appear here after they register and place orders.
+        </p>
+
+      }
+
+    </section>
+
+  }
+
+</div>
