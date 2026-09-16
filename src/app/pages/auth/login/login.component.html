@@ -1,0 +1,283 @@
+<div class="login-page">
+
+  <!-- ================= LEFT PANEL ================= -->
+  <div class="brand-panel">
+
+    <div class="brand-panel-inner">
+
+      <!-- Logo -->
+      <div class="brand-logo">
+        <div class="brand-logo-icon">🛒</div>
+        <span class="brand-logo-text">My Local Shop</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="brand-headline">
+        Fresh picks,<br />
+        <span class="highlight">delivered quick.</span>
+      </h1>
+
+      <p class="brand-tagline">Order from your neighborhood store</p>
+
+      <p class="brand-description">
+        Everyday essentials, groceries, and local favorites — ordered
+        online and on your doorstep in no time.
+      </p>
+
+      <!-- Highlight badge -->
+      <!-- <div class="highlight-badge">
+        <div class="highlight-badge-icon">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 3 7v6c0 5 4 8.5 9 9 5-.5 9-4 9-9V7l-9-5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="highlight-badge-text">
+          <strong>Trusted by your neighbors</strong>
+          <span>Local orders, delivered with care</span>
+        </div>
+        <div class="highlight-badge-check">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M20 6 9 17l-5-5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div> -->
+
+      <!-- Feature list -->
+      <div class="feature-list">
+
+        <div class="feature-item" style="--d: 0.05s">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span>Verified Local Sellers</span>
+        </div>
+
+        <div class="feature-item" style="--d: 0.15s">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <span>Same-Day Delivery</span>
+        </div>
+
+        <div class="feature-item" style="--d: 0.25s">
+          <div class="feature-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M16 3v8M8 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <span>Easy Order Tracking</span>
+        </div>
+
+      </div>
+
+      <!-- Live orders ticker -->
+      <div class="orders-ticker">
+        <span class="pulse-dot"></span>
+        <span><strong>128</strong> orders placed today</span>
+      </div>
+
+      <!-- Floating grocery bubble cluster -->
+      <div class="grocery-orbit">
+
+        <div class="bubble bubble-1">
+          <span>🍎</span>
+        </div>
+
+        <div class="bubble bubble-2">
+          <span>🥦</span>
+        </div>
+
+        <div class="bubble bubble-3">
+          <span>🥛</span>
+        </div>
+
+        <div class="bubble bubble-4">
+          <span>🍞</span>
+        </div>
+
+        <div class="bubble bubble-5">
+          <span>🧃</span>
+        </div>
+
+        <div class="bubble bubble-6">
+          <span>🧀</span>
+        </div>
+
+        <div class="orbit-center">
+          <span>🛍️</span>
+        </div>
+
+      </div>
+
+      <!-- Scrolling category marquee -->
+      <div class="category-marquee">
+        <div class="marquee-track">
+          <span class="marquee-chip">🥦 Vegetables</span>
+          <span class="marquee-chip">🍞 Bakery</span>
+          <span class="marquee-chip">🥛 Dairy</span>
+          <span class="marquee-chip">🧃 Beverages</span>
+          <span class="marquee-chip">🍫 Snacks</span>
+          <span class="marquee-chip">🧴 Household</span>
+          <span class="marquee-chip">🥦 Vegetables</span>
+          <span class="marquee-chip">🍞 Bakery</span>
+          <span class="marquee-chip">🥛 Dairy</span>
+          <span class="marquee-chip">🧃 Beverages</span>
+          <span class="marquee-chip">🍫 Snacks</span>
+          <span class="marquee-chip">🧴 Household</span>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= RIGHT PANEL (FORM) ================= -->
+  <div class="form-panel">
+
+    <div class="form-panel-inner">
+
+      <div class="secure-tag">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <span>SECURE LOGIN</span>
+      </div>
+
+      <h2>Welcome back</h2>
+      <p class="form-subtitle">Login to continue shopping</p>
+
+      <form class="login-form" (ngSubmit)="login()">
+
+        <!-- Login ID -->
+        <div class="form-group">
+
+          <label for="loginId">Mobile Number or Email</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <input
+              id="loginId"
+              name="loginId"
+              type="text"
+              placeholder="Enter mobile number or email"
+              [(ngModel)]="loginId"
+              autocomplete="username"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+
+          <label for="password">Password</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Enter your password"
+              [(ngModel)]="password"
+              autocomplete="current-password"
+            />
+
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              @if (showPassword) {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.6 18.6 0 0 1 4.22-5.44M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+              }
+            </button>
+
+          </div>
+
+        </div>
+
+        <!-- Remember + Forgot -->
+        <div class="form-meta-row">
+
+          <label class="remember-check">
+            <input type="checkbox" name="rememberMe" [(ngModel)]="rememberMe" />
+            <span class="checkbox-box"></span>
+            <span>Remember me</span>
+          </label>
+
+          <a class="forgot-link" href="javascript:void(0)">Forgot Password?</a>
+
+        </div>
+
+        <!-- Error Message -->
+        @if (errorMessage) {
+
+          <div class="error-message">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+
+        }
+
+        <!-- Login Button -->
+        <button
+          type="submit"
+          class="login-button"
+          [disabled]="isLoading"
+        >
+
+          @if (isLoading) {
+            <span class="spinner"></span>
+            <span>Signing in...</span>
+          } @else {
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Sign In</span>
+          }
+
+        </button>
+
+      </form>
+
+      <!-- Register -->
+      <div class="register-section">
+        <span>Don't have an account?</span>
+        <a routerLink="/register">Create an account →</a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

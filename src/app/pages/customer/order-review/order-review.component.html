@@ -1,0 +1,684 @@
+<div class="review-page">
+
+  <!-- =========================================
+       ANIMATED BACKGROUND
+  ========================================== -->
+
+  <div class="page-background">
+
+    <div class="background-grid"></div>
+
+    <div class="ambient-glow glow-blue"></div>
+    <div class="ambient-glow glow-green"></div>
+    <div class="ambient-glow glow-small"></div>
+
+    <span class="floating-dot dot-one"></span>
+    <span class="floating-dot dot-two"></span>
+    <span class="floating-dot dot-three"></span>
+    <span class="floating-dot dot-four"></span>
+
+    <span class="floating-grocery grocery-one">🥬</span>
+    <span class="floating-grocery grocery-two">🍎</span>
+    <span class="floating-grocery grocery-three">🥛</span>
+    <span class="floating-grocery grocery-four">🍞</span>
+
+  </div>
+
+
+  <!-- =========================================
+       MAIN
+  ========================================== -->
+
+  <main class="review-container">
+
+
+    <!-- =====================================
+         PAGE HEADING
+    ====================================== -->
+
+    <section class="page-heading">
+
+      <div class="heading-left">
+
+        <div class="heading-badge">
+          <span class="badge-dot"></span>
+          REVIEW ORDER
+        </div>
+
+        <h1>
+          Check your
+          <span>order</span>
+        </h1>
+
+        <p>
+          Review the details before sending your order to the shop.
+        </p>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="back-button"
+        [disabled]="isPlacingOrder"
+        (click)="editOrder()">
+
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M19 12H5M12 19l-7-7 7-7"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+        </svg>
+
+        Edit Order
+
+      </button>
+
+    </section>
+
+
+    <!-- =====================================
+         ORDER DETAILS
+    ====================================== -->
+
+    <section class="review-card order-card">
+
+      <div class="card-header">
+
+        <div class="card-title">
+
+          <div class="card-icon blue">
+
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 3h12l3 4v13H3V7l3-4Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+              <path
+                d="M3 7h18"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"/>
+
+              <path
+                d="M9 11h6"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"/>
+            </svg>
+
+          </div>
+
+          <div>
+
+            <span class="section-label">
+              ORDER SUMMARY
+            </span>
+
+            <h2>Order Details</h2>
+
+            <p>
+              {{
+                draft.orderType === 'manual'
+                  ? 'Items added manually'
+                  : 'Grocery list uploaded as a photo'
+              }}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <span class="order-type-badge">
+
+          @if (draft.orderType === 'manual') {
+
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 20h4L19 9a2.12 2.12 0 0 0-3-3L5 17v3Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+            </svg>
+
+            Manual Order
+
+          } @else {
+
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+
+              <circle
+                cx="12"
+                cy="13"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.8"/>
+            </svg>
+
+            Photo Order
+
+          }
+
+        </span>
+
+      </div>
+
+
+      <!-- MANUAL ITEMS -->
+
+      @if (draft.orderType === 'manual') {
+
+        <div class="items-section">
+
+          <div class="items-header">
+
+            <span>ITEM</span>
+
+            <span>QUANTITY</span>
+
+          </div>
+
+
+          <div class="items-list">
+
+            @for (item of draft.items; track $index) {
+
+              <div
+                class="item-row"
+                [style.--i]="$index">
+
+                <div class="item-left">
+
+                  <div class="item-number">
+                    {{ $index + 1 }}
+                  </div>
+
+                  <div class="item-info">
+
+                    <strong>
+                      {{ item.itemName }}
+                    </strong>
+
+                    <span>
+                      Grocery item
+                    </span>
+
+                  </div>
+
+                </div>
+
+
+                <div class="item-quantity">
+
+                  <strong>
+                    {{ item.quantity }}
+                  </strong>
+
+                  <span>
+                    {{ item.unit }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        </div>
+
+      }
+
+
+      <!-- PHOTO ORDER -->
+
+      @if (draft.orderType === 'photo') {
+
+        <div class="photo-section">
+
+          @if (draft.photoPreview) {
+
+            <div class="photo-preview">
+
+              <img
+                [src]="draft.photoPreview"
+                alt="Uploaded grocery list">
+
+              <div class="photo-overlay">
+
+                <span class="photo-check">
+                  ✓
+                </span>
+
+                <span>
+                  Grocery list photo
+                </span>
+
+              </div>
+
+            </div>
+
+          }
+
+
+          @if (draft.photoNote) {
+
+            <div class="photo-note">
+
+              <div class="note-icon">
+
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+                </svg>
+
+              </div>
+
+              <div>
+
+                <span>NOTE FOR SHOPKEEPER</span>
+
+                <p>
+                  {{ draft.photoNote }}
+                </p>
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- =====================================
+         CUSTOMER INFORMATION
+    ====================================== -->
+
+    @if (customer) {
+
+      <section class="review-card customer-card">
+
+        <div class="card-header">
+
+          <div class="card-title">
+
+            <div class="card-icon green">
+
+              <svg viewBox="0 0 24 24" fill="none">
+                <circle
+                  cx="12"
+                  cy="8"
+                  r="4"
+                  stroke="currentColor"
+                  stroke-width="1.8"/>
+
+                <path
+                  d="M4 21a8 8 0 0 1 16 0"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"/>
+              </svg>
+
+            </div>
+
+            <div>
+
+              <span class="section-label">
+                ACCOUNT
+              </span>
+
+              <h2>Customer Information</h2>
+
+              <p>
+                Your registered account details
+              </p>
+
+            </div>
+
+          </div>
+
+          <span class="verified-badge">
+            <span></span>
+            Verified
+          </span>
+
+        </div>
+
+
+        <div class="customer-grid">
+
+          <div class="customer-item">
+
+            <span class="customer-label">
+              NAME
+            </span>
+
+            <strong>
+              {{ customer.name }}
+            </strong>
+
+          </div>
+
+
+          <div class="customer-item">
+
+            <span class="customer-label">
+              MOBILE
+            </span>
+
+            <strong>
+              {{ customer.mobile }}
+            </strong>
+
+          </div>
+
+
+          <div class="customer-item">
+
+            <span class="customer-label">
+              EMAIL
+            </span>
+
+            <strong>
+              {{ customer.email }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- =====================================
+         PRICE INFORMATION
+    ====================================== -->
+
+    <section class="price-info">
+
+      <div class="price-icon">
+
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+        </svg>
+
+      </div>
+
+
+      <div>
+
+        <span class="price-label">
+          PRICE NOT REQUIRED
+        </span>
+
+        <h3>
+          The shopkeeper will add the price
+        </h3>
+
+        <p>
+          Your order will be checked and packed first.
+          The shopkeeper will then add the current prices
+          and generate your final bill.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================
+         WHAT HAPPENS NEXT
+    ====================================== -->
+
+    <section class="process-card">
+
+      <div class="process-header">
+
+        <div>
+
+          <span class="section-label">
+            ORDER PROCESS
+          </span>
+
+          <h2>
+            What happens next?
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="process-steps">
+
+
+        <div class="process-step">
+
+          <div class="step-icon active">
+            1
+          </div>
+
+          <div>
+
+            <strong>
+              Place order
+            </strong>
+
+            <span>
+              Your order is sent to the shopkeeper.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="process-line"></div>
+
+
+        <div class="process-step">
+
+          <div class="step-icon">
+            2
+          </div>
+
+          <div>
+
+            <strong>
+              Order is packed
+            </strong>
+
+            <span>
+              Your grocery items are prepared.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="process-line"></div>
+
+
+        <div class="process-step">
+
+          <div class="step-icon">
+            3
+          </div>
+
+          <div>
+
+            <strong>
+              Bill is prepared
+            </strong>
+
+            <span>
+              Prices are added and the bill is generated.
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="process-line"></div>
+
+
+        <div class="process-step">
+
+          <div class="step-icon">
+            4
+          </div>
+
+          <div>
+
+            <strong>
+              Pick up from shop
+            </strong>
+
+            <span>
+              Come to the shop and collect your order.
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================
+         ERROR
+    ====================================== -->
+
+    @if (errorMessage) {
+
+      <div class="error-box">
+
+        <div class="error-icon">
+
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="1.8"/>
+
+            <path
+              d="M12 8v5M12 16h.01"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"/>
+          </svg>
+
+        </div>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+
+      </div>
+
+    }
+
+
+    <!-- =====================================
+         ACTIONS
+    ====================================== -->
+
+    <section class="review-actions">
+
+      <button
+        type="button"
+        class="secondary-button"
+        [disabled]="isPlacingOrder"
+        (click)="editOrder()">
+
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M19 12H5M12 19l-7-7 7-7"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+        </svg>
+
+        Edit Order
+
+      </button>
+
+
+      <button
+        type="button"
+        class="primary-button"
+        [disabled]="isPlacingOrder"
+        (click)="placeOrder()">
+
+        @if (isPlacingOrder) {
+
+          <span class="button-spinner"></span>
+
+          Placing Order...
+
+        } @else {
+
+          <span>
+            Place Order
+          </span>
+
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+          </svg>
+
+        }
+
+      </button>
+
+    </section>
+
+
+    <p class="secure-note">
+      🔒 Your order will be securely sent to the shopkeeper.
+    </p>
+
+  </main>
+
+</div>

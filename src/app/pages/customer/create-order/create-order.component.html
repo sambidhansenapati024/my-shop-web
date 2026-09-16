@@ -1,0 +1,781 @@
+<div class="create-order-page">
+
+  <!-- =========================================
+       ANIMATED BACKGROUND
+  ========================================== -->
+
+  <div class="page-background">
+
+    <div class="background-grid"></div>
+
+    <div class="ambient-glow glow-blue"></div>
+    <div class="ambient-glow glow-green"></div>
+    <div class="ambient-glow glow-small"></div>
+
+    <span class="floating-dot dot-one"></span>
+    <span class="floating-dot dot-two"></span>
+    <span class="floating-dot dot-three"></span>
+    <span class="floating-dot dot-four"></span>
+
+    <span class="floating-grocery grocery-one">🥬</span>
+    <span class="floating-grocery grocery-two">🍎</span>
+    <span class="floating-grocery grocery-three">🥛</span>
+    <span class="floating-grocery grocery-four">🍞</span>
+
+  </div>
+
+
+  <!-- =========================================
+       MAIN CONTENT
+  ========================================== -->
+
+  <main class="main-content">
+
+    <!-- =======================================
+         PAGE HEADING
+    ======================================== -->
+
+    <section class="page-heading">
+
+      <div class="heading-badge">
+        <span class="badge-dot"></span>
+        NEW ORDER
+      </div>
+
+      <h1>
+        What do you need
+        <span>today?</span>
+      </h1>
+
+      <p>
+        Send your grocery list and we'll prepare it for you.
+      </p>
+
+    </section>
+
+
+    <!-- =======================================
+         ORDER METHOD
+    ======================================== -->
+
+    <section class="order-method">
+
+      <div class="section-heading">
+
+        <div>
+          <span class="section-label">
+            STEP 01
+          </span>
+
+          <h2>
+            Choose how to order
+          </h2>
+
+          <p>
+            Select the easiest way to send your grocery list.
+          </p>
+        </div>
+
+      </div>
+
+
+      <div class="method-options">
+
+        <!-- MANUAL -->
+
+        <button
+          type="button"
+          class="method-card manual"
+          [class.selected]="orderMode === 'MANUAL'"
+          (click)="selectOrderMode('MANUAL')">
+
+          <div class="method-icon">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M12 20h9"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round" />
+
+              <path
+                d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+            </svg>
+
+          </div>
+
+
+          <div class="method-content">
+
+            <span class="method-number">
+              01
+            </span>
+
+            <h3>
+              Enter items manually
+            </h3>
+
+            <p>
+              Add grocery items, quantity and unit yourself.
+            </p>
+
+          </div>
+
+
+          <div
+            class="selection-indicator"
+            [class.active]="orderMode === 'MANUAL'">
+
+            <svg
+              *ngIf="orderMode === 'MANUAL'"
+              viewBox="0 0 24 24"
+              fill="none">
+
+              <path
+                d="m5 12 5 5L20 7"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+            </svg>
+
+          </div>
+
+        </button>
+
+
+        <!-- PHOTO -->
+
+        <button
+          type="button"
+          class="method-card photo"
+          [class.selected]="orderMode === 'PHOTO'"
+          (click)="selectOrderMode('PHOTO')">
+
+          <div class="method-icon">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+              <circle
+                cx="12"
+                cy="13"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.8" />
+
+            </svg>
+
+          </div>
+
+
+          <div class="method-content">
+
+            <span class="method-number">
+              02
+            </span>
+
+            <h3>
+              Upload a grocery list
+            </h3>
+
+            <p>
+              Take a photo of your handwritten grocery list.
+            </p>
+
+          </div>
+
+
+          <div
+            class="selection-indicator"
+            [class.active]="orderMode === 'PHOTO'">
+
+            <svg
+              *ngIf="orderMode === 'PHOTO'"
+              viewBox="0 0 24 24"
+              fill="none">
+
+              <path
+                d="m5 12 5 5L20 7"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+            </svg>
+
+          </div>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================
+         MANUAL ORDER
+    ======================================== -->
+
+    <section
+      class="order-panel"
+      *ngIf="orderMode === 'MANUAL'">
+
+      <!-- PANEL HEADER -->
+
+      <div class="panel-header">
+
+        <div class="panel-title">
+
+          <div class="panel-icon blue">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linejoin="round" />
+
+              <path
+                d="M3 6h18"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round" />
+
+            </svg>
+
+          </div>
+
+          <div>
+
+            <span class="panel-label">
+              GROCERY LIST
+            </span>
+
+            <h2>
+              Add your items
+            </h2>
+
+            <p>
+              Tell us what you need and how much.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="item-count">
+
+          <strong>
+            {{ validItems.length }}
+          </strong>
+
+          <span>
+            {{ validItems.length === 1 ? 'item' : 'items' }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ITEMS -->
+
+      <div class="items-container">
+
+        <div
+          class="item-row"
+          *ngFor="let item of orderItems; let i = index">
+
+          <div class="item-number">
+            {{ i + 1 }}
+          </div>
+
+
+          <!-- ITEM -->
+
+          <div class="field item-name">
+
+            <label>
+              Item name
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="item.itemName"
+              placeholder="Example: Rice"
+              autocomplete="off" />
+
+          </div>
+
+
+          <!-- QUANTITY -->
+
+          <div class="field quantity-field">
+
+            <label>
+              Quantity
+            </label>
+
+            <input
+              type="number"
+              [(ngModel)]="item.quantity"
+              min="0"
+              step="0.01"
+              placeholder="0" />
+
+          </div>
+
+
+          <!-- UNIT -->
+
+          <div class="field unit-field">
+
+            <label>
+              Unit
+            </label>
+
+            <select [(ngModel)]="item.unit">
+
+              <option
+                *ngFor="let unit of units"
+                [value]="unit">
+
+                {{ unit }}
+
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <!-- REMOVE -->
+
+          <button
+            type="button"
+            class="remove-button"
+            (click)="removeItem(i)"
+            [disabled]="orderItems.length === 1"
+            title="Remove item">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M18 6 6 18M6 6l12 12"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round" />
+
+            </svg>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- ADD ITEM -->
+
+      <button
+        type="button"
+        class="add-item-button"
+        (click)="addItem()">
+
+        <span class="add-icon">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round" />
+
+          </svg>
+
+        </span>
+
+        <span>
+          Add another item
+        </span>
+
+      </button>
+
+
+      <!-- INFORMATION -->
+
+      <div class="info-box">
+
+        <div class="info-icon">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="1.8" />
+
+            <path
+              d="M12 16v-5M12 8h.01"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round" />
+
+          </svg>
+
+        </div>
+
+        <div>
+
+          <strong>
+            No price needed
+          </strong>
+
+          <p>
+            Our shopkeeper will check the items and calculate the
+            price after preparing your order.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- FOOTER -->
+
+      <div class="panel-footer">
+
+        <button
+          type="button"
+          class="cancel-button"
+          routerLink="/app/home">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          type="button"
+          class="continue-button"
+          (click)="continueOrder()">
+
+          <span>
+            Continue
+          </span>
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round" />
+
+          </svg>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================
+         PHOTO ORDER
+    ======================================== -->
+
+    <section
+      class="photo-panel"
+      *ngIf="orderMode === 'PHOTO'">
+
+
+      <!-- BEFORE UPLOAD -->
+
+      <ng-container *ngIf="!photoPreview">
+
+        <div class="upload-area">
+
+          <div class="upload-icon">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+              <circle
+                cx="12"
+                cy="13"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.7" />
+
+            </svg>
+
+          </div>
+
+
+          <div class="upload-content">
+
+            <span class="panel-label green-label">
+              PHOTO ORDER
+            </span>
+
+            <h2>
+              Upload your grocery list
+            </h2>
+
+            <p>
+              Take a clear photo of your handwritten grocery list
+              and upload it here.
+            </p>
+
+          </div>
+
+
+          <label
+            class="upload-button"
+            for="photoInput">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+              <circle
+                cx="12"
+                cy="13"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.8" />
+
+            </svg>
+
+            Upload Photo
+
+          </label>
+
+        </div>
+
+
+        <!-- PHOTO TIP -->
+
+        <div class="photo-tip">
+
+          <div class="tip-icon">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.7.5 1 1.3 1 2.1V17h6v-2.2c0-.8.3-1.6 1-2.1A7 7 0 0 0 12 2Z"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round" />
+
+            </svg>
+
+          </div>
+
+          <div>
+
+            <strong>
+              Make the list easy to read
+            </strong>
+
+            <p>
+              Keep all item names and quantities clearly visible
+              in the photo.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <input
+          id="photoInput"
+          type="file"
+          accept="image/*"
+          capture="environment"
+          hidden
+          (change)="onPhotoSelected($event)" />
+
+      </ng-container>
+
+
+      <!-- AFTER UPLOAD -->
+
+      <ng-container *ngIf="photoPreview">
+
+        <div class="photo-preview-section">
+
+          <!-- HEADER -->
+
+          <div class="preview-header">
+
+            <div>
+
+              <span class="panel-label green-label">
+                PHOTO ORDER
+              </span>
+
+              <h2>
+                Check your grocery list
+              </h2>
+
+              <p>
+                Make sure everything is clearly visible.
+              </p>
+
+            </div>
+
+
+            <span class="photo-status">
+
+              <svg viewBox="0 0 24 24" fill="none">
+
+                <path
+                  d="m5 12 5 5L20 7"
+                  stroke="currentColor"
+                  stroke-width="2.4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+
+              </svg>
+
+              Photo selected
+
+            </span>
+
+          </div>
+
+
+          <!-- IMAGE -->
+
+          <div class="photo-preview">
+
+            <img
+              [src]="photoPreview"
+              alt="Grocery list preview" />
+
+          </div>
+
+
+          <!-- NOTE -->
+
+          <div class="field photo-note">
+
+            <label>
+
+              Note for shopkeeper
+
+              <span>
+                Optional
+              </span>
+
+            </label>
+
+            <textarea
+              [(ngModel)]="photoNote"
+              rows="3"
+              placeholder="Example: Please give the usual brand if available.">
+            </textarea>
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div class="photo-actions">
+
+            <button
+              type="button"
+              class="remove-photo-button"
+              (click)="removePhoto()">
+
+              Remove
+
+            </button>
+
+
+            <button
+              type="button"
+              class="replace-photo-button"
+              (click)="replacePhoto()">
+
+              Replace Photo
+
+            </button>
+
+
+            <button
+              type="button"
+              class="photo-continue-button"
+              (click)="continueWithPhoto()">
+
+              <span>
+                Continue
+              </span>
+
+              <svg viewBox="0 0 24 24" fill="none">
+
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round" />
+
+              </svg>
+
+            </button>
+
+          </div>
+
+
+          <input
+            id="photoInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            hidden
+            (change)="onPhotoSelected($event)" />
+
+        </div>
+
+      </ng-container>
+
+    </section>
+
+  </main>
+
+</div>

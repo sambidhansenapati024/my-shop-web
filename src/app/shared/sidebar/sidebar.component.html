@@ -1,0 +1,147 @@
+<aside
+  class="sidebar"
+  [class.open]="isOpen">
+
+  <!-- ================================
+       SIDEBAR HEADER
+  ================================= -->
+
+  <div class="sidebar-header">
+
+    <div class="sidebar-role">
+
+      <span class="role-icon">
+        {{ isAdmin ? '👨‍💼' : '👤' }}
+      </span>
+
+      <div>
+
+        <strong>
+          {{ isAdmin ? 'Shopkeeper' : 'Customer' }}
+        </strong>
+
+        <span>
+          {{ isAdmin ? 'Admin Panel' : 'My Account' }}
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================
+       NAVIGATION
+  ================================= -->
+
+  <nav class="sidebar-navigation">
+
+    <div class="navigation-label">
+      MENU
+    </div>
+
+    @for (
+      item of menuItems;
+      track item.route
+    ) {
+
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{
+          exact: item.route === '/app/home' ||
+                 item.route === '/admin/dashboard'
+        }"
+        class="navigation-item"
+        (click)="closeSidebar()">
+
+        <span class="navigation-icon">
+          {{ item.icon }}
+        </span>
+
+        <span class="navigation-text">
+          {{ item.label }}
+        </span>
+
+        <span class="navigation-arrow">
+          →
+        </span>
+
+      </a>
+
+    }
+
+  </nav>
+
+
+  <!-- ================================
+       SIDEBAR FOOTER
+  ================================= -->
+
+  <div class="sidebar-footer">
+
+    @if (user) {
+
+      <div class="sidebar-user">
+
+        <div class="sidebar-user-avatar">
+
+          {{
+            user.name
+              ?.trim()
+              ?.charAt(0)
+              ?.toUpperCase() || 'U'
+          }}
+
+        </div>
+
+        <div class="sidebar-user-info">
+
+          <strong>
+            {{ user.name }}
+          </strong>
+
+          <span>
+            {{ isAdmin ? 'Administrator' : 'Customer' }}
+          </span>
+
+        </div>
+
+      </div>
+
+    }
+
+
+    <button
+      type="button"
+      class="logout-button"
+      (click)="logout()">
+
+      <span>
+        ↪
+      </span>
+
+      <span>
+        Logout
+      </span>
+
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- =========================================
+     MOBILE OVERLAY
+========================================= -->
+
+@if (isOpen) {
+
+  <div
+    class="sidebar-overlay"
+    (click)="closeSidebar()">
+  </div>
+
+}

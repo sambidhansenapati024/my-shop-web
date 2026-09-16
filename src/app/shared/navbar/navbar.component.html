@@ -1,0 +1,85 @@
+<header class="navbar">
+
+  <!-- LEFT -->
+  <div class="navbar-left">
+
+    <button
+      type="button"
+      class="mobile-menu-button"
+      aria-label="Open menu">
+
+      ☰
+
+    </button>
+
+
+    <button
+      type="button"
+      class="brand"
+      (click)="goToHome()">
+
+      <div class="brand-icon">
+        🛒
+      </div>
+
+      <div class="brand-text">
+
+        <strong>
+          My Local Shop
+        </strong>
+
+        <span>
+          {{ isAdmin ? 'Shopkeeper' : 'Customer' }}
+        </span>
+
+      </div>
+
+    </button>
+
+  </div>
+
+
+  <!-- RIGHT -->
+  @if (user) {
+
+    <div class="navbar-right">
+
+      <div class="user-info">
+
+        <div class="user-avatar">
+          {{ userInitial }}
+        </div>
+
+        <div class="user-details">
+
+          <strong>
+            {{ user.name }}
+          </strong>
+
+          <span>
+            {{ isAdmin ? 'Administrator' : 'Customer' }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="button"
+        class="logout-button"
+        (click)="logout()">
+
+        <span>
+          ↪
+        </span>
+
+        Logout
+
+      </button>
+
+    </div>
+
+  }
+
+</header>

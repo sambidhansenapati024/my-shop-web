@@ -1,0 +1,384 @@
+<div class="account-page">
+
+  <!-- Animated Background -->
+  <div class="page-background">
+    <div class="background-grid"></div>
+
+    <div class="background-glow glow-blue"></div>
+    <div class="background-glow glow-green"></div>
+
+    <span class="background-dot dot-1"></span>
+    <span class="background-dot dot-2"></span>
+    <span class="background-dot dot-3"></span>
+    <span class="background-dot dot-4"></span>
+
+    <span class="floating-icon icon-1">🛒</span>
+    <span class="floating-icon icon-2">🥛</span>
+    <span class="floating-icon icon-3">🍚</span>
+    <span class="floating-icon icon-4">🥫</span>
+  </div>
+
+  <main class="account-content">
+
+    <!-- Page Heading -->
+    <section class="page-heading">
+      <div>
+        <span class="heading-badge">
+          <span class="badge-dot"></span>
+          ACCOUNT
+        </span>
+
+        <h1>
+          My <span>Account</span>
+        </h1>
+
+        <p>
+          Manage your profile and view your shopping activity.
+        </p>
+      </div>
+
+      <a
+        routerLink="/app/home"
+        class="home-button">
+        <span>←</span>
+        Home
+      </a>
+    </section>
+
+
+    <!-- Profile Card -->
+    @if (customer) {
+      <section class="profile-card">
+
+        <div class="profile-main">
+
+          <div class="profile-avatar">
+            {{ customerInitial }}
+
+            <span class="online-dot"></span>
+          </div>
+
+          <div class="profile-info">
+            <div class="profile-name-row">
+              <h2>{{ customer.name }}</h2>
+
+              <span class="customer-badge">
+                Customer
+              </span>
+            </div>
+
+            <p class="profile-subtitle">
+              My Local Shop customer
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="profile-details">
+
+          <div class="detail-item">
+            <div class="detail-icon">
+              ☎
+            </div>
+
+            <div>
+              <span>Mobile Number</span>
+              <strong>{{ customer.mobile }}</strong>
+            </div>
+          </div>
+
+
+          <div class="detail-item">
+            <div class="detail-icon">
+              ✉
+            </div>
+
+            <div>
+              <span>Email Address</span>
+              <strong>{{ customer.email }}</strong>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+    }
+
+
+    <!-- Order Summary -->
+    <section class="account-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-label">
+            ACTIVITY
+          </span>
+
+          <h2>Order Summary</h2>
+        </div>
+
+        <a
+          routerLink="/app/orders"
+          class="section-link">
+          View Orders
+          <span>→</span>
+        </a>
+      </div>
+
+
+      @if (isLoadingOrders) {
+
+        <div class="stats-grid">
+
+          <div class="stat-card skeleton-card">
+            <div class="skeleton-icon"></div>
+
+            <div class="skeleton-lines">
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="stat-card skeleton-card">
+            <div class="skeleton-icon"></div>
+
+            <div class="skeleton-lines">
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div class="stat-card skeleton-card">
+            <div class="skeleton-icon"></div>
+
+            <div class="skeleton-lines">
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+        </div>
+
+      } @else {
+
+        <div class="stats-grid">
+
+          <!-- Total -->
+          <div class="stat-card">
+
+            <div class="stat-icon blue-icon">
+              📦
+            </div>
+
+            <div class="stat-content">
+              <span>Total Orders</span>
+
+              <strong>
+                {{ getTotalOrders() }}
+              </strong>
+            </div>
+
+            <div class="stat-arrow">
+              →
+            </div>
+
+          </div>
+
+
+          <!-- Active -->
+          <div class="stat-card">
+
+            <div class="stat-icon green-icon">
+              🛍️
+            </div>
+
+            <div class="stat-content">
+              <span>Active Orders</span>
+
+              <strong>
+                {{ getPendingOrders() }}
+              </strong>
+            </div>
+
+            <div class="stat-arrow">
+              →
+            </div>
+
+          </div>
+
+
+          <!-- Completed -->
+          <div class="stat-card">
+
+            <div class="stat-icon purple-icon">
+              ✓
+            </div>
+
+            <div class="stat-content">
+              <span>Completed</span>
+
+              <strong>
+                {{ getCompletedOrders() }}
+              </strong>
+            </div>
+
+            <div class="stat-arrow">
+              →
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- Billing -->
+    <section class="account-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-label">
+            PAYMENTS
+          </span>
+
+          <h2>Billing & Payments</h2>
+        </div>
+      </div>
+
+
+      <div class="billing-card">
+
+        <div class="billing-icon">
+          ₹
+        </div>
+
+        <div class="billing-content">
+
+          <h3>Billing information</h3>
+
+          <p>
+            Your bills and payment history will appear here
+            once billing is available for your orders.
+          </p>
+
+        </div>
+
+        <span class="coming-soon">
+          Coming Soon
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- Error -->
+    @if (errorMessage) {
+
+      <div class="error-message">
+
+        <span class="error-icon">
+          !
+        </span>
+
+        <span>
+          {{ errorMessage }}
+        </span>
+
+      </div>
+
+    }
+
+
+    <!-- Account Actions -->
+    <section class="account-section">
+
+      <div class="section-heading">
+        <div>
+          <span class="section-label">
+            SETTINGS
+          </span>
+
+          <h2>Account Actions</h2>
+        </div>
+      </div>
+
+
+      <div class="actions-card">
+
+        <a
+          routerLink="/app/orders"
+          class="action-item">
+
+          <div class="action-icon blue-action">
+            📦
+          </div>
+
+          <div class="action-content">
+            <strong>My Orders</strong>
+
+            <span>
+              View your complete order history
+            </span>
+          </div>
+
+          <span class="action-arrow">
+            →
+          </span>
+
+        </a>
+
+
+        <div class="action-divider"></div>
+
+
+        <button
+          type="button"
+          class="action-item logout-action"
+          (click)="logout()">
+
+          <div class="action-icon red-action">
+            ↪
+          </div>
+
+          <div class="action-content">
+            <strong>Logout</strong>
+
+            <span>
+              Sign out of your account
+            </span>
+          </div>
+
+          <span class="action-arrow">
+            →
+          </span>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-navigation">
+
+      <a routerLink="/app/home">
+        <span>←</span>
+        Back to Home
+      </a>
+
+      <a routerLink="/app/create-order">
+        Create New Order
+        <span>→</span>
+      </a>
+
+    </div>
+
+  </main>
+
+</div>

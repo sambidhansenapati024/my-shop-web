@@ -1,0 +1,370 @@
+<div class="register-page">
+
+  <!-- ================= LEFT PANEL ================= -->
+  <div class="brand-panel">
+
+    <div class="brand-panel-inner">
+
+      <!-- Logo -->
+      <div class="brand-logo">
+        <div class="brand-logo-icon">🛒</div>
+        <span class="brand-logo-text">My Local Shop</span>
+      </div>
+
+      <!-- Headline -->
+      <h1 class="brand-headline">
+        Join the<br />
+        <span class="highlight">neighborhood store.</span>
+      </h1>
+
+      <p class="brand-tagline">Create your free account</p>
+
+      <p class="brand-description">
+        Sign up once and unlock quick reordering, live order tracking,
+        and offers picked just for regulars like you.
+      </p>
+
+      <!-- Animated perks checklist -->
+      <div class="perks-checklist">
+
+        <div class="perk-item" style="--d: 0.1s">
+          <span class="perk-check">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="perk-text">
+            <strong>One-tap Reordering</strong>
+            <span>Repeat your favorite basket instantly</span>
+          </div>
+        </div>
+
+        <div class="perk-item" style="--d: 0.35s">
+          <span class="perk-check">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="perk-text">
+            <strong>Real-time Order Tracking</strong>
+            <span>Know exactly when it's arriving</span>
+          </div>
+        </div>
+
+        <div class="perk-item" style="--d: 0.6s">
+          <span class="perk-check">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div class="perk-text">
+            <strong>Member-only Offers</strong>
+            <span>Save more on every visit</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stat strip -->
+      <div class="stat-strip">
+
+        <div class="stat-block">
+          <strong>500+</strong>
+          <span>Happy customers</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-block">
+          <strong>4.8★</strong>
+          <span>Average rating</span>
+        </div>
+
+        <div class="stat-divider"></div>
+
+        <div class="stat-block">
+          <strong>30 min</strong>
+          <span>Avg. delivery</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ================= RIGHT PANEL (FORM) ================= -->
+  <div class="form-panel">
+
+    <div class="form-panel-inner">
+
+      <div class="secure-tag">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M20 21a8 8 0 1 0-16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+        </svg>
+        <span>NEW ACCOUNT</span>
+      </div>
+
+      <h2>Create your account</h2>
+      <p class="form-subtitle">Start ordering from your local shop</p>
+
+      <form class="register-form" (ngSubmit)="register()">
+
+        <!-- Name -->
+        <div class="form-group">
+
+          <label for="name">Full Name</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M20 21a8 8 0 1 0-16 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8"/>
+            </svg>
+
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Enter your full name"
+              [(ngModel)]="name"
+              maxlength="100"
+              autocomplete="name"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- Mobile -->
+        <div class="form-group">
+
+          <label for="mobileNumber">Mobile Number</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M11 18h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+
+            <input
+              id="mobileNumber"
+              name="mobileNumber"
+              type="tel"
+              placeholder="Enter your mobile number"
+              [(ngModel)]="mobileNumber"
+              maxlength="15"
+              autocomplete="tel"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+
+          <label for="email">Email Address</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="m22 6-10 7L2 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="Enter your email address"
+              [(ngModel)]="email"
+              maxlength="150"
+              autocomplete="email"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+
+          <label for="password">Password</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              placeholder="Create a password"
+              [(ngModel)]="password"
+              maxlength="100"
+              autocomplete="new-password"
+            />
+
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+            >
+              @if (showPassword) {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.6 18.6 0 0 1 4.22-5.44M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+              }
+            </button>
+
+          </div>
+
+          <!-- Password strength meter -->
+          @if (password) {
+            <div class="strength-meter">
+              <div class="strength-bars">
+                <span class="strength-bar" [class.filled]="passwordStrength >= 1" [class]="'level-' + passwordStrength"></span>
+                <span class="strength-bar" [class.filled]="passwordStrength >= 2" [class]="'level-' + passwordStrength"></span>
+                <span class="strength-bar" [class.filled]="passwordStrength >= 3" [class]="'level-' + passwordStrength"></span>
+                <span class="strength-bar" [class.filled]="passwordStrength >= 4" [class]="'level-' + passwordStrength"></span>
+              </div>
+              <span class="strength-label" [class]="'level-' + passwordStrength">
+                {{ passwordStrengthLabel }}
+              </span>
+            </div>
+          } @else {
+            <small class="field-hint">Password must be at least 8 characters</small>
+          }
+
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+
+          <label for="confirmPassword">Confirm Password</label>
+
+          <div class="input-wrapper">
+
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none">
+              <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+
+            <input
+              id="confirmPassword"
+              name="confirmPassword"
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              placeholder="Re-enter your password"
+              [(ngModel)]="confirmPassword"
+              maxlength="100"
+              autocomplete="new-password"
+              [class.match-ok]="passwordsMatch"
+              [class.match-bad]="passwordsMismatch"
+            />
+
+            <button
+              type="button"
+              class="toggle-password"
+              [class.shifted]="passwordsMatch || passwordsMismatch"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'"
+            >
+              @if (showConfirmPassword) {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-10-8-10-8a18.6 18.6 0 0 1 4.22-5.44M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M1 1l22 22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              } @else {
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/>
+                </svg>
+              }
+            </button>
+
+            @if (passwordsMatch) {
+              <span class="match-icon match-ok-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            }
+
+            @if (passwordsMismatch) {
+              <span class="match-icon match-bad-icon">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+                </svg>
+              </span>
+            }
+
+          </div>
+
+        </div>
+
+        <!-- Error -->
+        @if (errorMessage) {
+          <div class="message error-message">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            </svg>
+            <span>{{ errorMessage }}</span>
+          </div>
+        }
+
+        <!-- Success -->
+        @if (successMessage) {
+          <div class="message success-message">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>{{ successMessage }}</span>
+          </div>
+        }
+
+        <!-- Register Button -->
+        <button
+          type="submit"
+          class="register-button"
+          [disabled]="isLoading"
+        >
+
+          @if (isLoading) {
+            <span class="spinner"></span>
+            <span>Creating Account...</span>
+          } @else {
+            <span>Create Account</span>
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          }
+
+        </button>
+
+      </form>
+
+      <!-- Login -->
+      <div class="login-section">
+        <span>Already have an account?</span>
+        <a routerLink="/login">Login →</a>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

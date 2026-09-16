@@ -1,0 +1,602 @@
+<div class="customer-page">
+
+  <!-- ==============================
+       BACKGROUND
+  =============================== -->
+
+  <div class="page-background">
+
+    <div class="ambient-glow glow-blue"></div>
+    <div class="ambient-glow glow-green"></div>
+
+    <div class="background-grid"></div>
+
+    <div class="floating-line line-one"></div>
+    <div class="floating-line line-two"></div>
+
+    <span class="floating-grocery grocery-one">🥬</span>
+    <span class="floating-grocery grocery-two">🍎</span>
+    <span class="floating-grocery grocery-three">🥛</span>
+    <span class="floating-grocery grocery-four">🛒</span>
+
+  </div>
+
+
+  <!-- ==============================
+       MAIN
+  =============================== -->
+
+  <main class="main-content">
+
+
+    <!-- ==========================
+         WELCOME
+    =========================== -->
+
+    <section class="welcome-section">
+
+      <div class="welcome-content">
+
+        <div class="welcome-label">
+          <span class="online-dot"></span>
+          MY LOCAL SHOP
+        </div>
+
+        <h1>
+          Good morning,
+          <span>{{ customerName }}</span>
+          <span class="wave">👋</span>
+        </h1>
+
+        <p>
+          What would you like to order today?
+        </p>
+
+      </div>
+
+
+      <!-- CREATE ORDER -->
+
+      <button
+        type="button"
+        class="create-order-button"
+        routerLink="/app/create-order">
+
+        <span class="create-order-icon">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M12 5v14M5 12h14"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"/>
+
+          </svg>
+
+        </span>
+
+
+        <span class="create-order-text">
+
+          <strong>
+            Create New Order
+          </strong>
+
+          <small>
+            Add items or upload your grocery list
+          </small>
+
+        </span>
+
+
+        <span class="create-order-arrow">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+
+          </svg>
+
+        </span>
+
+      </button>
+
+    </section>
+
+
+
+    <!-- ==========================
+         STATS
+    =========================== -->
+
+    <section class="stats-section">
+
+
+      <!-- TOTAL ORDERS -->
+
+      <div class="stat-card">
+
+        <div class="stat-icon blue">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linejoin="round"/>
+
+            <path
+              d="M3 6h18"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"/>
+
+          </svg>
+
+        </div>
+
+        <div class="stat-content">
+
+          <span>Total Orders</span>
+
+          <strong>
+            {{ getTotalOrders() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- IN PROGRESS -->
+
+      <div class="stat-card">
+
+        <div class="stat-icon green">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <circle
+              cx="12"
+              cy="12"
+              r="9"
+              stroke="currentColor"
+              stroke-width="1.7"/>
+
+            <path
+              d="M12 7v5l3 3"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"/>
+
+          </svg>
+
+        </div>
+
+        <div class="stat-content">
+
+          <span>In Progress</span>
+
+          <strong>
+            {{ getPendingOrders() }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- OUTSTANDING -->
+
+      <div class="stat-card">
+
+        <div class="stat-icon neutral">
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9"
+              stroke="currentColor"
+              stroke-width="1.7"
+              stroke-linecap="round"/>
+
+          </svg>
+
+        </div>
+
+        <div class="stat-content">
+
+          <span>Outstanding</span>
+
+          <strong>—</strong>
+
+        </div>
+
+        <small class="coming-soon">
+          Coming soon
+        </small>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ==========================
+         RECENT ORDERS
+    =========================== -->
+
+    <section class="recent-section">
+
+
+      <div class="section-header">
+
+        <div>
+
+          <span class="section-label">
+            ACTIVITY
+          </span>
+
+          <h2>
+            Recent Orders
+          </h2>
+
+          <p>
+            Keep track of your latest grocery orders.
+          </p>
+
+        </div>
+
+
+        <a
+          routerLink="/app/orders"
+          class="view-all">
+
+          View all
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+
+          </svg>
+
+        </a>
+
+      </div>
+
+
+
+      <div class="orders-container">
+
+
+        <!-- LOADING -->
+
+        @if (isLoadingOrders) {
+
+          @for (i of [1, 2, 3]; track i) {
+
+            <div class="order-skeleton">
+
+              <div class="skeleton skeleton-icon"></div>
+
+              <div class="skeleton-content">
+
+                <div class="skeleton skeleton-line"></div>
+
+                <div class="skeleton skeleton-small"></div>
+
+              </div>
+
+              <div class="skeleton skeleton-status"></div>
+
+            </div>
+
+          }
+
+        }
+
+
+        <!-- ERROR -->
+
+        @else if (errorMessage) {
+
+          <div class="state-message error-state">
+
+            <div class="state-icon">
+
+              <svg viewBox="0 0 24 24" fill="none">
+
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="9"
+                  stroke="currentColor"
+                  stroke-width="1.7"/>
+
+                <path
+                  d="M12 8v5M12 16h.01"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"/>
+
+              </svg>
+
+            </div>
+
+            <div>
+
+              <strong>
+                Unable to load orders
+              </strong>
+
+              <p>
+                Please try again.
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- EMPTY -->
+
+        @else if (orders.length === 0) {
+
+          <div class="state-message">
+
+            <div class="state-icon empty">
+
+              <svg viewBox="0 0 24 24" fill="none">
+
+                <path
+                  d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linejoin="round"/>
+
+                <path
+                  d="M3 6h18"
+                  stroke="currentColor"
+                  stroke-width="1.7"
+                  stroke-linecap="round"/>
+
+              </svg>
+
+            </div>
+
+            <div>
+
+              <strong>
+                No orders yet
+              </strong>
+
+              <p>
+                Your recent orders will appear here.
+              </p>
+
+            </div>
+
+          </div>
+
+        }
+
+
+        <!-- ORDERS -->
+
+        @else {
+
+          @for (
+            order of getRecentOrders();
+            track order.id;
+            let i = $index
+          ) {
+
+            <div
+              class="order-row"
+              [style.--i]="i"
+              [routerLink]="['/app/orders', order.id]">
+
+
+              <!-- ORDER ICON -->
+
+              <div
+                class="order-icon"
+                [class.received]="order.status === 'RECEIVED'"
+                [class.preparing]="order.status === 'PREPARING'"
+                [class.completed]="order.status === 'COMPLETED'"
+                [class.cancelled]="order.status === 'CANCELLED'">
+
+                <svg viewBox="0 0 24 24" fill="none">
+
+                  <path
+                    d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linejoin="round"/>
+
+                  <path
+                    d="M3 6h18"
+                    stroke="currentColor"
+                    stroke-width="1.7"
+                    stroke-linecap="round"/>
+
+                </svg>
+
+              </div>
+
+
+              <!-- ORDER INFO -->
+
+              <div class="order-info">
+
+                <strong>
+                  #{{ order.orderNumber }}
+                </strong>
+
+                <span>
+                  {{ order.createdAt | date:'dd MMM yyyy' }}
+                </span>
+
+              </div>
+
+
+              <!-- ORDER TYPE -->
+
+              <div class="order-type">
+
+                @if (order.orderType === 'PHOTO') {
+
+                  <span class="type-icon">
+                    📷
+                  </span>
+
+                  Photo
+
+                } @else {
+
+                  <span class="type-icon">
+                    ☷
+                  </span>
+
+                  Manual
+
+                }
+
+              </div>
+
+
+              <!-- STATUS -->
+
+              <div
+                class="status"
+                [class.received]="order.status === 'RECEIVED'"
+                [class.preparing]="order.status === 'PREPARING'"
+                [class.completed]="order.status === 'COMPLETED'"
+                [class.cancelled]="order.status === 'CANCELLED'">
+
+                <span class="status-dot"></span>
+
+                {{ order.status }}
+
+              </div>
+
+
+              <!-- ARROW -->
+
+              <div class="row-arrow">
+
+                <svg viewBox="0 0 24 24" fill="none">
+
+                  <path
+                    d="M5 12h14M13 6l6 6-6 6"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"/>
+
+                </svg>
+
+              </div>
+
+            </div>
+
+          }
+
+        }
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ==========================
+         ACCOUNT
+    =========================== -->
+
+    <section class="account-section">
+
+      <div class="account-card">
+
+        <div class="account-left">
+
+          <div class="account-icon">
+
+            <svg viewBox="0 0 24 24" fill="none">
+
+              <path
+                d="M20 21a8 8 0 0 0-16 0"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"/>
+
+              <circle
+                cx="12"
+                cy="7"
+                r="4"
+                stroke="currentColor"
+                stroke-width="1.7"/>
+
+            </svg>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              YOUR ACCOUNT
+            </span>
+
+            <strong>
+              Manage your orders and account
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <a
+          routerLink="/app/account"
+          class="account-link">
+
+          Open account
+
+          <svg viewBox="0 0 24 24" fill="none">
+
+            <path
+              d="M5 12h14M13 6l6 6-6 6"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
+
+          </svg>
+
+        </a>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+</div>
