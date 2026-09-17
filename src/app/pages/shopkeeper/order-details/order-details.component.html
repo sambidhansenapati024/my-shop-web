@@ -1,6 +1,12 @@
+
+
+
 <div class="order-details-page">
 
-  <!-- Header -->
+  <!-- ================================
+       HEADER
+  ================================= -->
+
   <section class="page-header">
 
     <div class="header-left">
@@ -13,6 +19,7 @@
       </button>
 
       <div>
+
         <span class="page-label">
           ORDER MANAGEMENT
         </span>
@@ -22,38 +29,61 @@
         </h1>
 
         @if (order) {
+
           <p>
             {{ order.orderNumber }}
           </p>
+
         } @else if (orderId) {
+
           <p>
             Order #{{ orderId }}
           </p>
+
         }
+
       </div>
 
     </div>
 
+
     @if (order) {
+
       <span
         class="status-badge"
         [ngClass]="getStatusClass(order.status)">
+
         {{ getStatusLabel(order.status) }}
+
       </span>
+
     }
 
   </section>
 
 
+  <!-- ================================
+       ERROR
+  ================================= -->
+
   @if (errorMessage) {
 
     <div class="error-message">
+
       <span>⚠️</span>
-      {{ errorMessage }}
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
     </div>
 
   }
 
+
+  <!-- ================================
+       LOADING
+  ================================= -->
 
   @if (isLoading) {
 
@@ -70,20 +100,39 @@
   }
 
 
+  <!-- ================================
+       ORDER CONTENT
+  ================================= -->
+
   @if (!isLoading && order) {
 
-    <!-- Customer Information -->
+
+    <!-- ================================
+         CUSTOMER INFORMATION
+    ================================= -->
+
     <section class="content-card">
 
       <div class="card-header">
 
         <div class="card-title">
-          <span class="card-icon">👤</span>
+
+          <span class="card-icon">
+            👤
+          </span>
 
           <div>
-            <h2>Customer Information</h2>
-            <p>Customer details for this order</p>
+
+            <h2>
+              Customer Information
+            </h2>
+
+            <p>
+              Customer details for this order
+            </p>
+
           </div>
+
         </div>
 
       </div>
@@ -98,7 +147,7 @@
           </span>
 
           <strong>
-            {{ order.customerName }}
+            {{ order.customerName || 'Customer' }}
           </strong>
 
         </div>
@@ -107,24 +156,11 @@
         <div class="info-item">
 
           <span class="info-label">
-            MOBILE NUMBER
+            CUSTOMER ID
           </span>
 
           <strong>
-            {{ order.customerMobile }}
-          </strong>
-
-        </div>
-
-
-        <div class="info-item">
-
-          <span class="info-label">
-            EMAIL
-          </span>
-
-          <strong>
-            {{ order.customerEmail }}
+            {{ order.userId }}
           </strong>
 
         </div>
@@ -134,7 +170,11 @@
     </section>
 
 
-    <!-- Order Information -->
+
+    <!-- ================================
+         ORDER INFORMATION
+    ================================= -->
+
     <section class="content-card">
 
       <div class="card-header">
@@ -146,8 +186,15 @@
           </span>
 
           <div>
-            <h2>Order Information</h2>
-            <p>Basic information about the order</p>
+
+            <h2>
+              Order Information
+            </h2>
+
+            <p>
+              Basic information about the order
+            </p>
+
           </div>
 
         </div>
@@ -200,146 +247,12 @@
     </section>
 
 
-    <!-- Grocery Items -->
-    <section class="content-card">
 
-      <div class="card-header">
+    
+<!-- ================================
+         UPLOADED PHOTO
+    ================================= -->
 
-        <div class="card-title">
-
-          <span class="card-icon">
-            🛒
-          </span>
-
-          <div>
-            <h2>Grocery Items</h2>
-            <p>
-              Enter the actual selling price while preparing the order
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      @if (order.items?.length) {
-
-        <div class="items-table-wrapper">
-
-          <table class="items-table">
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  ITEM
-                </th>
-
-                <th>
-                  QUANTITY
-                </th>
-
-                <th>
-                  UNIT PRICE
-                </th>
-
-                <th>
-                  TOTAL
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody>
-
-              @for (
-                item of order.items;
-                track $index
-              ) {
-
-                <tr>
-
-                  <td>
-
-                    <div class="item-name">
-                      {{ item.itemName }}
-                    </div>
-
-                  </td>
-
-
-                  <td>
-
-                    <span class="quantity-value">
-                      {{ item.quantity }}
-                      {{ item.unit }}
-                    </span>
-
-                  </td>
-
-
-                  <td>
-
-                    <div class="price-input-wrapper">
-
-                      <span>
-                        ₹
-                      </span>
-
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        [(ngModel)]="item.unitPrice"
-                        placeholder="0.00">
-
-                    </div>
-
-                  </td>
-
-
-                  <td>
-
-                    <strong class="item-total">
-                      ₹{{ getItemTotal(item) | number:'1.2-2' }}
-                    </strong>
-
-                  </td>
-
-                </tr>
-
-              }
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-      } @else {
-
-        <div class="empty-items">
-
-          <span>
-            🛒
-          </span>
-
-          <p>
-            No manual items are available for this order.
-          </p>
-
-        </div>
-
-      }
-
-    </section>
-
-
-    <!-- Uploaded Photo -->
     @if (order.photoUrl) {
 
       <section class="content-card">
@@ -353,10 +266,15 @@
             </span>
 
             <div>
-              <h2>Uploaded Grocery List</h2>
+
+              <h2>
+                Uploaded Grocery List
+              </h2>
+
               <p>
                 Customer's uploaded list
               </p>
+
             </div>
 
           </div>
@@ -384,21 +302,30 @@
               PHOTO ORDER
             </span>
 
+
             @if (order.photoNote) {
 
               <p>
-                <strong>Customer note:</strong>
+
+                <strong>
+                  Customer note:
+                </strong>
+
                 {{ order.photoNote }}
+
               </p>
 
             }
+
 
             <a
               [href]="order.photoUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="view-photo-button">
+
               Open Full Photo ↗
+
             </a>
 
           </div>
@@ -410,7 +337,11 @@
     }
 
 
-    <!-- Preparation -->
+
+    <!-- ================================
+         ORDER PREPARATION / STATUS
+    ================================= -->
+
     <section class="content-card">
 
       <div class="card-header">
@@ -422,10 +353,15 @@
           </span>
 
           <div>
-            <h2>Order Preparation</h2>
+
+            <h2>
+              Order Preparation
+            </h2>
+
             <p>
-              Update the order while packing
+              Update the order as you prepare it
             </p>
+
           </div>
 
         </div>
@@ -433,151 +369,530 @@
       </div>
 
 
-      <div class="preparation-actions">
+      <div class="status-action">
 
-        <button
-          type="button"
-          class="action-button preparing-button"
-          (click)="markAsPreparing()">
 
-          <span>
-            📦
+        <!-- Current Status -->
+
+        <div class="current-status">
+
+          <span class="info-label">
+            CURRENT STATUS
           </span>
 
-          Mark as Preparing
+          <span
+            class="status-badge"
+            [ngClass]="getStatusClass(order.status)">
 
-        </button>
+            {{ getStatusLabel(order.status) }}
 
-
-        <button
-          type="button"
-          class="action-button ready-button"
-          (click)="markAsReady()">
-
-          <span>
-            ✓
           </span>
-
-          Ready for Pickup
-
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- Bill Summary -->
-    <section class="content-card billing-card">
-
-      <div class="card-header">
-
-        <div class="card-title">
-
-          <span class="card-icon">
-            🧾
-          </span>
-
-          <div>
-            <h2>Bill & Payment</h2>
-            <p>
-              Review the final bill and payment status
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="bill-summary">
-
-        <div class="bill-row">
-
-          <span>
-            Total Amount
-          </span>
-
-          <strong>
-            ₹{{ getBillTotal() | number:'1.2-2' }}
-          </strong>
 
         </div>
 
 
-        <div class="bill-row payment-row">
+        <!-- Next Status Action -->
 
-          <span>
-            Amount Paid
-          </span>
+        @if (getNextStatus(); as nextStatus) {
 
-          <div class="payment-input-wrapper">
+          <div class="next-action">
 
-            <span>
-              ₹
+            <span class="next-action-label">
+              NEXT ACTION
             </span>
 
-            <input
-              type="number"
-              min="0"
-              [ngModel]="paidAmount"
-              (ngModelChange)="setPaymentAmount($event)"
-              placeholder="0.00">
+            <button
+              type="button"
+              class="primary-action"
+              [disabled]="isUpdatingStatus"
+              (click)="updateStatus(nextStatus)">
+
+              @if (!isUpdatingStatus) {
+
+                <span>
+
+                  @if (nextStatus === 'PACKING') {
+                    📦 Start Packing
+                  }
+
+                  @if (nextStatus === 'READY') {
+                    ✅ Mark Ready
+                  }
+
+                  @if (nextStatus === 'BILLED') {
+                    🧾 Generate Bill
+                  }
+
+                  @if (nextStatus === 'COMPLETED') {
+                    ✔ Complete Order
+                  }
+
+                </span>
+
+              } @else {
+
+                <span>
+                  Updating...
+                </span>
+
+              }
+
+            </button>
 
           </div>
 
-        </div>
+        } @else {
+
+          <div class="order-completed-message">
+
+            <span>
+              ✓
+            </span>
+
+            <div>
+
+              <strong>
+                Order processing completed
+              </strong>
+
+              <p>
+                No further status update is required.
+              </p>
+
+            </div>
+
+          </div>
+
+        }
 
 
-        <div class="bill-row">
+        <!-- Status Message -->
 
-          <span>
-            Remaining Amount
-          </span>
+        @if (statusMessage) {
 
-          <strong>
-            ₹{{ getRemainingAmount() | number:'1.2-2' }}
-          </strong>
+          <div class="status-message">
 
-        </div>
+            <span>
+              ✓
+            </span>
 
+            {{ statusMessage }}
 
-        <div class="payment-status">
+          </div>
 
-          <span>
-            Payment Status
-          </span>
-
-          <strong>
-            {{ getPaymentStatus() }}
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <div class="billing-actions">
-
-        <button
-          type="button"
-          class="generate-bill-button"
-          (click)="generateBill()">
-
-          <span>
-            🧾
-          </span>
-
-          {{ isBillGenerated ? 'Bill Generated' : 'Generate Bill' }}
-
-        </button>
+        }
 
       </div>
 
     </section>
 
 
-    <!-- Final Actions -->
+
+    
+<!-- ================================
+     BILLING / CALCULATION
+================================= -->
+
+<section class="content-card billing-card">
+
+  <div class="card-header">
+
+    <div class="card-title">
+
+      <span class="card-icon">
+        🧾
+      </span>
+
+      <div>
+
+        <h2>
+          Bill Calculation
+        </h2>
+
+        <p>
+          Calculate and preview the customer bill
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  @if (order.items?.length) {
+
+    <div class="billing-content">
+
+
+      <!-- ================================
+           PRICE ENTRY MODE
+      ================================= -->
+
+      @if (!isBillPreview) {
+
+        <div class="billing-info">
+
+          <span class="info-label">
+            PRICE ENTRY
+          </span>
+
+          <p>
+            @if (isEditingBill) {
+              Update any unit price you want to change,
+              then click Generate Modified Bill.
+            } @else {
+              Enter the unit price for every item,
+              then click Calculate Bill.
+            }
+          </p>
+
+        </div>
+
+
+        <div class="items-table-wrapper">
+
+          <table class="items-table">
+
+            <thead>
+
+              <tr>
+                <th>ITEM</th>
+                <th>QUANTITY</th>
+                <th>UNIT PRICE</th>
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                item of order.items;
+                track item.id
+              ) {
+
+                <tr>
+
+                  <td>
+                    <div class="item-name">
+                      {{ item.itemName }}
+                    </div>
+                  </td>
+
+
+                  <td>
+
+                    <span class="quantity-value">
+                      {{ item.quantity }}
+                      {{ item.unit }}
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    <div class="price-input-wrapper">
+
+                      <span class="currency-symbol">
+                        ₹
+                      </span>
+
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="unit-price-input"
+                        placeholder="Enter price"
+                        [value]="getUnitPrice(item.id) ?? ''"
+                        (input)="setUnitPrice(
+                          item.id,
+                          $any($event.target).value
+                        )">
+
+                    </div>
+
+
+                    <span class="price-unit-label">
+
+                      Per
+                      {{
+                        item.unit === 'gm' ||
+                        item.unit === 'kg'
+                          ? 'kg'
+                          : item.unit === 'ml' ||
+                            item.unit === 'litre'
+                          ? 'litre'
+                          : item.unit
+                      }}
+
+                    </span>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
+        @if (!isEditingBill) {
+
+          <button
+            type="button"
+            class="calculate-bill-button"
+            [disabled]="isCalculating"
+            (click)="calculateBill()">
+
+            @if (!isCalculating) {
+              🧮 Calculate Bill
+            } @else {
+              Calculating...
+            }
+
+          </button>
+
+        } @else {
+
+          <button
+            type="button"
+            class="generate-bill-button"
+            [disabled]="isCalculating"
+            (click)="generateBill()">
+
+            @if (!isCalculating) {
+              🧾 Generate Modified Bill
+            } @else {
+              Generating Bill...
+            }
+
+          </button>
+
+        }
+
+      }
+
+
+      <!-- ================================
+           BILL PREVIEW MODE
+      ================================= -->
+
+      @if (isBillPreview && calculationResult; as result) {
+
+        <div class="bill-preview">
+
+          <div class="bill-preview-header">
+
+            <div>
+
+              <span class="bill-preview-label">
+                @if (isBillGenerated) {
+                  BILL ALREADY GENERATED
+                } @else {
+                  BILL PREVIEW
+                }
+              </span>
+
+              <h3>
+                Customer Bill
+              </h3>
+
+              <p>
+                {{ order.orderNumber }}
+              </p>
+
+            </div>
+
+            <span class="preview-status">
+              @if (isBillGenerated) {
+                SAVED BILL
+              } @else {
+                PREVIEW
+              }
+            </span>
+
+          </div>
+
+
+          <div class="bill-customer-info">
+
+            <span>
+              Customer
+            </span>
+
+            <strong>
+              {{ order.customerName || 'Customer' }}
+            </strong>
+
+          </div>
+
+
+          <div class="bill-items-wrapper">
+
+            <table class="bill-items-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>ITEM</th>
+                  <th>QUANTITY</th>
+                  <th>UNIT PRICE</th>
+                  <th>AMOUNT</th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                @for (
+                  item of result.items;
+                  track item.itemId
+                ) {
+
+                  <tr>
+
+                    <td>
+                      <strong>
+                        {{ item.itemName }}
+                      </strong>
+                    </td>
+
+                    <td>
+                      {{ item.quantity }}
+                      {{ item.unit }}
+                    </td>
+
+                    <td>
+                      ₹{{ item.unitPrice | number:'1.2-2' }}
+                    </td>
+
+                    <td>
+                      <strong>
+                        ₹{{ item.itemTotal | number:'1.2-2' }}
+                      </strong>
+                    </td>
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <div class="bill-total-row">
+
+            <span>
+              FINAL AMOUNT
+            </span>
+
+            <strong>
+              ₹{{ result.totalAmount | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+
+          <div class="bill-preview-actions">
+
+            <button
+              type="button"
+              class="edit-price-button"
+              (click)="editBillPrices()">
+
+              ✏️ Edit Bill
+
+            </button>
+
+
+            @if (!isBillGenerated) {
+
+              <button
+                type="button"
+                class="generate-bill-button"
+                [disabled]="isCalculating"
+                (click)="generateBill()">
+
+                @if (!isCalculating) {
+                  🧾 Generate Bill
+                } @else {
+                  Generating Bill...
+                }
+
+              </button>
+
+            }
+
+          </div>
+
+
+          <p class="preview-note">
+            @if (isEditingBill) {
+              Change the prices above and click Generate Modified Bill
+              to save the updated bill.
+            } @else if (isBillGenerated) {
+              This bill is already saved. Click Edit Bill to change
+              prices and generate a modified bill.
+            } @else {
+              This is a bill preview. The bill will be saved
+              after you click Generate Bill.
+            }
+          </p>
+
+        </div>
+
+      }
+
+
+      @if (calculationMessage) {
+
+        <div class="calculation-message">
+
+          <span>ℹ️</span>
+
+          {{ calculationMessage }}
+
+        </div>
+
+      }
+
+    </div>
+
+  } @else {
+
+    <div class="empty-items">
+
+      <span>🧾</span>
+
+      <p>
+        Billing is not available because this order
+        has no manual items.
+      </p>
+
+    </div>
+
+  }
+
+</section>
+
+
+
+    <!-- ================================
+         FINAL ACTIONS
+    ================================= -->
+
     <section class="final-actions">
 
       <button
@@ -589,20 +904,15 @@
 
       </button>
 
-
-      <button
-        type="button"
-        class="primary-button"
-        (click)="generateBill()">
-
-        🧾 Generate Bill
-
-      </button>
-
     </section>
 
   }
 
+
+
+  <!-- ================================
+       NO ORDER
+  ================================= -->
 
   @if (!isLoading && !order && !errorMessage) {
 

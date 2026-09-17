@@ -33,6 +33,8 @@ import {
   OrderDetailsComponent as ShopkeeperOrderDetailsComponent
 } from './pages/shopkeeper/order-details/order-details.component';
 import { CustomersComponent } from './pages/shopkeeper/customers/customers.component';
+import { BillsComponent } from './pages/shopkeeper/bills/bills.component';
+import { PaymentsComponent } from './pages/shopkeeper/payments/payments.component';
 
 
 export const routes: Routes = [
@@ -188,6 +190,15 @@ export const routes: Routes = [
        {
         path: 'customers',
         component: CustomersComponent
+      },
+       {
+        path: 'bills',
+        component: BillsComponent
+      },
+
+      {
+        path: 'payments',
+        component: PaymentsComponent
       }
 
     ]

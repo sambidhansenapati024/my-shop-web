@@ -3,6 +3,7 @@ export type OrderStatus =
   | 'PACKING'
   | 'READY'
   | 'BILLED'
+  | 'BILL_MODIFIED'
   | 'COMPLETED';
 
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
@@ -10,5 +11,6 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   PACKING: 'Being Packed',
   READY: 'Ready for Pickup',
   BILLED: 'Bill Generated',
+  BILL_MODIFIED: 'Bill Modified',
   COMPLETED: 'Completed'
 };

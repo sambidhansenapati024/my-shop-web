@@ -1,22 +1,16 @@
-<div class="bills-page">
+<div class="payments-page">
 
   <!-- Header -->
   <section class="page-header">
-
     <div>
-      <span class="page-label">
-        BILL MANAGEMENT
-      </span>
+      <span class="page-label">PAYMENT MANAGEMENT</span>
 
-      <h1>
-        Bills
-      </h1>
+      <h1>Payments</h1>
 
       <p>
-        View generated bills and payment status
+        View customer payment transactions and their status
       </p>
     </div>
-
   </section>
 
 
@@ -36,25 +30,25 @@
       <button
         type="button"
         class="filter-button"
-        [class.active]="selectedFilter === 'UNPAID'"
-        (click)="setFilter('UNPAID')">
-        Unpaid
+        [class.active]="selectedFilter === 'SUCCESS'"
+        (click)="setFilter('SUCCESS')">
+        Successful
       </button>
 
       <button
         type="button"
         class="filter-button"
-        [class.active]="selectedFilter === 'PARTIALLY_PAID'"
-        (click)="setFilter('PARTIALLY_PAID')">
-        Partially Paid
+        [class.active]="selectedFilter === 'PENDING'"
+        (click)="setFilter('PENDING')">
+        Pending
       </button>
 
       <button
         type="button"
         class="filter-button"
-        [class.active]="selectedFilter === 'PAID'"
-        (click)="setFilter('PAID')">
-        Paid
+        [class.active]="selectedFilter === 'FAILED'"
+        (click)="setFilter('FAILED')">
+        Failed
       </button>
 
     </div>
@@ -69,17 +63,15 @@
       <input
         type="text"
         [(ngModel)]="searchText"
-        placeholder="Search bill, order or customer">
+        placeholder="Search payment, bill or customer">
 
       @if (searchText) {
-
         <button
           type="button"
           class="clear-search"
           (click)="clearSearch()">
           ×
         </button>
-
       }
 
     </div>
@@ -92,9 +84,7 @@
 
     <div class="error-message">
 
-      <span>
-        ⚠️
-      </span>
+      <span>⚠️</span>
 
       <span>
         {{ errorMessage }}
@@ -119,7 +109,7 @@
       <div class="loading-spinner"></div>
 
       <p>
-        Loading bills...
+        Loading payments...
       </p>
 
     </section>
@@ -127,65 +117,49 @@
   }
 
 
-  <!-- Bills List -->
-  @if (!isLoading && filteredBills.length > 0) {
+  <!-- Payment List -->
+  @if (!isLoading && filteredPayments.length > 0) {
 
-    <section class="bills-card">
+    <section class="payments-card">
 
       <div class="card-header">
 
         <div>
-          <h2>
-            Bill List
-          </h2>
+          <h2>Payment Transactions</h2>
 
           <p>
-            {{ filteredBills.length }} bill(s)
+            {{ filteredPayments.length }} payment(s)
           </p>
         </div>
 
       </div>
 
 
-      <div class="bills-table-wrapper">
+      <div class="payments-table-wrapper">
 
-        <table class="bills-table">
+        <table class="payments-table">
 
           <thead>
 
             <tr>
 
-              <th>
-                BILL
-              </th>
+              <th>PAYMENT</th>
 
-              <th>
-                CUSTOMER
-              </th>
+              <th>CUSTOMER</th>
 
-              <th>
-                ORDER
-              </th>
+              <th>BILL</th>
 
-              <th>
-                TOTAL
-              </th>
+              <th>ORDER</th>
 
-              <th>
-                PAID
-              </th>
+              <th>AMOUNT</th>
 
-              <th>
-                REMAINING
-              </th>
+              <th>METHOD</th>
 
-              <th>
-                STATUS
-              </th>
+              <th>STATUS</th>
 
-              <th>
-                ACTION
-              </th>
+              <th>DATE</th>
+
+              <th>ACTION</th>
 
             </tr>
 
@@ -195,94 +169,107 @@
           <tbody>
 
             @for (
-              bill of filteredBills;
-              track bill.id
+              payment of filteredPayments;
+              track payment.id
             ) {
 
               <tr>
 
+                <!-- Payment -->
                 <td>
 
-                  <div class="bill-number">
+                  <div class="payment-number">
 
                     <strong>
-                      {{ bill.billNumber }}
+                      {{ payment.paymentNumber }}
                     </strong>
-
-                    <span>
-                      {{ bill.createdAt | date:'dd MMM yyyy' }}
-                    </span>
 
                   </div>
 
                 </td>
 
 
+                <!-- Customer -->
                 <td>
 
                   <div class="customer-name">
-                    {{ bill.customerName }}
+                    {{ payment.customerName }}
                   </div>
 
                 </td>
 
 
+                <!-- Bill -->
                 <td>
 
-                  <span class="order-number">
-                    {{ bill.orderNumber }}
+                  <span class="bill-number">
+                    {{ payment.billNumber }}
                   </span>
 
                 </td>
 
 
+                <!-- Order -->
                 <td>
 
-                  <strong class="amount total-amount">
-                    ₹{{ bill.totalAmount | number:'1.2-2' }}
+                  <span class="order-number">
+                    {{ payment.orderNumber }}
+                  </span>
+
+                </td>
+
+
+                <!-- Amount -->
+                <td>
+
+                  <strong class="payment-amount">
+                    ₹{{ payment.amount | number:'1.2-2' }}
                   </strong>
 
                 </td>
 
 
+                <!-- Method -->
                 <td>
 
-                  <strong class="amount paid-amount">
-                    ₹{{ bill.paidAmount | number:'1.2-2' }}
-                  </strong>
+                  <span class="payment-method">
+
+                    @switch (payment.paymentMethod) {
+
+                      @case ('CASH') {
+                        💵 Cash
+                      }
+
+                      @case ('UPI') {
+                        📱 UPI
+                      }
+
+                      @case ('CARD') {
+                        💳 Card
+                      }
+
+                      @default {
+                        Other
+                      }
+
+                    }
+
+                  </span>
 
                 </td>
 
 
-                <td>
-
-                  @if (bill.remainingAmount > 0) {
-
-                    <strong class="amount remaining-amount">
-                      ₹{{ bill.remainingAmount | number:'1.2-2' }}
-                    </strong>
-
-                  } @else {
-
-                    <span class="amount cleared-amount">
-                      ₹0.00
-                    </span>
-
-                  }
-
-                </td>
-
-
+                <!-- Status -->
                 <td>
 
                   <span
                     class="payment-status"
                     [ngClass]="getPaymentStatusClass(
-                      bill.paymentStatus
+                      payment.paymentStatus
                     )">
 
                     {{ getPaymentStatusLabel(
-                      bill.paymentStatus
+                      payment.paymentStatus
                     ) }}
 
                   </span>
@@ -290,18 +277,27 @@
                 </td>
 
 
+                <!-- Date -->
+                <td>
+
+                  <span class="payment-date">
+                    {{ payment.paymentDate | date:'dd MMM yyyy, hh:mm a' }}
+                  </span>
+
+                </td>
+
+
+                <!-- Action -->
                 <td>
 
                   <button
                     type="button"
                     class="view-button"
-                    (click)="viewBill(bill)">
+                    (click)="viewPayment(payment)">
 
                     View
 
-                    <span>
-                      →
-                    </span>
+                    <span>→</span>
 
                   </button>
 
@@ -323,23 +319,23 @@
 
 
   <!-- Empty State -->
-  @if (!isLoading && filteredBills.length === 0) {
+  @if (!isLoading && filteredPayments.length === 0) {
 
     <section class="empty-card">
 
       <div class="empty-icon">
-        🧾
+        💰
       </div>
 
 
       @if (searchText.trim() || selectedFilter !== 'ALL') {
 
         <h2>
-          No Bills Found
+          No Payments Found
         </h2>
 
         <p>
-          No bills match the current search or payment filter.
+          No payments match the current search or status filter.
         </p>
 
         <button
@@ -354,11 +350,12 @@
       } @else {
 
         <h2>
-          No Bills Yet
+          No Payments Yet
         </h2>
 
         <p>
-          Generated bills will appear here after orders are billed.
+          Customer payment transactions will appear here
+          after payments are recorded.
         </p>
 
       }

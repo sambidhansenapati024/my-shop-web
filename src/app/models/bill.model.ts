@@ -1,20 +1,28 @@
-import { BillItem } from './bill-item.model';
-
-export type BillStatus =
-  | 'GENERATED'
-  | 'PAID'
-  | 'PARTIALLY_PAID'
-  | 'UNPAID';
-
 export interface Bill {
   id: number;
+
   billNumber: string;
+
   orderId: number;
+
+  orderNumber: string;
+
   customerId: number;
-  items: BillItem[];
+
+  customerName: string;
+
   totalAmount: number;
+
   paidAmount: number;
+
   remainingAmount: number;
-  status: BillStatus;
-  createdAt: Date;
+
+  paymentStatus:
+    | 'UNPAID'
+    | 'PARTIALLY_PAID'
+    | 'PAID';
+
+  createdAt: string;
+
+  updatedAt?: string;
 }

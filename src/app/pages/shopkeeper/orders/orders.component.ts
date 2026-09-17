@@ -1,23 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-interface ShopkeeperOrder {
-  id: number;
-  orderNumber: string;
-  customerName: string;
-  orderType: 'MANUAL' | 'PHOTO';
-  itemCount: number;
-  status:
-    | 'RECEIVED'
-    | 'PREPARING'
-    | 'READY'
-    | 'BILLED'
-    | 'COMPLETED'
-    | 'CANCELLED';
-  createdAt: string;
-}
+import { AdminOrderService } from '../../../services/admin-order.service';
+import { AdminOrder } from '../../../models/admin-order';
 
 @Component({
   selector: 'app-orders',
@@ -30,7 +17,7 @@ interface ShopkeeperOrder {
   templateUrl: './orders.component.html',
   styleUrl: './orders.component.css'
 })
-export class OrdersComponent {
+export class OrdersComponent implements OnInit {
 
   selectedFilter:
     | 'ALL'
@@ -42,14 +29,65 @@ export class OrdersComponent {
 
   searchText = '';
 
-  /*
-   * Temporary frontend data.
-   *
-   * This will be removed when we connect
-   * the Spring Boot admin API.
-   */
-  orders: ShopkeeperOrder[] = [];
+  orders: AdminOrder[] = [];
 
+  isLoading = false;
+
+  errorMessage = '';
+
+
+  constructor(
+    private adminOrderService: AdminOrderService
+  ) {}
+
+
+  ngOnInit(): void {
+    this.loadOrders();
+  }
+
+
+  // ==========================================
+  // LOAD ALL ORDERS
+  // ==========================================
+
+  loadOrders(): void {
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.adminOrderService.getAllOrders().subscribe({
+
+      next: (response) => {
+
+        this.isLoading = false;
+
+        this.orders = response?.data || [];
+
+      },
+
+      error: (error) => {
+
+        this.isLoading = false;
+
+        console.error(
+          'Failed to load shopkeeper orders:',
+          error
+        );
+
+        this.errorMessage =
+          error?.error?.message ||
+          'Unable to load orders. Please try again.';
+
+      }
+
+    });
+
+  }
+
+
+  // ==========================================
+  // FILTER
+  // ==========================================
 
   setFilter(
     filter:
@@ -60,38 +98,57 @@ export class OrdersComponent {
       | 'BILLED'
       | 'COMPLETED'
   ): void {
+
     this.selectedFilter = filter;
+
   }
 
 
-  get filteredOrders(): ShopkeeperOrder[] {
+  // ==========================================
+  // FILTERED ORDERS
+  // ==========================================
+
+  get filteredOrders(): AdminOrder[] {
 
     let result = this.orders;
 
+
     if (this.selectedFilter !== 'ALL') {
+
       result = result.filter(
-        order => order.status === this.selectedFilter
+        order =>
+          order.status?.toUpperCase() ===
+          this.selectedFilter
       );
+
     }
+
 
     const search =
       this.searchText.trim().toLowerCase();
 
-    if (search) {
-      result = result.filter(order =>
-        order.orderNumber
-          .toLowerCase()
-          .includes(search) ||
 
-        order.customerName
-          .toLowerCase()
+    if (search) {
+
+      result = result.filter(order =>
+
+        order.orderNumber
+          ?.toLowerCase()
           .includes(search)
+
       );
+
     }
 
+
     return result;
+
   }
 
+
+  // ==========================================
+  // STATUS LABEL
+  // ==========================================
 
   getStatusLabel(status: string): string {
 
@@ -102,6 +159,9 @@ export class OrdersComponent {
 
       case 'PREPARING':
         return 'Preparing';
+
+      case 'PACKING':
+        return 'Packing';
 
       case 'READY':
         return 'Ready for Pickup';
@@ -117,9 +177,15 @@ export class OrdersComponent {
 
       default:
         return status || 'Unknown';
+
     }
+
   }
 
+
+  // ==========================================
+  // STATUS CSS CLASS
+  // ==========================================
 
   getStatusClass(status: string): string {
 
@@ -129,6 +195,9 @@ export class OrdersComponent {
         return 'received';
 
       case 'PREPARING':
+        return 'preparing';
+
+      case 'PACKING':
         return 'preparing';
 
       case 'READY':
@@ -145,9 +214,15 @@ export class OrdersComponent {
 
       default:
         return '';
+
     }
+
   }
 
+
+  // ==========================================
+  // ORDER TYPE
+  // ==========================================
 
   getOrderTypeLabel(
     orderType: string
@@ -156,11 +231,29 @@ export class OrdersComponent {
     return orderType?.toUpperCase() === 'PHOTO'
       ? 'Photo Order'
       : 'Manual Order';
+
   }
 
 
+  // ==========================================
+  // SEARCH
+  // ==========================================
+
   clearSearch(): void {
+
     this.searchText = '';
+
+  }
+
+
+  // ==========================================
+  // RETRY
+  // ==========================================
+
+  retry(): void {
+
+    this.loadOrders();
+
   }
 
 }

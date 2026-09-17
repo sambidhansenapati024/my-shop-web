@@ -296,14 +296,12 @@
             <!-- Order Information -->
             <div class="order-information">
 
+              <!-- Customer -->
               <div class="customer-info">
 
                 <div class="customer-avatar">
                   {{
-                    order.customerName
-                      .trim()
-                      .charAt(0)
-                      .toUpperCase()
+                    order.customerName?.trim()?.charAt(0)?.toUpperCase() || 'C'
                   }}
                 </div>
 
@@ -314,7 +312,7 @@
                   </span>
 
                   <strong>
-                    {{ order.customerName }}
+                    {{ order.customerName || 'Customer' }}
                   </strong>
 
                 </div>
@@ -322,6 +320,7 @@
               </div>
 
 
+              <!-- Order Type -->
               <div class="info-item">
 
                 <span>
@@ -337,6 +336,7 @@
               </div>
 
 
+              <!-- Items -->
               <div class="info-item">
 
                 <span>
@@ -355,6 +355,7 @@
               </div>
 
 
+              <!-- Date -->
               <div class="info-item">
 
                 <span>

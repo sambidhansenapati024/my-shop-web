@@ -1,70 +1,66 @@
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 
-interface ShopkeeperOrderItem {
-  itemName: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number | null;
-  totalPrice: number | null;
-}
+import {
+  AdminOrderService,
+  CalculateBillRequest,
+  BillCalculation
+} from '../../../services/admin-order.service';
 
-interface ShopkeeperOrder {
-  id: number;
-  orderNumber: string;
-  customerName: string;
-  customerMobile: string;
-  customerEmail: string;
-  orderType: 'MANUAL' | 'PHOTO';
-  status:
-    | 'RECEIVED'
-    | 'PREPARING'
-    | 'READY'
-    | 'BILLED'
-    | 'COMPLETED'
-    | 'CANCELLED';
-  createdAt: string;
-  photoUrl: string | null;
-  photoNote: string | null;
-  items: ShopkeeperOrderItem[];
-}
+import { AdminOrder } from '../../../models/admin-order';
 
 @Component({
   selector: 'app-order-details',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     RouterLink,
     DatePipe
   ],
   templateUrl: './order-details.component.html',
   styleUrl: './order-details.component.css'
 })
-export class OrderDetailsComponent {
+export class OrderDetailsComponent implements OnInit {
 
   orderId: number | null = null;
 
-  order: ShopkeeperOrder | null = null;
+  order: AdminOrder | null = null;
 
   isLoading = false;
-
   errorMessage = '';
 
-  isPacking = false;
+  isUpdatingStatus = false;
+  statusMessage = '';
 
+  // ==============================
+  // BILL CALCULATION
+  // ==============================
+  isBillPreview = false;
   isBillGenerated = false;
+  isEditingBill = false;
 
-  paidAmount = 0;
+  unitPrices: Record<number, number | null> = {};
 
+  calculationResult: BillCalculation | null = null;
+
+  isCalculating = false;
+  calculationMessage = '';
+
+  // ==============================
+  // CONSTRUCTOR
+  // ==============================
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private adminOrderService: AdminOrderService
   ) {}
 
+  // ==============================
+  // INIT
+  // ==============================
 
   ngOnInit(): void {
 
@@ -76,51 +72,101 @@ export class OrderDetailsComponent {
       return;
     }
 
-    this.orderId = Number(idParam);
+    const id = Number(idParam);
 
-    if (Number.isNaN(this.orderId)) {
+    if (Number.isNaN(id)) {
       this.router.navigate(['/admin/orders']);
       return;
     }
 
-    this.order = {
-  id: this.orderId,
-  orderNumber: 'ORD-20260916-001',
-  customerName: 'Rahul Kumar',
-  customerMobile: '9876543210',
-  customerEmail: 'rahul@gmail.com',
-  orderType: 'MANUAL',
-  status: 'RECEIVED',
-  createdAt: new Date().toISOString(),
-  photoUrl: null,
-  photoNote: null,
-  items: [
-    {
-      itemName: 'Rice',
-      quantity: 2,
-      unit: 'kg',
-      unitPrice: 100,
-      totalPrice: 200
-    },
-    {
-      itemName: 'Sugar',
-      quantity: 500,
-      unit: 'gm',
-      unitPrice: 45,
-      totalPrice: 22.5
-    },
-    {
-      itemName: 'Parle-G',
-      quantity: 2,
-      unit: 'packet',
-      unitPrice: 10,
-      totalPrice: 20
-    }
-  ]
-};
+    this.orderId = id;
 
+    this.loadOrder();
   }
 
+  // ==============================
+  // LOAD ORDER
+  // ==============================
+
+  loadOrder(): void {
+
+    if (this.orderId === null) {
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.adminOrderService
+      .getOrderById(this.orderId)
+      .subscribe({
+
+        next: (response) => {
+
+          this.isLoading = false;
+
+          this.order = response?.data || null;
+
+          this.unitPrices = {};
+          this.calculationResult = null;
+          this.isBillPreview = false;
+          this.isBillGenerated = false;
+
+if (
+  this.order &&
+  (
+    this.order.status?.toUpperCase() === 'BILLED' ||
+    this.order.status?.toUpperCase() === 'BILL_MODIFIED'
+  )
+) {
+  const billedItems = (this.order.items || []).map(item => {
+
+    // Load saved prices into the editable input fields.
+    this.unitPrices[item.id] = item.unitPrice ?? null;
+
+    return {
+      itemId: item.id,
+      itemName: item.itemName,
+      quantity: item.quantity,
+      unit: item.unit,
+      unitPrice: item.unitPrice ?? 0,
+      itemTotal: item.itemTotal ?? 0
+    };
+  });
+
+  this.calculationResult = {
+    items: billedItems,
+    totalAmount: this.order.totalAmount ?? 0
+  };
+
+  this.isBillPreview = true;
+  this.isBillGenerated = true;
+  this.isEditingBill = false;
+}
+
+        },
+
+        error: (error) => {
+
+          this.isLoading = false;
+
+          console.error(
+            'Failed to load admin order:',
+            error
+          );
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to load order. Please try again.';
+
+        }
+
+      });
+  }
+
+  // ==============================
+  // STATUS LABEL
+  // ==============================
 
   getStatusLabel(status: string): string {
 
@@ -129,8 +175,8 @@ export class OrderDetailsComponent {
       case 'RECEIVED':
         return 'New Order';
 
-      case 'PREPARING':
-        return 'Preparing';
+      case 'PACKING':
+        return 'Packing';
 
       case 'READY':
         return 'Ready for Pickup';
@@ -138,17 +184,20 @@ export class OrderDetailsComponent {
       case 'BILLED':
         return 'Bill Generated';
 
+      case 'BILL_MODIFIED':
+        return 'Bill Modified';
+
       case 'COMPLETED':
         return 'Completed';
-
-      case 'CANCELLED':
-        return 'Cancelled';
 
       default:
         return status || 'Unknown';
     }
   }
 
+  // ==============================
+  // STATUS CSS CLASS
+  // ==============================
 
   getStatusClass(status: string): string {
 
@@ -157,8 +206,8 @@ export class OrderDetailsComponent {
       case 'RECEIVED':
         return 'received';
 
-      case 'PREPARING':
-        return 'preparing';
+      case 'PACKING':
+        return 'packing';
 
       case 'READY':
         return 'ready';
@@ -166,17 +215,20 @@ export class OrderDetailsComponent {
       case 'BILLED':
         return 'billed';
 
+      case 'BILL_MODIFIED':
+        return 'billed';
+
       case 'COMPLETED':
         return 'completed';
-
-      case 'CANCELLED':
-        return 'cancelled';
 
       default:
         return '';
     }
   }
 
+  // ==============================
+  // ORDER TYPE
+  // ==============================
 
   getOrderTypeLabel(orderType: string): string {
 
@@ -185,97 +237,264 @@ export class OrderDetailsComponent {
       : 'Manual Order';
   }
 
+  // ==============================
+  // UPDATE STATUS
+  // ==============================
 
-  getItemTotal(item: ShopkeeperOrderItem): number {
+  updateStatus(
+    status:
+      | 'RECEIVED'
+      | 'PACKING'
+      | 'READY'
+      | 'BILLED'
+      | 'BILL_MODIFIED'
+      | 'COMPLETED'
+  ): void {
 
     if (
-      item.unitPrice === null ||
-      item.quantity === null
+      this.orderId === null ||
+      this.isUpdatingStatus
     ) {
-      return 0;
-    }
-
-    return item.unitPrice * item.quantity;
-  }
-
-
-  getBillTotal(): number {
-
-    if (!this.order?.items) {
-      return 0;
-    }
-
-    return this.order.items.reduce(
-      (total, item) => {
-        return total + this.getItemTotal(item);
-      },
-      0
-    );
-  }
-
-
-  getRemainingAmount(): number {
-
-    return Math.max(
-      this.getBillTotal() - this.paidAmount,
-      0
-    );
-  }
-
-
-  markAsPreparing(): void {
-
-    this.isPacking = true;
-  }
-
-
-  markAsReady(): void {
-
-    this.isPacking = false;
-  }
-
-
-  generateBill(): void {
-
-    this.isBillGenerated = true;
-  }
-
-
-  setPaymentAmount(amount: number): void {
-
-    if (!amount || amount < 0) {
-      this.paidAmount = 0;
       return;
     }
 
-    const total = this.getBillTotal();
+    this.isUpdatingStatus = true;
+    this.statusMessage = '';
 
-    this.paidAmount = Math.min(
-      amount,
-      total
-    );
+    this.adminOrderService
+      .updateOrderStatus(
+        this.orderId,
+        status
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          this.isUpdatingStatus = false;
+
+          if (response?.data) {
+            this.order = response.data;
+          }
+
+          this.statusMessage =
+            response?.message ||
+            'Order status updated successfully.';
+        },
+
+        error: (error) => {
+
+          this.isUpdatingStatus = false;
+
+          console.error(
+            'Failed to update order status:',
+            error
+          );
+
+          this.statusMessage =
+            error?.error?.message ||
+            'Unable to update order status. Please try again.';
+        }
+
+      });
   }
 
+  // ==============================
+  // NEXT STATUS
+  // ==============================
 
-  getPaymentStatus(): string {
+  getNextStatus():
+    | 'PACKING'
+    | 'READY'
+    | 'BILLED'
+    | 'COMPLETED'
+    | null {
 
-    const total = this.getBillTotal();
+    const status =
+      this.order?.status?.toUpperCase();
 
-    if (total <= 0) {
-      return 'Unpaid';
+    switch (status) {
+
+      case 'RECEIVED':
+        return 'PACKING';
+
+      case 'PACKING':
+        return 'READY';
+
+      case 'READY':
+        return 'BILLED';
+
+      case 'BILLED':
+        return 'COMPLETED';
+
+      default:
+        return null;
     }
-
-    if (this.paidAmount <= 0) {
-      return 'Unpaid';
-    }
-
-    if (this.paidAmount >= total) {
-      return 'Paid';
-    }
-
-    return 'Partially Paid';
   }
 
+  // ==============================
+  // UNIT PRICE
+  // ==============================
+
+  setUnitPrice(
+  itemId: number,
+  value: string
+): void {
+
+  const price =
+    value === ''
+      ? null
+      : Number(value);
+
+  this.unitPrices[itemId] = price;
+
+  // Clear calculated result when price changes
+  this.calculationResult = null;
+
+  this.isBillPreview = false;
+
+  this.calculationMessage = '';
+
+}
+
+  getUnitPrice(itemId: number): number | null {
+
+    return this.unitPrices[itemId] ?? null;
+  }
+
+  // ==============================
+  // CALCULATE BILL
+  // ==============================
+
+  calculateBill(): void {
+
+  if (
+    this.orderId === null ||
+    !this.order
+  ) {
+    return;
+  }
+
+  const items = this.order.items || [];
+
+  if (items.length === 0) {
+
+    this.calculationMessage =
+      'This order has no manual items to calculate.';
+
+    return;
+  }
+
+  const requestItems: {
+    itemId: number;
+    unitPrice: number;
+  }[] = [];
+
+  for (const item of items) {
+
+    const unitPrice =
+      this.unitPrices[item.id];
+
+    if (
+      unitPrice === null ||
+      unitPrice === undefined ||
+      !Number.isFinite(unitPrice) ||
+      unitPrice <= 0
+    ) {
+
+      this.calculationMessage =
+        `Please enter a valid price for ${item.itemName}.`;
+
+      return;
+    }
+
+    requestItems.push({
+      itemId: item.id,
+      unitPrice
+    });
+
+  }
+
+  const request: CalculateBillRequest = {
+    items: requestItems
+  };
+
+  this.isCalculating = true;
+  this.calculationMessage = '';
+  this.calculationResult = null;
+
+  this.adminOrderService
+    .calculateBill(
+      this.orderId,
+      request
+    )
+    .subscribe({
+
+      next: (response) => {
+
+        this.isCalculating = false;
+
+        this.calculationResult =
+          response?.data || null;
+
+        this.calculationMessage =
+          response?.message ||
+          'Bill calculated successfully.';
+
+        // Switch from price entry to bill preview.
+        if (this.calculationResult) {
+          this.isBillPreview = true;
+          this.isEditingBill = false;
+          this.isBillGenerated = false;
+        }
+
+      },
+
+      error: (error) => {
+
+        this.isCalculating = false;
+
+        console.error(
+          'Failed to calculate bill:',
+          error
+        );
+
+        this.calculationMessage =
+          error?.error?.message ||
+          'Unable to calculate bill. Please try again.';
+
+      }
+
+    });
+
+}
+
+// ==============================
+// EDIT BILL PRICES
+// ==============================
+
+editBillPrices(): void {
+
+  // Keep the saved prices in the input fields.
+  this.isBillPreview = false;
+  this.isBillGenerated = true;
+  this.isEditingBill = true;
+
+  this.calculationMessage = '';
+
+}
+
+  // ==============================
+  // RETRY
+  // ==============================
+
+  retry(): void {
+
+    this.loadOrder();
+  }
+
+  // ==============================
+  // BACK
+  // ==============================
 
   goBack(): void {
 
@@ -284,4 +503,73 @@ export class OrderDetailsComponent {
     ]);
   }
 
+  generateBill(): void {
+
+  if (!this.order) {
+    return;
+  }
+
+  const requestItems: {
+    itemId: number;
+    unitPrice: number;
+  }[] = [];
+
+  for (const item of this.order.items || []) {
+
+    const unitPrice = this.getUnitPrice(item.id);
+
+    if (
+      unitPrice === null ||
+      unitPrice === undefined ||
+      !Number.isFinite(unitPrice) ||
+      unitPrice <= 0
+    ) {
+      this.calculationMessage =
+        `Please enter a valid price for ${item.itemName}.`;
+      return;
+    }
+
+    requestItems.push({
+      itemId: item.id,
+      unitPrice
+    });
+  }
+
+  const request: CalculateBillRequest = {
+    items: requestItems
+  };
+
+  this.isCalculating = true;
+  this.calculationMessage = '';
+
+  this.adminOrderService.generateBill(
+    this.order.id,
+    request
+  ).subscribe({
+
+    next: (response) => {
+
+      this.isCalculating = false;
+      this.isEditingBill = false;
+
+      this.calculationMessage =
+        response?.message ||
+        'Bill generated successfully.';
+
+      this.loadOrder();
+
+    },
+
+    error: (error) => {
+
+      this.isCalculating = false;
+
+      this.calculationMessage =
+        error?.error?.message ||
+        'Failed to generate bill.';
+
+    }
+
+  });
+}
 }

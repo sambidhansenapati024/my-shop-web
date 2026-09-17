@@ -1,0 +1,50 @@
+export interface AdminOrder {
+
+  id: number;
+
+  orderNumber: string;
+
+  userId: number;
+
+  customerName: string;
+
+  orderType: string;
+
+  status: string;
+
+  photoPath?: string | null;
+
+  photoUrl?: string | null;
+
+  photoNote?: string | null;
+
+  createdAt: string;
+
+  items: AdminOrderItem[];
+
+  itemCount: number;
+
+  // BILLING FIELDS
+  totalAmount?: number | null;
+
+  billedAt?: string | null;
+
+}
+
+
+export interface AdminOrderItem {
+
+  id: number;
+
+  itemName: string;
+
+  quantity: number;
+
+  unit: string;
+
+  // BILLING FIELDS
+  unitPrice?: number | null;
+
+  itemTotal?: number | null;
+
+}

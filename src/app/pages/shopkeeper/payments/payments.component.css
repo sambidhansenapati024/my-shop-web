@@ -2,7 +2,7 @@
    PAGE
 ================================ */
 
-.bills-page {
+.payments-page {
   min-height: 100%;
   padding: 24px;
   background:
@@ -99,6 +99,11 @@
   color: #ffffff;
 }
 
+
+/* ================================
+   SEARCH
+================================ */
+
 .search-wrapper {
   display: flex;
   align-items: center;
@@ -184,10 +189,10 @@
 
 
 /* ================================
-   BILLS CARD
+   PAYMENTS CARD
 ================================ */
 
-.bills-card {
+.payments-card {
   overflow: hidden;
   border: 1px solid #e4e9f0;
   border-radius: 16px;
@@ -218,18 +223,18 @@
    TABLE
 ================================ */
 
-.bills-table-wrapper {
+.payments-table-wrapper {
   width: 100%;
   overflow-x: auto;
 }
 
-.bills-table {
+.payments-table {
   width: 100%;
-  min-width: 1000px;
+  min-width: 1100px;
   border-collapse: collapse;
 }
 
-.bills-table th {
+.payments-table th {
   padding: 11px 15px;
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
@@ -241,7 +246,7 @@
   white-space: nowrap;
 }
 
-.bills-table td {
+.payments-table td {
   padding: 14px 15px;
   border-bottom: 1px solid #eef2f6;
   color: #475569;
@@ -249,38 +254,33 @@
   vertical-align: middle;
 }
 
-.bills-table tbody tr:last-child td {
+.payments-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.bills-table tbody tr {
+.payments-table tbody tr {
   transition: background 0.15s ease;
 }
 
-.bills-table tbody tr:hover {
+.payments-table tbody tr:hover {
   background: #f8fafc;
 }
 
 
 /* ================================
-   BILL NUMBER
+   CONTENT
 ================================ */
 
-.bill-number {
+.payment-number {
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 
-.bill-number strong {
+.payment-number strong {
   color: #1e293b;
   font-size: 12px;
   font-weight: 700;
-}
-
-.bill-number span {
-  color: #94a3b8;
-  font-size: 10px;
 }
 
 .customer-name {
@@ -288,40 +288,37 @@
   font-weight: 600;
 }
 
+.bill-number,
 .order-number {
   color: #64748b;
   font-size: 11px;
-}
-
-
-/* ================================
-   AMOUNTS
-================================ */
-
-.amount {
   white-space: nowrap;
 }
 
-.total-amount {
-  color: #1e293b;
-}
 
-.paid-amount {
+/* ================================
+   AMOUNT
+================================ */
+
+.payment-amount {
   color: #15803d;
-}
-
-.remaining-amount {
-  color: #dc2626;
-}
-
-.cleared-amount {
-  color: #15803d;
-  font-weight: 600;
+  white-space: nowrap;
 }
 
 
 /* ================================
-   PAYMENT STATUS
+   PAYMENT METHOD
+================================ */
+
+.payment-method {
+  color: #475569;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+
+/* ================================
+   STATUS
 ================================ */
 
 .payment-status {
@@ -335,19 +332,30 @@
   white-space: nowrap;
 }
 
-.payment-status.unpaid {
-  background: #fee2e2;
-  color: #b91c1c;
+.payment-status.success {
+  background: #dcfce7;
+  color: #15803d;
 }
 
-.payment-status.partially-paid {
+.payment-status.pending {
   background: #fef3c7;
   color: #b45309;
 }
 
-.payment-status.paid {
-  background: #dcfce7;
-  color: #15803d;
+.payment-status.failed {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+
+/* ================================
+   DATE
+================================ */
+
+.payment-date {
+  color: #64748b;
+  font-size: 11px;
+  white-space: nowrap;
 }
 
 
@@ -505,7 +513,7 @@
 
 @media (max-width: 700px) {
 
-  .bills-page {
+  .payments-page {
     padding: 16px;
   }
 
@@ -531,7 +539,7 @@
     width: 100%;
   }
 
-  .bills-card {
+  .payments-card {
     border-radius: 13px;
   }
 
@@ -539,8 +547,8 @@
     padding: 15px;
   }
 
-  .bills-table {
-    min-width: 1000px;
+  .payments-table {
+    min-width: 1100px;
   }
 
   .empty-card {
