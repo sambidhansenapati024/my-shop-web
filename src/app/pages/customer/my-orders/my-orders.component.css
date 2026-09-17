@@ -2247,3 +2247,23 @@
   }
 
 }
+
+/* PAYMENT SUMMARY */
+
+.payment-summary {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #f5f7fa;
+}
+
+.payment-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.payment-summary-row strong {
+  font-weight: 600;
+}

@@ -779,6 +779,42 @@
 
     </div>
 
+    <!-- PAYMENT DETAILS -->
+
+<div class="payment-details">
+
+  <div class="payment-row">
+
+    <span>Payment Status</span>
+
+    <strong>
+      {{ order?.paymentStatus }}
+    </strong>
+
+  </div>
+
+  <div class="payment-row">
+
+    <span>Paid Amount</span>
+
+    <strong>
+      ₹{{ order?.paidAmount | number:'1.2-2' }}
+    </strong>
+
+  </div>
+
+  <div class="payment-row">
+
+    <span>Remaining Amount</span>
+
+    <strong>
+      ₹{{ order?.remainingAmount | number:'1.2-2' }}
+    </strong>
+
+  </div>
+
+</div>
+
 
     <!-- PAYMENT MESSAGE -->
 

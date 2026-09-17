@@ -1241,3 +1241,115 @@
   }
 
 }
+
+/* ================================
+   PAYMENT SECTION
+================================ */
+
+.payment-section {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #dbe3ef;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+
+.payment-section h3 {
+  margin-bottom: 18px;
+  color: #1e293b;
+}
+
+.payment-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.payment-info strong {
+  color: #1e293b;
+}
+
+.payment-label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.payment-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.full-payment-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0;
+  font-size: 14px;
+}
+
+.payment-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #16a34a;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.payment-button:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.payment-message {
+  margin-top: 12px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 14px;
+}
+
+/* ================================
+   BILL PAYMENT SUMMARY
+================================ */
+
+.bill-payment-summary {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.bill-payment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bill-payment-row:last-child {
+  border-bottom: none;
+}
+
+.bill-payment-row span {
+  color: #64748b;
+}
+
+.bill-payment-row strong {
+  color: #1e293b;
+  font-weight: 600;
+}

@@ -804,6 +804,45 @@
 
           </div>
 
+          <!-- ================================
+     PAYMENT SUMMARY IN BILL
+================================ -->
+
+@if (isBillGenerated) {
+
+  <div class="bill-payment-summary">
+
+    <div class="bill-payment-row">
+      <span>Payment Status</span>
+      <strong>
+        @if (order.paymentStatus === 'PAID') {
+          PAID
+        } @else if (order.paymentStatus === 'PARTIAL') {
+          PARTIALLY PAID
+        } @else {
+          UNPAID
+        }
+      </strong>
+    </div>
+
+    <div class="bill-payment-row">
+      <span>Paid Amount</span>
+      <strong>
+        ₹{{ (order.paidAmount ?? 0) | number:'1.2-2' }}
+      </strong>
+    </div>
+
+    <div class="bill-payment-row">
+      <span>Remaining Amount</span>
+      <strong>
+        ₹{{ (order.remainingAmount ?? result.totalAmount) | number:'1.2-2' }}
+      </strong>
+    </div>
+
+  </div>
+
+}
+
 
           <div class="bill-preview-actions">
 
@@ -836,6 +875,86 @@
             }
 
           </div>
+
+          <!-- ================================
+     PAYMENT SECTION
+================================= -->
+
+@if (isBillGenerated && order.paymentStatus !== 'PAID') {
+
+  <div class="payment-section">
+
+    <h3>💳 Make Payment</h3>
+
+    <div class="payment-info">
+      <span>Total Amount</span>
+      <strong>
+        ₹{{ order.totalAmount | number:'1.2-2' }}
+      </strong>
+    </div>
+
+    <div class="payment-info">
+      <span>Already Paid</span>
+      <strong>
+        ₹{{ order.paidAmount ?? 0 | number:'1.2-2' }}
+      </strong>
+    </div>
+
+    <div class="payment-info">
+      <span>Remaining Amount</span>
+      <strong>
+        ₹{{ order.remainingAmount ?? order.totalAmount | number:'1.2-2' }}
+      </strong>
+    </div>
+
+    <label class="payment-label">
+      Payment Amount
+    </label>
+
+    <input
+      type="number"
+      min="0.01"
+      step="0.01"
+      class="payment-input"
+      placeholder="Enter payment amount"
+      [(ngModel)]="paymentAmount">
+
+    <label class="full-payment-checkbox">
+      <input
+        type="checkbox"
+        [(ngModel)]="isFullPayment"
+        (change)="toggleFullPayment()">
+
+      Full Payment
+    </label>
+
+    <button
+      type="button"
+      class="payment-button"
+      [disabled]="
+        isProcessingPayment ||
+        paymentAmount === null ||
+        paymentAmount <= 0
+      "
+      (click)="makePayment()">
+
+      @if (!isProcessingPayment) {
+        💰 Confirm Payment
+      } @else {
+        Processing...
+      }
+
+    </button>
+
+    @if (paymentMessage) {
+      <div class="payment-message">
+        {{ paymentMessage }}
+      </div>
+    }
+
+  </div>
+
+}
 
 
           <p class="preview-note">

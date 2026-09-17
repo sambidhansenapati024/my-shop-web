@@ -30,4 +30,8 @@ export interface Order {
 
   createdAt: Date;
 
+  paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID';
+
+  remainingAmount?: number | null;
+
 }

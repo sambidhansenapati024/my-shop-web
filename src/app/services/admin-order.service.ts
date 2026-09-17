@@ -55,6 +55,18 @@ export interface GenerateBillResponse {
   data: number;
 }
 
+// Payment Request
+export interface PaymentRequest {
+  amount: number;
+}
+
+// Payment Response
+export interface PaymentResponse {
+  code: number;
+  message: string;
+  data: AdminOrder;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -114,4 +126,16 @@ export class AdminOrderService {
     request
   );
 }
+
+  makePayment(
+  orderId: number,
+  request: PaymentRequest
+): Observable<PaymentResponse> {
+
+  return this.http.post<PaymentResponse>(
+    `${this.API_URL}/${orderId}/payment`,
+    request
+  );
+}
+
 }

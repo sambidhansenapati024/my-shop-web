@@ -2,11 +2,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-
+import { FormsModule } from '@angular/forms';
 import {
   AdminOrderService,
   CalculateBillRequest,
-  BillCalculation
+  BillCalculation,
+  PaymentRequest
 } from '../../../services/admin-order.service';
 
 import { AdminOrder } from '../../../models/admin-order';
@@ -17,7 +18,8 @@ import { AdminOrder } from '../../../models/admin-order';
   imports: [
     CommonModule,
     RouterLink,
-    DatePipe
+    DatePipe,
+    FormsModule
   ],
   templateUrl: './order-details.component.html',
   styleUrl: './order-details.component.css'
@@ -47,6 +49,15 @@ export class OrderDetailsComponent implements OnInit {
 
   isCalculating = false;
   calculationMessage = '';
+
+  // ==============================
+// PAYMENT
+// ==============================
+showPaymentSection = false;
+paymentAmount: number | null = null;
+isFullPayment = false;
+isProcessingPayment = false;
+paymentMessage = '';
 
   // ==============================
   // CONSTRUCTOR
@@ -481,6 +492,62 @@ editBillPrices(): void {
 
   this.calculationMessage = '';
 
+}
+
+// ==============================
+// PAYMENT
+// ==============================
+
+toggleFullPayment(): void {
+  if (this.isFullPayment && this.order?.totalAmount) {
+    this.paymentAmount = this.order.totalAmount;
+  } else {
+    this.paymentAmount = null;
+  }
+}
+
+makePayment(): void {
+  if (
+    !this.order ||
+    this.paymentAmount === null ||
+    this.paymentAmount <= 0 ||
+    this.isProcessingPayment
+  ) {
+    return;
+  }
+
+  const request: PaymentRequest = {
+    amount: this.paymentAmount
+  };
+
+  this.isProcessingPayment = true;
+  this.paymentMessage = '';
+
+  this.adminOrderService
+    .makePayment(this.order.id, request)
+    .subscribe({
+      next: (response) => {
+        this.isProcessingPayment = false;
+
+        this.paymentMessage =
+          response?.message ||
+          'Payment completed successfully.';
+
+        this.showPaymentSection = false;
+        this.paymentAmount = null;
+        this.isFullPayment = false;
+
+        this.loadOrder();
+      },
+
+      error: (error) => {
+        this.isProcessingPayment = false;
+
+        this.paymentMessage =
+          error?.error?.message ||
+          'Unable to process payment. Please try again.';
+      }
+    });
 }
 
   // ==============================

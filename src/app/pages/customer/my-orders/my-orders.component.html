@@ -479,6 +479,26 @@
 
               }
 
+              <!-- PAYMENT SUMMARY -->
+
+@if (order.paymentStatus) {
+
+  <div class="payment-summary">
+
+    <div class="payment-summary-row">
+
+      <span>Payment Status</span>
+
+      <strong>
+        {{ order.paymentStatus }}
+      </strong>
+
+    </div>
+
+  </div>
+
+}
+
 
               <!-- CARD FOOTER -->
 
@@ -518,6 +538,8 @@
                 </a>
 
               </div>
+
+
 
             </article>
 

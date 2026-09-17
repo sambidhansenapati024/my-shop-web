@@ -29,6 +29,12 @@ export interface AdminOrder {
 
   billedAt?: string | null;
 
+  paymentStatus?: 'UNPAID' | 'PARTIAL' | 'PAID';
+
+paidAmount?: number | null;
+
+remainingAmount?: number | null;
+
 }
 
 
