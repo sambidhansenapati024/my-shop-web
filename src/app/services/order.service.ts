@@ -14,6 +14,8 @@ export interface Order {
 
   userId: number;
 
+  customerName?: string;
+
   orderType: string;
 
   status: string;
@@ -27,6 +29,10 @@ export interface Order {
   createdAt: string;
 
   items: OrderItem[];
+
+  totalAmount?: number | null;
+
+  billedAt?: string | null;
 
 }
 

@@ -703,67 +703,147 @@
           </div>
 
 
-          <div class="bill-not-generated">
+          @if (isBillGenerated()) {
 
-            <div class="bill-illustration">
+  <!-- BILL GENERATED -->
 
-              <div class="bill-circle">
+  <div class="bill-generated">
 
-                <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
-                </svg>
+    <div class="bill-status">
+      {{ isBillModified() ? 'BILL MODIFIED' : 'BILL GENERATED' }}
+    </div>
 
-              </div>
+    <h3>
+      Your Bill
+    </h3>
 
-              <span class="orbit-dot"></span>
-              <span class="orbit-dot second"></span>
-
-            </div>
+    <p class="bill-date">
+      {{ order?.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+    </p>
 
 
-            <span class="bill-status">
-              WAITING FOR BILL
-            </span>
+    <!-- BILL ITEMS -->
 
-            <h3>
-              Bill not generated yet
-            </h3>
+    <div class="bill-items">
 
-            <p>
-              The shopkeeper will prepare your order first
-              and add the prices before generating your bill.
-            </p>
+      <div class="bill-item-header">
+        <span>ITEM</span>
+        <span>AMOUNT</span>
+      </div>
 
 
-            <div class="bill-note">
+      @for (item of order?.items; track item.id || $index) {
 
-              <svg viewBox="0 0 24 24" fill="none">
-                <circle
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="1.7"/>
+        <div class="bill-item-row">
 
-                <path
-                  d="M12 16v-5M12 8h.01"
-                  stroke="currentColor"
-                  stroke-width="1.7"
-                  stroke-linecap="round"/>
-              </svg>
+          <div class="bill-item-info">
 
-              <span>
-                No payment is required from this page yet.
-              </span>
+            <strong>
+              {{ item.itemName }}
+            </strong>
 
-            </div>
+            <small>
+              {{ item.quantity }} {{ item.unit }}
+              × ₹{{ item.unitPrice | number:'1.2-2' }}
+            </small>
 
           </div>
+
+
+          <strong class="bill-item-total">
+
+            ₹{{ item.itemTotal | number:'1.2-2' }}
+
+          </strong>
+
+        </div>
+
+      }
+
+    </div>
+
+
+    <!-- BILL TOTAL -->
+
+    <div class="bill-total-divider"></div>
+
+    <div class="bill-total-row">
+
+      <span>
+        Total Amount
+      </span>
+
+      <strong>
+        ₹{{ order?.totalAmount | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+
+    <!-- PAYMENT MESSAGE -->
+
+    <div class="bill-note">
+
+      <span>
+        Your bill is ready. Please collect your order from the shop.
+      </span>
+
+    </div>
+
+  </div>
+
+
+} @else {
+
+  <!-- BILL NOT GENERATED -->
+
+  <div class="bill-not-generated">
+
+    <div class="bill-illustration">
+
+      <div class="bill-circle">
+
+        <svg viewBox="0 0 24 24" fill="none">
+
+          <path
+            d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+        </svg>
+
+      </div>
+
+    </div>
+
+
+    <span class="bill-status">
+      WAITING FOR BILL
+    </span>
+
+    <h3>
+      Bill not generated yet
+    </h3>
+
+    <p>
+      The shopkeeper will prepare your order first
+      and add the prices before generating your bill.
+    </p>
+
+
+    <div class="bill-note">
+
+      <span>
+        No payment is required from this page yet.
+      </span>
+
+    </div>
+
+  </div>
+
+}
 
         </div>
 

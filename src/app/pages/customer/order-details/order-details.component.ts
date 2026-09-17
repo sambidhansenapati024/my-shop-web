@@ -230,6 +230,9 @@ export class OrderDetailsComponent implements OnInit {
 
       case 'BILLED':
         return 'Bill Generated';
+      
+      case 'BILL_MODIFIED':
+        return 'Bill Modified';  
 
       case 'COMPLETED':
         return 'Completed';
@@ -306,5 +309,29 @@ export class OrderDetailsComponent implements OnInit {
     return !!this.order?.photoUrl;
 
   }
+
+  // =====================================================
+// BILL
+// =====================================================
+
+isBillGenerated(): boolean {
+
+  const status = this.order?.status?.toUpperCase();
+
+  return (
+    status === 'BILLED' ||
+    status === 'BILL_MODIFIED'
+  );
+
+}
+
+
+isBillModified(): boolean {
+
+  return (
+    this.order?.status?.toUpperCase() === 'BILL_MODIFIED'
+  );
+
+}
 
 }
