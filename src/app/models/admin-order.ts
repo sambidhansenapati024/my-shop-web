@@ -54,3 +54,11 @@ export interface AdminOrderItem {
   itemTotal?: number | null;
 
 }
+
+export interface Payment {
+  id: number;
+  orderId: number;
+  amount: number;
+  paymentMethod: 'CASH';
+  paymentDate: string;
+}

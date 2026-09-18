@@ -957,6 +957,68 @@
 }
 
 
+@if (isBillGenerated) {
+
+  <div class="payment-history-section">
+
+    <h3>📋 Payment History</h3>
+
+    @if (isLoadingPayments) {
+
+      <p>Loading payment history...</p>
+
+    } @else if (payments.length === 0) {
+
+      <p>No payment records found.</p>
+
+    } @else {
+
+      <div class="payment-history-list">
+
+        @for (payment of payments; track payment.id) {
+
+          <div class="payment-history-card">
+
+            <div class="payment-history-row">
+              <span>Amount</span>
+              <strong>
+                ₹{{ payment.amount | number:'1.2-2' }}
+              </strong>
+            </div>
+
+            <div class="payment-history-row">
+              <span>Payment Method</span>
+              <strong>
+                {{ payment.paymentMethod }}
+              </strong>
+            </div>
+
+            <div class="payment-history-row">
+              <span>Payment Date</span>
+              <strong>
+                {{ payment.paymentDate | date:'dd MMM yyyy, hh:mm a' }}
+              </strong>
+            </div>
+
+          </div>
+
+        }
+
+      </div>
+
+    }
+
+    @if (paymentHistoryMessage) {
+      <p class="payment-history-error">
+        {{ paymentHistoryMessage }}
+      </p>
+    }
+
+  </div>
+
+}
+
+
           <p class="preview-note">
             @if (isEditingBill) {
               Change the prices above and click Generate Modified Bill

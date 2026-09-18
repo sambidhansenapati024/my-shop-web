@@ -1353,3 +1353,66 @@
   color: #1e293b;
   font-weight: 600;
 }
+
+/* Payment History */
+
+.payment-history-section {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.payment-history-section h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.payment-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.payment-history-card {
+  padding: 14px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.payment-history-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 6px 0;
+}
+
+.payment-history-row span {
+  color: #6b7280;
+}
+
+.payment-history-row strong {
+  color: #111827;
+  text-align: right;
+}
+
+.payment-history-error {
+  color: #b91c1c;
+  margin-top: 12px;
+}
+
+/* Mobile Responsive */
+
+@media (max-width: 600px) {
+  .payment-history-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .payment-history-row strong {
+    text-align: left;
+  }
+}

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { AdminOrder } from '../models/admin-order';
+import { AdminOrder, Payment } from '../models/admin-order';
 import { OrderStatus } from '../models/order-status.model';
 
 export interface AdminOrdersResponse {
@@ -58,6 +58,7 @@ export interface GenerateBillResponse {
 // Payment Request
 export interface PaymentRequest {
   amount: number;
+  paymentMethod: 'CASH';
 }
 
 // Payment Response
@@ -74,6 +75,8 @@ export class AdminOrderService {
 
   private readonly API_URL =
     'http://localhost:2003/api/admin/orders';
+     private readonly PAYMENT_API_URL =
+    'http://localhost:2003/api/admin/payments/order';
 
   constructor(
     private http: HttpClient
@@ -135,6 +138,12 @@ export class AdminOrderService {
   return this.http.post<PaymentResponse>(
     `${this.API_URL}/${orderId}/payment`,
     request
+  );
+}
+
+  getPaymentsByOrderId(orderId: number): Observable<Payment[]> {
+  return this.http.get<Payment[]>(
+    `${this.PAYMENT_API_URL}/${orderId}`
   );
 }
 

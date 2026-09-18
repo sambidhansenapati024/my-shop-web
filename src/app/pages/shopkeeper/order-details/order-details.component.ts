@@ -10,7 +10,7 @@ import {
   PaymentRequest
 } from '../../../services/admin-order.service';
 
-import { AdminOrder } from '../../../models/admin-order';
+import { AdminOrder, Payment } from '../../../models/admin-order';
 
 @Component({
   selector: 'app-order-details',
@@ -58,6 +58,16 @@ paymentAmount: number | null = null;
 isFullPayment = false;
 isProcessingPayment = false;
 paymentMessage = '';
+
+// ==============================
+// PAYMENT HISTORY
+// ==============================
+
+payments: Payment[] = [];
+
+isLoadingPayments = false;
+
+paymentHistoryMessage = '';
 
   // ==============================
   // CONSTRUCTOR
@@ -153,6 +163,7 @@ if (
   this.isBillPreview = true;
   this.isBillGenerated = true;
   this.isEditingBill = false;
+  this.loadPaymentHistory();
 }
 
         },
@@ -499,8 +510,9 @@ editBillPrices(): void {
 // ==============================
 
 toggleFullPayment(): void {
-  if (this.isFullPayment && this.order?.totalAmount) {
-    this.paymentAmount = this.order.totalAmount;
+  if (this.isFullPayment && this.order) {
+    this.paymentAmount =
+      this.order.remainingAmount ?? this.order.totalAmount ?? 0;
   } else {
     this.paymentAmount = null;
   }
@@ -517,8 +529,9 @@ makePayment(): void {
   }
 
   const request: PaymentRequest = {
-    amount: this.paymentAmount
-  };
+  amount: this.paymentAmount,
+  paymentMethod: 'CASH'
+};
 
   this.isProcessingPayment = true;
   this.paymentMessage = '';
@@ -639,4 +652,45 @@ makePayment(): void {
 
   });
 }
+
+  
+loadPaymentHistory(): void {
+
+  if (this.orderId === null) {
+    return;
+  }
+
+  this.isLoadingPayments = true;
+  this.paymentHistoryMessage = '';
+
+  this.adminOrderService
+    .getPaymentsByOrderId(this.orderId)
+    .subscribe({
+
+      next: (response) => {
+
+        this.isLoadingPayments = false;
+
+        this.payments = response || [];
+
+      },
+
+      error: (error) => {
+
+        this.isLoadingPayments = false;
+
+        console.error(
+          'Failed to load payment history:',
+          error
+        );
+
+        this.paymentHistoryMessage =
+          'Unable to load payment history.';
+
+      }
+
+    });
+
+}
+
 }
