@@ -132,6 +132,12 @@ export class SidebarComponent
         },
 
         {
+          label: 'Khata',
+          icon: '📖',
+          route: '/app/khata'
+        },
+
+        {
           label: 'My Account',
           icon: '👤',
           route: '/app/account'

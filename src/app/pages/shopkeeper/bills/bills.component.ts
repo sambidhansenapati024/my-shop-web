@@ -1,18 +1,12 @@
-import { Component } from '@angular/core';
+
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AdminOrder } from '../../../models/admin-order';
+import { AdminOrderService } from '../../../services/admin-order.service';
+import { Router } from '@angular/router';
+import { BillResponse } from '../../../models/bill-response';
 
-interface ShopkeeperBill {
-  id: number;
-  billNumber: string;
-  orderNumber: string;
-  customerName: string;
-  totalAmount: number;
-  paidAmount: number;
-  remainingAmount: number;
-  paymentStatus: 'UNPAID' | 'PARTIALLY_PAID' | 'PAID';
-  createdAt: string;
-}
 
 @Component({
   selector: 'app-bills',
@@ -24,81 +18,101 @@ interface ShopkeeperBill {
   templateUrl: './bills.component.html',
   styleUrl: './bills.component.css'
 })
-export class BillsComponent {
+export class BillsComponent implements OnInit {
 
   selectedFilter:
     | 'ALL'
     | 'UNPAID'
-    | 'PARTIALLY_PAID'
+    | 'PARTIAL'
     | 'PAID' = 'ALL';
 
   searchText = '';
 
-  bills: ShopkeeperBill[] = [];
+  bills: BillResponse[] = [];
 
   isLoading = false;
 
   errorMessage = '';
 
+  constructor(
+    private adminOrderService: AdminOrderService,
+     private router: Router
+  ) {}
 
-  setFilter(
-    filter:
-      | 'ALL'
-      | 'UNPAID'
-      | 'PARTIALLY_PAID'
-      | 'PAID'
-  ): void {
-
-    this.selectedFilter = filter;
+  ngOnInit(): void {
+    this.loadBills();
   }
 
+  loadBills(): void {
 
-  get filteredBills(): ShopkeeperBill[] {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.adminOrderService.getAllBills().subscribe({
+
+      next: (response) => {
+
+        this.bills = (response.data || [])
+          .filter(order => order.billedAt !== null &&
+                           order.billedAt !== undefined);
+
+        this.isLoading = false;
+      },
+
+      error: (error) => {
+
+        console.error('Failed to load bills:', error);
+
+        this.errorMessage = 'Unable to load bills.';
+
+        this.isLoading = false;
+      }
+
+    });
+  }
+
+  get filteredBills(): BillResponse[] {
 
     let result = this.bills;
 
     if (this.selectedFilter !== 'ALL') {
 
       result = result.filter(
-        bill =>
-          bill.paymentStatus === this.selectedFilter
+        bill => bill.paymentStatus === this.selectedFilter
       );
+
     }
 
-    const search =
-      this.searchText.trim().toLowerCase();
+    const search = this.searchText.trim().toLowerCase();
 
     if (search) {
 
       result = result.filter(bill =>
-        bill.billNumber
-          .toLowerCase()
-          .includes(search) ||
-
-        bill.orderNumber
-          .toLowerCase()
-          .includes(search) ||
-
-        bill.customerName
-          .toLowerCase()
-          .includes(search)
+        bill.orderNumber.toLowerCase().includes(search) ||
+        bill.customerName.toLowerCase().includes(search) ||
+        String(bill.id).includes(search)
       );
+
     }
 
     return result;
   }
 
+  setFilter(
+    filter: 'ALL' | 'UNPAID' | 'PARTIAL' | 'PAID'
+  ): void {
 
-  getPaymentStatusLabel(
-    status: string
-  ): string {
+    this.selectedFilter = filter;
+  }
+
+  getPaymentStatusLabel(status?: string | null): string {
 
     switch (status?.toUpperCase()) {
 
       case 'UNPAID':
         return 'Unpaid';
 
-      case 'PARTIALLY_PAID':
+      case 'PARTIAL':
         return 'Partially Paid';
 
       case 'PAID':
@@ -109,17 +123,14 @@ export class BillsComponent {
     }
   }
 
-
-  getPaymentStatusClass(
-    status: string
-  ): string {
+  getPaymentStatusClass(status?: string | null): string {
 
     switch (status?.toUpperCase()) {
 
       case 'UNPAID':
         return 'unpaid';
 
-      case 'PARTIALLY_PAID':
+      case 'PARTIAL':
         return 'partially-paid';
 
       case 'PAID':
@@ -130,35 +141,18 @@ export class BillsComponent {
     }
   }
 
-
   clearSearch(): void {
 
     this.searchText = '';
   }
 
-
-  viewBill(bill: ShopkeeperBill): void {
-
-    /*
-     * Bill details / PDF page
-     * will be connected later.
-     */
-
-    console.log(
-      'View bill:',
-      bill.id
-    );
-  }
-
+  viewBill(bill: BillResponse): void {
+  this.router.navigate(['/admin/bills', bill.id]);
+}
 
   retry(): void {
 
-    /*
-     * Backend billing API
-     * will be connected later.
-     */
-
-    this.errorMessage = '';
+    this.loadBills();
   }
 
 }

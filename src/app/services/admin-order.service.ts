@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 
 import { AdminOrder, Payment } from '../models/admin-order';
 import { OrderStatus } from '../models/order-status.model';
+import { BillResponse } from '../models/bill-response';
 
 export interface AdminOrdersResponse {
   code: number;
@@ -16,6 +17,12 @@ export interface AdminOrderResponse {
   code: number;
   message: string;
   data: AdminOrder;
+}
+
+export interface BillResponseWrapper {
+  code: number;
+  message: string;
+  data: BillResponse[];
 }
 
 // Calculate Bill Request
@@ -75,7 +82,8 @@ export class AdminOrderService {
 
   private readonly API_URL =
     'http://localhost:2003/api/admin/orders';
-     private readonly PAYMENT_API_URL =
+    
+  private readonly PAYMENT_API_URL =
     'http://localhost:2003/api/admin/payments/order';
 
   constructor(
@@ -144,6 +152,12 @@ export class AdminOrderService {
   getPaymentsByOrderId(orderId: number): Observable<Payment[]> {
   return this.http.get<Payment[]>(
     `${this.PAYMENT_API_URL}/${orderId}`
+  );
+}
+
+getAllBills(): Observable<BillResponseWrapper> {
+  return this.http.get<BillResponseWrapper>(
+    `${this.API_URL}/bills`
   );
 }
 

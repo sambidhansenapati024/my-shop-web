@@ -1,8 +1,8 @@
+
 <div class="bills-page">
 
   <!-- Header -->
   <section class="page-header">
-
     <div>
       <span class="page-label">
         BILL MANAGEMENT
@@ -16,7 +16,6 @@
         View generated bills and payment status
       </p>
     </div>
-
   </section>
 
 
@@ -44,8 +43,8 @@
       <button
         type="button"
         class="filter-button"
-        [class.active]="selectedFilter === 'PARTIALLY_PAID'"
-        (click)="setFilter('PARTIALLY_PAID')">
+        [class.active]="selectedFilter === 'PARTIAL'"
+        (click)="setFilter('PARTIAL')">
         Partially Paid
       </button>
 
@@ -72,14 +71,12 @@
         placeholder="Search bill, order or customer">
 
       @if (searchText) {
-
         <button
           type="button"
           class="clear-search"
           (click)="clearSearch()">
           ×
         </button>
-
       }
 
     </div>
@@ -92,9 +89,7 @@
 
     <div class="error-message">
 
-      <span>
-        ⚠️
-      </span>
+      <span>⚠️</span>
 
       <span>
         {{ errorMessage }}
@@ -152,65 +147,36 @@
         <table class="bills-table">
 
           <thead>
-
             <tr>
-
-              <th>
-                BILL
-              </th>
-
-              <th>
-                CUSTOMER
-              </th>
-
-              <th>
-                ORDER
-              </th>
-
-              <th>
-                TOTAL
-              </th>
-
-              <th>
-                PAID
-              </th>
-
-              <th>
-                REMAINING
-              </th>
-
-              <th>
-                STATUS
-              </th>
-
-              <th>
-                ACTION
-              </th>
-
+              <th>BILL</th>
+              <th>CUSTOMER</th>
+              <th>ORDER</th>
+              <th>TOTAL</th>
+              <th>PAID</th>
+              <th>REMAINING</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
             </tr>
-
           </thead>
 
 
           <tbody>
 
-            @for (
-              bill of filteredBills;
-              track bill.id
-            ) {
+            @for (bill of filteredBills; track bill.id) {
 
               <tr>
 
+                <!-- Bill Number -->
                 <td>
 
                   <div class="bill-number">
 
                     <strong>
-                      {{ bill.billNumber }}
+                      BILL-{{ bill.id }}
                     </strong>
 
                     <span>
-                      {{ bill.createdAt | date:'dd MMM yyyy' }}
+                      {{ bill.billedAt | date:'dd MMM yyyy' }}
                     </span>
 
                   </div>
@@ -218,6 +184,7 @@
                 </td>
 
 
+                <!-- Customer -->
                 <td>
 
                   <div class="customer-name">
@@ -227,6 +194,7 @@
                 </td>
 
 
+                <!-- Order Number -->
                 <td>
 
                   <span class="order-number">
@@ -236,30 +204,33 @@
                 </td>
 
 
+                <!-- Total Amount -->
                 <td>
 
                   <strong class="amount total-amount">
-                    ₹{{ bill.totalAmount | number:'1.2-2' }}
+                    ₹{{ (bill.totalAmount ?? 0) | number:'1.2-2' }}
                   </strong>
 
                 </td>
 
 
+                <!-- Paid Amount -->
                 <td>
 
                   <strong class="amount paid-amount">
-                    ₹{{ bill.paidAmount | number:'1.2-2' }}
+                    ₹{{ (bill.paidAmount ?? 0) | number:'1.2-2' }}
                   </strong>
 
                 </td>
 
 
+                <!-- Remaining Amount -->
                 <td>
 
-                  @if (bill.remainingAmount > 0) {
+                  @if ((bill.remainingAmount ?? 0) > 0) {
 
                     <strong class="amount remaining-amount">
-                      ₹{{ bill.remainingAmount | number:'1.2-2' }}
+                      ₹{{ (bill.remainingAmount ?? 0) | number:'1.2-2' }}
                     </strong>
 
                   } @else {
@@ -273,23 +244,21 @@
                 </td>
 
 
+                <!-- Payment Status -->
                 <td>
 
                   <span
                     class="payment-status"
-                    [ngClass]="getPaymentStatusClass(
-                      bill.paymentStatus
-                    )">
+                    [ngClass]="getPaymentStatusClass(bill.paymentStatus)">
 
-                    {{ getPaymentStatusLabel(
-                      bill.paymentStatus
-                    ) }}
+                    {{ getPaymentStatusLabel(bill.paymentStatus) }}
 
                   </span>
 
                 </td>
 
 
+                <!-- Action -->
                 <td>
 
                   <button

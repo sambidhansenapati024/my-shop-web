@@ -1,0 +1,252 @@
+
+<div class="bill-view-page">
+
+  <!-- Header -->
+  <section class="page-header">
+
+    <button
+      type="button"
+      class="back-button"
+      (click)="goBack()">
+      ← Back to Bills
+    </button>
+
+    <h1>Bill Details</h1>
+
+    <p>View bill information and payment history</p>
+
+  </section>
+
+
+  <!-- Loading -->
+  @if (isLoading) {
+
+    <section class="status-card">
+      <p>Loading bill details...</p>
+    </section>
+
+  }
+
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+
+    <section class="error-card">
+      <p>{{ errorMessage }}</p>
+
+      <button
+        type="button"
+        (click)="loadBillDetails()">
+        Retry
+      </button>
+    </section>
+
+  }
+
+
+  <!-- Bill Details -->
+  @if (!isLoading && !errorMessage && order) {
+
+    <section class="bill-card">
+
+      <div class="bill-header">
+
+        <div>
+          <span class="bill-label">BILL</span>
+
+          <h2>
+            BILL-{{ order.id }}
+          </h2>
+
+          <p>
+            Order: {{ order.orderNumber }}
+          </p>
+        </div>
+
+        <span
+          class="payment-status"
+          [ngClass]="getPaymentStatusClass(order.paymentStatus)">
+
+          {{ getPaymentStatusLabel(order.paymentStatus) }}
+
+        </span>
+
+      </div>
+
+
+      <!-- Customer Information -->
+      <div class="section-block">
+
+        <h3>Customer Information</h3>
+
+        <div class="info-row">
+          <span>Customer Name</span>
+          <strong>{{ order.customerName }}</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Customer ID</span>
+          <strong>{{ order.userId }}</strong>
+        </div>
+
+        <div class="info-row">
+          <span>Bill Date</span>
+          <strong>
+            {{ order.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+          </strong>
+        </div>
+
+      </div>
+
+
+      <!-- Ordered Items -->
+      <div class="section-block">
+
+        <h3>Ordered Items</h3>
+
+        <div class="items-table-wrapper">
+
+          <table class="items-table">
+
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (item of order.items; track item.id) {
+
+                <tr>
+
+                  <td>{{ item.itemName }}</td>
+
+                  <td>
+                    {{ item.quantity }} {{ item.unit }}
+                  </td>
+
+                  <td>
+                    ₹{{ (item.unitPrice ?? 0) | number:'1.2-2' }}
+                  </td>
+
+                  <td>
+                    ₹{{ (item.itemTotal ?? 0) | number:'1.2-2' }}
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <!-- Bill Summary -->
+      <div class="section-block bill-summary">
+
+        <h3>Bill Summary</h3>
+
+        <div class="info-row">
+          <span>Total Amount</span>
+
+          <strong>
+            ₹{{ (order.totalAmount ?? 0) | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="info-row">
+          <span>Paid Amount</span>
+
+          <strong class="paid-amount">
+            ₹{{ (order.paidAmount ?? 0) | number:'1.2-2' }}
+          </strong>
+        </div>
+
+        <div class="info-row">
+          <span>Remaining Amount</span>
+
+          <strong class="remaining-amount">
+            ₹{{ (order.remainingAmount ?? 0) | number:'1.2-2' }}
+          </strong>
+        </div>
+
+      </div>
+
+
+      <!-- Payment History -->
+      <div class="section-block">
+
+        <h3>Payment History</h3>
+
+        @if (isLoadingPayments) {
+
+          <p>Loading payment history...</p>
+
+        } @else if (payments.length === 0) {
+
+          <p>No payment records found.</p>
+
+        } @else {
+
+          <div class="payment-history-list">
+
+            @for (payment of payments; track payment.id) {
+
+              <div class="payment-card">
+
+                <div class="info-row">
+                  <span>Payment Amount</span>
+
+                  <strong>
+                    ₹{{ payment.amount | number:'1.2-2' }}
+                  </strong>
+                </div>
+
+                <div class="info-row">
+                  <span>Payment Method</span>
+
+                  <strong>
+                    {{ payment.paymentMethod }}
+                  </strong>
+                </div>
+
+                <div class="info-row">
+                  <span>Payment Date</span>
+
+                  <strong>
+                    {{ payment.paymentDate | date:'dd MMM yyyy, hh:mm a' }}
+                  </strong>
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+        @if (paymentHistoryMessage) {
+
+          <p class="error-text">
+            {{ paymentHistoryMessage }}
+          </p>
+
+        }
+
+      </div>
+
+    </section>
+
+  }
+
+</div>

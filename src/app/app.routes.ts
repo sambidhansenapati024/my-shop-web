@@ -35,6 +35,7 @@ import {
 import { CustomersComponent } from './pages/shopkeeper/customers/customers.component';
 import { BillsComponent } from './pages/shopkeeper/bills/bills.component';
 import { PaymentsComponent } from './pages/shopkeeper/payments/payments.component';
+import { BillViewComponent } from './pages/shopkeeper/bill-view/bill-view.component';
 
 
 export const routes: Routes = [
@@ -199,7 +200,11 @@ export const routes: Routes = [
       {
         path: 'payments',
         component: PaymentsComponent
-      }
+      },
+      {
+        path: 'bills/:id',
+        component: BillViewComponent
+      },
 
     ]
   },
