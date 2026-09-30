@@ -24,17 +24,23 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 
   // =====================================================
-  // AUTH REQUESTS
+  // PUBLIC REQUESTS
   // =====================================================
 
-  const isAuthRequest =
+  const isPublicRequest =
     req.url.includes('/api/auth/login') ||
-    req.url.includes('/api/auth/register');
+    req.url.includes('/api/auth/register') ||
+    req.url.includes('/api/verify/');
 
 
-  // Login and registration do not need JWT
-  if (isAuthRequest) {
+  // =====================================================
+  // PUBLIC REQUESTS DO NOT NEED JWT
+  // =====================================================
+
+  if (isPublicRequest) {
+
     return next(req);
+
   }
 
 
@@ -55,9 +61,11 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   if (accessToken) {
 
     request = req.clone({
+
       setHeaders: {
         Authorization: `Bearer ${accessToken}`
       }
+
     });
 
   }

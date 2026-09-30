@@ -36,6 +36,7 @@ import { CustomersComponent } from './pages/shopkeeper/customers/customers.compo
 import { BillsComponent } from './pages/shopkeeper/bills/bills.component';
 import { PaymentsComponent } from './pages/shopkeeper/payments/payments.component';
 import { BillViewComponent } from './pages/shopkeeper/bill-view/bill-view.component';
+import { VerifyComponent } from './pages/customer-verify/verify/verify.component';
 
 
 export const routes: Routes = [
@@ -66,6 +67,10 @@ export const routes: Routes = [
     path: 'register',
     component: RegisterComponent
   },
+  {
+        path: 'verify/:verificationCode',
+        component: VerifyComponent
+    },
 
 
   // =========================================================
@@ -143,7 +148,15 @@ export const routes: Routes = [
             './pages/customer/my-account/my-account.component'
           )
             .then(m => m.MyAccountComponent)
-      }
+      },
+      {
+        path: 'khata',
+        loadComponent: () =>
+          import(
+            './pages/customer/khata/khata.component'
+          )
+            .then(m => m.KhataComponent)
+      },
 
     ]
   },
