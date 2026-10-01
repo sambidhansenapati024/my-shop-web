@@ -3,259 +3,133 @@
   <!-- =========================================
        ANIMATED BACKGROUND
   ========================================== -->
-
   <div class="page-background">
-
     <div class="background-grid"></div>
-
     <div class="ambient-glow glow-blue"></div>
     <div class="ambient-glow glow-green"></div>
-
     <span class="floating-dot dot-one"></span>
     <span class="floating-dot dot-two"></span>
     <span class="floating-dot dot-three"></span>
     <span class="floating-dot dot-four"></span>
-
     <span class="floating-grocery grocery-one">🥬</span>
     <span class="floating-grocery grocery-two">🍎</span>
     <span class="floating-grocery grocery-three">🥛</span>
-
   </div>
 
 
   <!-- =========================================
        LOADING
   ========================================== -->
-
   @if (isLoading) {
-
     <main class="state-container">
-
       <div class="loading-orbit">
         <div class="loading-spinner"></div>
       </div>
-
-      <span class="state-label">
-        ORDER DETAILS
-      </span>
-
-      <h2>
-        Loading order...
-      </h2>
-
-      <p>
-        Please wait a moment.
-      </p>
-
+      <span class="state-label">ORDER DETAILS</span>
+      <h2>Loading order...</h2>
+      <p>Please wait a moment.</p>
     </main>
-
   }
 
 
   <!-- =========================================
        ERROR
   ========================================== -->
-
   @if (!isLoading && errorMessage) {
-
     <main class="state-container">
-
       <div class="state-icon error">
-
         <svg viewBox="0 0 24 24" fill="none">
-          <circle
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            stroke-width="1.8"/>
-
-          <path
-            d="M12 8v5M12 16h.01"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 8v5M12 16h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
         </svg>
-
       </div>
-
-      <span class="state-label">
-        ORDER ERROR
-      </span>
-
-      <h2>
-        Unable to load order
-      </h2>
-
-      <p>
-        {{ errorMessage }}
-      </p>
-
-      <button
-        type="button"
-        class="retry-button"
-        (click)="loadOrder()">
-
+      <span class="state-label">ORDER ERROR</span>
+      <h2>Unable to load order</h2>
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="retry-button" (click)="loadOrder()">
         Try Again
-
         <svg viewBox="0 0 24 24" fill="none">
-          <path
-            d="M5 12h14M13 6l6 6-6 6"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"/>
+          <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-
       </button>
-
     </main>
-
   }
 
 
   <!-- =========================================
        ORDER
   ========================================== -->
-
   @if (!isLoading && !errorMessage && order) {
 
     <main class="main-content">
 
-
-      <!-- =====================================
-           PAGE HEADING
-      ====================================== -->
-
+      <!-- PAGE HEADING -->
       <section class="page-heading">
 
         <div class="heading-left">
-
           <div class="heading-badge">
             <span class="badge-dot"></span>
             ORDER DETAILS
           </div>
-
-          <h1>
-            {{ order.orderNumber }}
-          </h1>
-
-          <p>
-            Placed on
-            {{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}
-          </p>
-
+          <h1>{{ order.orderNumber }}</h1>
+          <p>Placed on {{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}</p>
         </div>
-
 
         <span
           class="status-badge"
-          [class.received]="
-            order.status?.toUpperCase() === 'RECEIVED'
-          "
+          [class.received]="order.status?.toUpperCase() === 'RECEIVED'"
           [class.preparing]="
             order.status?.toUpperCase() === 'PREPARING' ||
             order.status?.toUpperCase() === 'PACKING'
           "
-          [class.ready]="
-            order.status?.toUpperCase() === 'READY'
-          "
+          [class.ready]="order.status?.toUpperCase() === 'READY'"
           [class.billed]="
-            order.status?.toUpperCase() === 'BILLED'
+            order.status?.toUpperCase() === 'BILLED' ||
+            order.status?.toUpperCase() === 'BILL_MODIFIED'
           "
-          [class.completed]="
-            order.status?.toUpperCase() === 'COMPLETED'
-          "
-          [class.cancelled]="
-            order.status?.toUpperCase() === 'CANCELLED'
-          ">
-
+          [class.completed]="order.status?.toUpperCase() === 'COMPLETED'"
+          [class.cancelled]="order.status?.toUpperCase() === 'CANCELLED'">
           <span class="status-dot"></span>
-
           {{ getStatusLabel() }}
-
         </span>
 
       </section>
 
 
-      <!-- =====================================
-           STATUS TRACKER
-      ====================================== -->
-
+      <!-- STATUS TRACKER -->
       <section class="status-card">
 
         <div class="status-card-header">
-
           <div>
-
-            <span class="card-label">
-              ORDER PROGRESS
-            </span>
-
-            <h2>
-              Track your order
-            </h2>
-
-            <p>
-              We'll update the status as your order moves forward.
-            </p>
-
+            <span class="card-label">ORDER PROGRESS</span>
+            <h2>Track your order</h2>
+            <p>We'll update the status as your order moves forward.</p>
           </div>
-
-          <div class="current-status">
-            {{ getStatusLabel() }}
-          </div>
-
+          <div class="current-status">{{ getStatusLabel() }}</div>
         </div>
-
 
         <div class="status-progress">
 
-
           <!-- RECEIVED -->
-
           <div
             class="status-step"
             [class.active]="isStatusAtLeast('RECEIVED')"
-            [class.current]="
-              order.status?.toUpperCase() === 'RECEIVED'
-            ">
-
+            [class.current]="order.status?.toUpperCase() === 'RECEIVED'">
             <div class="step-icon">
-
               @if (isStatusAtLeast('PREPARING')) {
-
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="m5 12 5 5L20 7"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
+                  <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-
               } @else {
-
                 1
-
               }
-
             </div>
-
             <span>Received</span>
-
           </div>
 
-
-          <div
-            class="status-line"
-            [class.active]="isStatusAtLeast('PREPARING')">
-          </div>
-
+          <div class="status-line" [class.active]="isStatusAtLeast('PREPARING')"></div>
 
           <!-- PREPARING -->
-
           <div
             class="status-step"
             [class.active]="isStatusAtLeast('PREPARING')"
@@ -263,114 +137,57 @@
               order.status?.toUpperCase() === 'PREPARING' ||
               order.status?.toUpperCase() === 'PACKING'
             ">
-
             <div class="step-icon">
-
               @if (isStatusAtLeast('READY')) {
-
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="m5 12 5 5L20 7"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
+                  <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-
               } @else {
-
                 2
-
               }
-
             </div>
-
             <span>Preparing</span>
-
           </div>
 
-
-          <div
-            class="status-line"
-            [class.active]="isStatusAtLeast('READY')">
-          </div>
-
+          <div class="status-line" [class.active]="isStatusAtLeast('READY')"></div>
 
           <!-- READY -->
-
           <div
             class="status-step"
             [class.active]="isStatusAtLeast('READY')"
-            [class.current]="
-              order.status?.toUpperCase() === 'READY'
-            ">
-
+            [class.current]="order.status?.toUpperCase() === 'READY'">
             <div class="step-icon">
-
               @if (isStatusAtLeast('BILLED')) {
-
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="m5 12 5 5L20 7"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
+                  <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-
               } @else {
-
                 3
-
               }
-
             </div>
-
             <span>Ready</span>
-
           </div>
 
-
-          <div
-            class="status-line"
-            [class.active]="isStatusAtLeast('BILLED')">
-          </div>
-
+          <div class="status-line" [class.active]="isStatusAtLeast('BILLED')"></div>
 
           <!-- BILLED -->
-
           <div
             class="status-step"
             [class.active]="isStatusAtLeast('BILLED')"
             [class.current]="
-              order.status?.toUpperCase() === 'BILLED'
+              order.status?.toUpperCase() === 'BILLED' ||
+              order.status?.toUpperCase() === 'BILL_MODIFIED'
             ">
-
             <div class="step-icon">
-
-              @if (
-                order.status?.toUpperCase() === 'COMPLETED'
-              ) {
-
+              @if (order.status?.toUpperCase() === 'COMPLETED') {
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="m5 12 5 5L20 7"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
+                  <path d="m5 12 5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-
               } @else {
-
                 4
-
               }
-
             </div>
-
             <span>Billed</span>
-
           </div>
 
         </div>
@@ -378,17 +195,10 @@
       </section>
 
 
-      <!-- =====================================
-           CONTENT
-      ====================================== -->
-
+      <!-- CONTENT -->
       <section class="content-grid">
 
-
-        <!-- ===================================
-             ITEMS / PHOTO
-        ==================================== -->
-
+        <!-- ITEMS / PHOTO -->
         <div class="details-card">
 
           <div class="card-header">
@@ -396,59 +206,26 @@
             <div class="card-title">
 
               <div class="title-icon blue">
-
                 @if (isManualOrder()) {
-
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M6 2h9l4 4v16H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      stroke-linejoin="round"/>
-
-                    <path
-                      d="M8 10h8M8 14h8M8 18h5"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      stroke-linecap="round"/>
+                    <path d="M6 2h9l4 4v16H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                    <path d="M8 10h8M8 14h8M8 18h5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
                   </svg>
-
                 } @else {
-
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"/>
-
-                    <circle
-                      cx="12"
-                      cy="13"
-                      r="4"
-                      stroke="currentColor"
-                      stroke-width="1.7"/>
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="1.7"/>
                   </svg>
-
                 }
-
               </div>
 
               <div>
-
                 <span class="card-label">
                   {{ isManualOrder() ? 'GROCERY LIST' : 'PHOTO ORDER' }}
                 </span>
-
                 <h2>
-                  {{
-                    isManualOrder()
-                      ? 'Grocery Items'
-                      : 'Grocery List Photo'
-                  }}
+                  {{ isManualOrder() ? 'Grocery Items' : 'Grocery List Photo' }}
                 </h2>
-
                 <p>
                   @if (isManualOrder()) {
                     {{ order.items.length }}
@@ -457,128 +234,61 @@
                     Uploaded grocery list
                   }
                 </p>
-
               </div>
 
             </div>
 
-
             <span class="type-badge">
-
               {{ isManualOrder() ? 'Manual' : 'Photo' }}
-
             </span>
 
           </div>
 
 
           <!-- MANUAL -->
-
           @if (isManualOrder()) {
 
             <div class="receipt-body">
 
               <div class="receipt-header">
-
                 <span>ITEM</span>
                 <span>QUANTITY</span>
-
               </div>
-
 
               <div class="receipt-items">
-
-                @for (
-                  item of order.items;
-                  track $index;
-                  let i = $index
-                ) {
-
-                  <div
-                    class="receipt-row"
-                    [style.--i]="i">
-
+                @for (item of order.items; track $index; let i = $index) {
+                  <div class="receipt-row" [style.--i]="i">
                     <div class="receipt-item">
-
-                      <span class="receipt-index">
-                        {{ i + 1 }}
-                      </span>
-
-                      <strong>
-                        {{ item.itemName }}
-                      </strong>
-
+                      <span class="receipt-index">{{ i + 1 }}</span>
+                      <strong>{{ item.itemName }}</strong>
                     </div>
-
-
                     <div class="receipt-dots"></div>
-
-
                     <div class="receipt-quantity">
-
                       {{ item.quantity }}
-
-                      <small>
-                        {{ item.unit }}
-                      </small>
-
+                      <small>{{ item.unit }}</small>
                     </div>
-
                   </div>
-
                 }
-
               </div>
-
 
               <div class="receipt-divider"></div>
 
-
               <div class="receipt-summary">
-
                 <span>Total Items</span>
-
-                <strong>
-                  {{ order.items.length }}
-                </strong>
-
+                <strong>{{ order.items.length }}</strong>
               </div>
 
-
               <div class="price-info">
-
                 <div class="price-info-icon">
-
                   <svg viewBox="0 0 24 24" fill="none">
-                    <circle
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      stroke-width="1.7"/>
-
-                    <path
-                      d="M12 16v-5M12 8h.01"
-                      stroke="currentColor"
-                      stroke-width="1.7"
-                      stroke-linecap="round"/>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.7"/>
+                    <path d="M12 16v-5M12 8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
                   </svg>
-
                 </div>
-
                 <div>
-
-                  <strong>
-                    Price will be added by the shopkeeper
-                  </strong>
-
-                  <p>
-                    The final bill will be generated after
-                    your items are prepared.
-                  </p>
-
+                  <strong>Price will be added by the shopkeeper</strong>
+                  <p>The final bill will be generated after your items are prepared.</p>
                 </div>
-
               </div>
 
             </div>
@@ -587,7 +297,6 @@
 
 
           <!-- PHOTO -->
-
           @if (isPhotoOrder()) {
 
             <div class="photo-section">
@@ -595,61 +304,28 @@
               @if (hasPhoto()) {
 
                 <div class="photo-frame">
-
-                  <img
-                    [src]="order.photoUrl"
-                    alt="Uploaded grocery list"
-                    loading="lazy">
-
+                  <img [src]="order.photoUrl" alt="Uploaded grocery list" loading="lazy">
                 </div>
 
               } @else {
 
                 <div class="photo-unavailable">
-
                   <div class="unavailable-icon">
-
                     <svg viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"
-                        stroke="currentColor"
-                        stroke-width="1.7"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"/>
-
-                      <circle
-                        cx="12"
-                        cy="13"
-                        r="4"
-                        stroke="currentColor"
-                        stroke-width="1.7"/>
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="1.7"/>
                     </svg>
-
                   </div>
-
-                  <p>
-                    Grocery list photo is not available.
-                  </p>
-
+                  <p>Grocery list photo is not available.</p>
                 </div>
 
               }
 
-
               @if (order.photoNote) {
-
                 <div class="photo-note">
-
-                  <span class="note-label">
-                    NOTE FOR SHOPKEEPER
-                  </span>
-
-                  <p>
-                    {{ order.photoNote }}
-                  </p>
-
+                  <span class="note-label">NOTE FOR SHOPKEEPER</span>
+                  <p>{{ order.photoNote }}</p>
                 </div>
-
               }
 
             </div>
@@ -659,297 +335,177 @@
         </div>
 
 
-        <!-- ===================================
-             BILL
-        ==================================== -->
-
+        <!-- BILL -->
         <div class="details-card bill-card">
 
           <div class="card-header">
-
             <div class="card-title">
-
               <div class="title-icon green">
-
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6"
-                    stroke="currentColor"
-                    stroke-width="1.7"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
+                  <path d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-
               </div>
-
               <div>
-
-                <span class="card-label">
-                  PAYMENT
-                </span>
-
-                <h2>
-                  Bill & Payment
-                </h2>
-
-                <p>
-                  Payment information
-                </p>
-
+                <span class="card-label">PAYMENT</span>
+                <h2>Bill & Payment</h2>
+                <p>Payment information</p>
               </div>
-
             </div>
-
           </div>
 
 
           @if (isBillGenerated()) {
 
-  <!-- BILL GENERATED -->
+            <!-- BILL GENERATED -->
+            <div class="bill-generated">
+
+              <div class="bill-status">
+                {{ isBillModified() ? 'BILL MODIFIED' : 'BILL GENERATED' }}
+              </div>
+
+              <h3>Your Bill</h3>
+
+              <p class="bill-date">
+                {{ order?.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+              </p>
+
+              <!-- BILL ITEMS -->
+              <div class="bill-items">
+
+                <div class="bill-item-header">
+                  <span>ITEM</span>
+                  <span>AMOUNT</span>
+                </div>
+
+                @for (item of order?.items; track item.id || $index) {
+                  <div class="bill-item-row">
+                    <div class="bill-item-info">
+                      <strong>{{ item.itemName }}</strong>
+                      <small>
+                        {{ item.quantity }} {{ item.unit }}
+                        × ₹{{ item.unitPrice | number:'1.2-2' }}
+                      </small>
+                    </div>
+                    <strong class="bill-item-total">
+                      ₹{{ item.itemTotal | number:'1.2-2' }}
+                    </strong>
+                  </div>
+                }
+
+              </div>
+
+              <!-- BILL TOTAL -->
+              <div class="bill-total-divider"></div>
+
+              <div class="bill-total-row">
+                <span>Total Amount</span>
+                <strong>₹{{ order?.totalAmount | number:'1.2-2' }}</strong>
+              </div>
+
+              <!-- PAYMENT DETAILS -->
+              <div class="payment-details">
+                <div class="payment-row">
+                  <span>Payment Status</span>
+                  <strong>{{ order?.paymentStatus }}</strong>
+                </div>
+                <div class="payment-row">
+                  <span>Paid Amount</span>
+                  <strong>₹{{ order?.paidAmount | number:'1.2-2' }}</strong>
+                </div>
+                <div class="payment-row">
+                  <span>Remaining Amount</span>
+                  <strong>₹{{ order?.remainingAmount | number:'1.2-2' }}</strong>
+                </div>
+              </div>
+
+              <div class="bill-actions">
+
+                <button type="button" class="view-bill-button" (click)="openBillViewer()">
+                  <span class="button-icon">🧾</span>
+                  <span>View Bill</span>
+                </button>
+
+                <button
+                  type="button"
+                  class="download-bill-button"
+                  [disabled]="isDownloadingBill"
+                  (click)="downloadBill()">
+                  @if (isDownloadingBill) {
+                    <span class="button-icon">⏳</span>
+                    <span>Downloading...</span>
+                  } @else {
+                    <span class="button-icon">⬇</span>
+                    <span>Download PDF</span>
+                  }
+                </button>
+
+              </div>
+
+              <!-- PAYMENT MESSAGE -->
+              <div class="bill-note">
+                <span>Your bill is ready. Please collect your order from the shop.</span>
+              </div>
+
+            </div>
+
+          } @else {
+
+            <!-- BILL NOT GENERATED -->
+            <div class="bill-not-generated">
+
+              <div class="bill-illustration">
+                <div class="bill-circle">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
 
-  <div class="bill-generated">
+              <span class="bill-status">WAITING FOR BILL</span>
 
-    <div class="bill-status">
-      {{ isBillModified() ? 'BILL MODIFIED' : 'BILL GENERATED' }}
-    </div>
+              <h3>Bill not generated yet</h3>
 
-    <h3>
-      Your Bill
-    </h3>
+              <p>
+                The shopkeeper will prepare your order first
+                and add the prices before generating your bill.
+              </p>
 
-    <p class="bill-date">
-      {{ order?.billedAt | date:'dd MMM yyyy, hh:mm a' }}
-    </p>
+              <div class="bill-note">
+                <span>No payment is required from this page yet.</span>
+              </div>
 
+            </div>
 
-    <!-- BILL ITEMS -->
-
-    <div class="bill-items">
-
-      <div class="bill-item-header">
-        <span>ITEM</span>
-        <span>AMOUNT</span>
-      </div>
-
-
-      @for (item of order?.items; track item.id || $index) {
-
-        <div class="bill-item-row">
-
-          <div class="bill-item-info">
-
-            <strong>
-              {{ item.itemName }}
-            </strong>
-
-            <small>
-              {{ item.quantity }} {{ item.unit }}
-              × ₹{{ item.unitPrice | number:'1.2-2' }}
-            </small>
-
-          </div>
-
-
-          <strong class="bill-item-total">
-
-            ₹{{ item.itemTotal | number:'1.2-2' }}
-
-          </strong>
-
-        </div>
-
-      }
-
-    </div>
-
-
-    <!-- BILL TOTAL -->
-
-    <div class="bill-total-divider"></div>
-
-    <div class="bill-total-row">
-
-      <span>
-        Total Amount
-      </span>
-
-      <strong>
-        ₹{{ order?.totalAmount | number:'1.2-2' }}
-      </strong>
-
-    </div>
-
-    <!-- PAYMENT DETAILS -->
-
-<div class="payment-details">
-
-  <div class="payment-row">
-
-    <span>Payment Status</span>
-
-    <strong>
-      {{ order?.paymentStatus }}
-    </strong>
-
-  </div>
-
-  <div class="payment-row">
-
-    <span>Paid Amount</span>
-
-    <strong>
-      ₹{{ order?.paidAmount | number:'1.2-2' }}
-    </strong>
-
-  </div>
-
-  <div class="payment-row">
-
-    <span>Remaining Amount</span>
-
-    <strong>
-      ₹{{ order?.remainingAmount | number:'1.2-2' }}
-    </strong>
-
-  </div>
-
-</div>
-
-
-    <!-- PAYMENT MESSAGE -->
-
-    <div class="bill-note">
-
-      <span>
-        Your bill is ready. Please collect your order from the shop.
-      </span>
-
-    </div>
-
-  </div>
-
-
-} @else {
-
-  <!-- BILL NOT GENERATED -->
-
-  <div class="bill-not-generated">
-
-    <div class="bill-illustration">
-
-      <div class="bill-circle">
-
-        <svg viewBox="0 0 24 24" fill="none">
-
-          <path
-            d="M6 3h9a4 4 0 0 1 0 8H6M6 3v18M6 11h9M6 15h6"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"/>
-
-        </svg>
-
-      </div>
-
-    </div>
-
-
-    <span class="bill-status">
-      WAITING FOR BILL
-    </span>
-
-    <h3>
-      Bill not generated yet
-    </h3>
-
-    <p>
-      The shopkeeper will prepare your order first
-      and add the prices before generating your bill.
-    </p>
-
-
-    <div class="bill-note">
-
-      <span>
-        No payment is required from this page yet.
-      </span>
-
-    </div>
-
-  </div>
-
-}
+          }
 
         </div>
 
       </section>
 
 
-      <!-- =====================================
-           HELP
-      ====================================== -->
-
+      <!-- HELP -->
       <section class="help-box">
-
         <div class="help-icon">
-
           <svg viewBox="0 0 24 24" fill="none">
-            <circle
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="1.7"/>
-
-            <path
-              d="M12 16v-5M12 8h.01"
-              stroke="currentColor"
-              stroke-width="1.7"
-              stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.7"/>
+            <path d="M12 16v-5M12 8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
           </svg>
-
         </div>
-
         <div>
-
-          <strong>
-            Need help with this order?
-          </strong>
-
-          <p>
-            If there is any issue with your order,
-            please contact the shopkeeper.
-          </p>
-
+          <strong>Need help with this order?</strong>
+          <p>If there is any issue with your order, please contact the shopkeeper.</p>
         </div>
-
       </section>
 
 
-      <!-- =====================================
-           BACK
-      ====================================== -->
-
+      <!-- BACK -->
       <div class="bottom-actions">
-
-        <a
-          class="back-orders-button"
-          routerLink="/app/orders">
-
+        <a class="back-orders-button" routerLink="/app/orders">
           <svg viewBox="0 0 24 24" fill="none">
-            <path
-              d="M19 12H5M12 19l-7-7 7-7"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"/>
+            <path d="M19 12H5M12 19l-7-7 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-
           Back to My Orders
-
         </a>
-
       </div>
 
     </main>
@@ -957,3 +513,143 @@
   }
 
 </div>
+
+
+<!-- =========================================================
+     BILL VIEWER  (printer animation)
+     The viewer is created fresh every time isBillViewerOpen
+     becomes true, so the print animation replays on every open.
+========================================================== -->
+@if (isBillViewerOpen && order) {
+
+  <div class="bill-viewer-overlay" (click)="closeBillViewer()">
+
+    <div class="bill-viewer" (click)="$event.stopPropagation()">
+
+      <button type="button" class="bill-viewer-close" (click)="closeBillViewer()">×</button>
+
+      <div class="receipt-printer">
+
+        <!-- PRINTER -->
+        <div class="printer-body">
+
+          <div class="printer-display">
+            <span class="display-printing">PRINTING...</span>
+            <span class="display-ready">READY</span>
+          </div>
+
+          <span class="printer-led"></span>
+
+          <div class="printer-slot">
+            <div class="printer-slot-line"></div>
+          </div>
+
+        </div>
+
+
+        <!-- PAPER (comes out of the printer) -->
+        <div class="paper-shadow">
+
+          <div class="animated-receipt">
+
+            <div class="rc-header">
+              <div class="rc-store-name">Senapati Store</div>
+              <div class="rc-store-subtitle">Grocery Store</div>
+              <div class="rc-title">BILL / INVOICE</div>
+            </div>
+
+            <div class="rc-details">
+              <div class="rc-row">
+                <span>Order</span>
+                <strong>{{ order.orderNumber }}</strong>
+              </div>
+              <div class="rc-row">
+                <span>Customer</span>
+                <strong>{{ customerName || 'Customer' }}</strong>
+              </div>
+              <div class="rc-row">
+                <span>Bill Date</span>
+                <strong>{{ order.billedAt | date:'dd MMM yyyy' }}</strong>
+              </div>
+            </div>
+
+            <div class="rc-items">
+              @for (item of order.items; track item.id || $index) {
+                <div class="rc-item">
+                  <div class="rc-item-main">
+                    <strong>{{ item.itemName }}</strong>
+                    <span>{{ item.quantity }} {{ item.unit }}</span>
+                  </div>
+                  <div class="rc-item-price">
+                    <span>₹{{ item.unitPrice | number:'1.2-2' }}</span>
+                    <strong>₹{{ item.itemTotal | number:'1.2-2' }}</strong>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="rc-total">
+              <span>TOTAL</span>
+              <strong>₹{{ order.totalAmount | number:'1.2-2' }}</strong>
+            </div>
+
+            <div class="rc-payment">
+              <div>
+                <span>Payment</span>
+                <strong>{{ order.paymentStatus || 'UNPAID' }}</strong>
+              </div>
+              <div>
+                <span>Paid</span>
+                <strong>₹{{ order.paidAmount | number:'1.2-2' }}</strong>
+              </div>
+              <div>
+                <span>Remaining</span>
+                <strong>₹{{ order.remainingAmount | number:'1.2-2' }}</strong>
+              </div>
+            </div>
+
+            <div class="rc-verification">
+              <div class="rc-verify-icon">✓</div>
+              <div>
+                <strong>Bill Verified</strong>
+                <span>Official Senapati Store Bill</span>
+              </div>
+            </div>
+
+            <div class="rc-footer">Thank you for shopping!</div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ACTIONS -->
+      <div class="bill-viewer-actions">
+
+        <button type="button" class="verify-bill-button" (click)="verifyBill()">
+          ✓ Verify Bill
+        </button>
+
+        <button
+          type="button"
+          class="viewer-download-button"
+          [disabled]="isDownloadingBill"
+          (click)="downloadBill()">
+          @if (isDownloadingBill) {
+            <span class="button-icon">⏳</span>
+            <span>Downloading...</span>
+          } @else {
+            <span class="button-icon">⬇</span>
+            <span>Download PDF</span>
+          }
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

@@ -1,156 +1,131 @@
 <div class="verify-page">
 
-    <!-- LOADING -->
+  <div class="verify-card">
 
-    <div
-        class="verify-card loading-card"
-        *ngIf="loading">
+    @if (loading) {
 
-        <div class="spinner"></div>
+      <div class="verify-loading">
 
-        <h2>
-            Verifying Bill
-        </h2>
+        <div class="loading-spinner"></div>
+
+        <h2>Verifying Bill...</h2>
 
         <p>
-            Please wait...
+          Please wait while we verify this bill.
         </p>
 
-    </div>
+      </div>
 
+    } @else if (bill?.valid) {
 
-    <!-- VERIFIED -->
-
-    <div
-        class="verify-card success-card"
-        *ngIf="!loading && bill?.valid">
-
-        <div class="store-name">
-            {{ bill?.storeName }}
-        </div>
+      <div class="verify-success">
 
         <div class="success-icon">
-            ✓
+          ✓
         </div>
 
-        <h1>
-            Bill Verified
-        </h1>
+        <div class="verified-label">
+          VERIFIED
+        </div>
 
-        <p class="subtitle">
-            This bill has been successfully verified.
+        <h1>Bill Verified</h1>
+
+        <p class="verify-message">
+          This bill is a valid bill issued by
+          <strong>{{ bill?.storeName }}</strong>.
         </p>
 
+      </div>
 
-        <div class="bill-details">
+      <div class="bill-information">
 
-            <div class="detail-row">
+        <div class="info-row">
+          <span>Store</span>
+          <strong>{{ bill?.storeName }}</strong>
+        </div>
 
-                <span>
-                    Order Number
-                </span>
+        <div class="info-row">
+          <span>Order Number</span>
+          <strong>{{ bill?.orderNumber }}</strong>
+        </div>
 
-                <strong>
-                    {{ bill?.orderNumber }}
-                </strong>
+        <div class="info-row">
+          <span>Total Amount</span>
+          <strong>
+            ₹{{ bill?.totalAmount | number:'1.2-2' }}
+          </strong>
+        </div>
 
-            </div>
+        <div class="info-row">
+          <span>Payment Status</span>
 
+          <strong
+            [class.payment-paid]="bill?.paymentStatus === 'PAID'"
+            [class.payment-partial]="bill?.paymentStatus === 'PARTIAL'"
+            [class.payment-unpaid]="bill?.paymentStatus === 'UNPAID'">
 
-            <div class="detail-row">
+            {{ bill?.paymentStatus || 'UNKNOWN' }}
 
-                <span>
-                    Total Amount
-                </span>
-
-                <strong>
-                    ₹ {{ bill?.totalAmount | number:'1.2-2' }}
-                </strong>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <span>
-                    Payment Status
-                </span>
-
-                <strong>
-                    {{ bill?.paymentStatus }}
-                </strong>
-
-            </div>
-
-
-            <div class="detail-row">
-
-                <span>
-                    Verification ID
-                </span>
-
-                <strong>
-                    {{ verificationCode }}
-                </strong>
-
-            </div>
+          </strong>
 
         </div>
 
+      </div>
 
-        <div class="verified-message">
+      <div class="verification-code-box">
 
-            ✓ This bill exists in the
-            Senapati Store system.
+        <span>VERIFICATION ID</span>
 
-        </div>
+        <strong>
+          {{ verificationCode }}
+        </strong>
 
-    </div>
+      </div>
 
+      <div class="verification-footer">
 
-    <!-- INVALID -->
+        <span class="footer-check">✓</span>
 
-    <div
-        class="verify-card invalid-card"
-        *ngIf="!loading && error">
+        <span>
+          This bill was verified securely
+          against Senapati Store records.
+        </span>
 
-        <div class="store-name">
-            Senapati Store
-        </div>
+      </div>
+
+    } @else {
+
+      <div class="verify-invalid">
 
         <div class="invalid-icon">
-            ✕
+          !
         </div>
 
-        <h1>
-            Invalid Bill
-        </h1>
+        <div class="invalid-label">
+          VERIFICATION FAILED
+        </div>
 
-        <p class="subtitle">
-            This bill could not be verified.
+        <h1>Bill Not Verified</h1>
+
+        <p>
+          We could not find a valid bill associated
+          with this verification code.
         </p>
 
-
-        <div class="invalid-message">
-
-            The verification ID is invalid or
-            the bill does not exist in the
-            Senapati Store system.
-
+        <div class="invalid-code">
+          {{ verificationCode }}
         </div>
 
-
-        <div class="verification-id"
-             *ngIf="verificationCode">
-
-            Verification ID:
-
-            <strong>
-                {{ verificationCode }}
-            </strong>
-
+        <div class="warning-box">
+          Please check the verification code and
+          try again. Do not rely on a bill that
+          cannot be verified.
         </div>
 
-    </div>
+      </div>
+
+    }
+
+  </div>
 
 </div>

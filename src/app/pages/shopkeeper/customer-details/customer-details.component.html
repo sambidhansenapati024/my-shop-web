@@ -1,0 +1,468 @@
+<div class="customer-details-page">
+
+  <!-- Header -->
+  <section class="page-header">
+
+    <div>
+
+      <span class="page-label">
+        CUSTOMER MANAGEMENT
+      </span>
+
+      <h1>
+        Customer Details
+      </h1>
+
+      <p>
+        View customer information, orders and payment history
+      </p>
+
+    </div>
+
+    <a
+      routerLink="/admin/customers"
+      class="back-button">
+
+      ← Back to Customers
+
+    </a>
+
+  </section>
+
+
+  <!-- Loading -->
+  @if (isLoading) {
+
+    <section class="loading-card">
+
+      <div class="loading-spinner"></div>
+
+      <p>
+        Loading customer details...
+      </p>
+
+    </section>
+
+  }
+
+
+  <!-- Error -->
+  @if (!isLoading && errorMessage) {
+
+    <section class="error-card">
+
+      <div class="error-icon">
+        ⚠️
+      </div>
+
+      <h2>
+        Unable to Load Customer
+      </h2>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="button"
+        class="retry-button"
+        (click)="retry()">
+
+        Try Again
+
+      </button>
+
+    </section>
+
+  }
+
+
+  @if (!isLoading && !errorMessage && customer) {
+
+    <!-- Customer Profile -->
+    <section class="profile-card">
+
+      <div class="profile-main">
+
+        <div class="customer-avatar">
+
+          {{
+            customer.name
+              .trim()
+              .charAt(0)
+              .toUpperCase()
+          }}
+
+        </div>
+
+        <div class="customer-info">
+
+          <span class="profile-label">
+            CUSTOMER
+          </span>
+
+          <h2>
+            {{ customer.name }}
+          </h2>
+
+          <div class="contact-info">
+
+            <span>
+              📱 {{ customer.mobileNumber }}
+            </span>
+
+            @if (customer.email) {
+
+              <span>
+                ✉️ {{ customer.email }}
+              </span>
+
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="customer-stats">
+
+        <div class="stat-box">
+
+          <span class="stat-label">
+            TOTAL ORDERS
+          </span>
+
+          <strong>
+            {{ customer.totalOrders }}
+          </strong>
+
+        </div>
+
+
+        <div class="stat-box outstanding-stat">
+
+          <span class="stat-label">
+            OUTSTANDING
+          </span>
+
+          <strong>
+            ₹{{ customer.outstandingAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Orders -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            Order History
+          </h2>
+
+          <p>
+            {{ customer.orders.length }} order(s)
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (customer.orders.length > 0) {
+
+        <div class="orders-table-wrapper">
+
+          <table class="orders-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  ORDER
+                </th>
+
+                <th>
+                  TYPE
+                </th>
+
+                <th>
+                  STATUS
+                </th>
+
+                <th>
+                  TOTAL
+                </th>
+
+                <th>
+                  PAID
+                </th>
+
+                <th>
+                  REMAINING
+                </th>
+
+                <th>
+                  DATE
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                order of customer.orders;
+                track order.id
+              ) {
+
+                <tr>
+
+                <td>
+                
+                    <a class="order-number" [routerLink]="['/admin/orders', order.id]">
+                
+                        {{ order.orderNumber }}
+                
+                    </a>
+                
+                </td>
+
+
+                  <td>
+                    {{ order.orderType }}
+                  </td>
+
+
+                  <td>
+
+                    <span
+                      class="status-badge"
+                      [class]="getStatusClass(order.status)">
+
+                      {{ getStatusLabel(order.status) }}
+
+                    </span>
+
+                  </td>
+
+
+                  <td>
+
+                    @if (order.totalAmount !== null) {
+
+                      ₹{{ order.totalAmount | number:'1.2-2' }}
+
+                    } @else {
+
+                      <span class="not-billed">
+                        Not billed
+                      </span>
+
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    ₹{{ order.paidAmount | number:'1.2-2' }}
+
+                  </td>
+
+
+                  <td>
+
+                    @if (order.remainingAmount > 0) {
+
+                      <strong class="outstanding">
+                        ₹{{ order.remainingAmount | number:'1.2-2' }}
+                      </strong>
+
+                    } @else {
+
+                      <span class="paid">
+                        ₹0.00
+                      </span>
+
+                    }
+
+                  </td>
+
+
+                  <td>
+
+                    {{ order.createdAt | date:'dd MMM yyyy, h:mm a' }}
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      } @else {
+
+        <div class="empty-section">
+
+          <div class="empty-icon">
+            🛒
+          </div>
+
+          <h3>
+            No Orders Yet
+          </h3>
+
+          <p>
+            This customer has not placed any orders.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+
+    <!-- Payment History -->
+    <section class="content-card">
+
+      <div class="card-header">
+
+        <div>
+
+          <h2>
+            Payment History
+          </h2>
+
+          <p>
+            {{ customer.payments.length }} payment(s)
+          </p>
+
+        </div>
+
+      </div>
+
+
+      @if (customer.payments.length > 0) {
+
+        <div class="payments-table-wrapper">
+
+          <table class="payments-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  ORDER
+                </th>
+
+                <th>
+                  AMOUNT
+                </th>
+
+                <th>
+                  METHOD
+                </th>
+
+                <th>
+                  DATE
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              @for (
+                payment of customer.payments;
+                track payment.id
+              ) {
+
+                <tr>
+
+                  <td>
+
+                    <strong>
+                      {{ payment.orderNumber }}
+                    </strong>
+
+                  </td>
+
+                  <td>
+
+                    <strong class="payment-amount">
+                      ₹{{ payment.amount | number:'1.2-2' }}
+                    </strong>
+
+                  </td>
+
+                  <td>
+
+                    <span class="payment-method">
+                      {{ payment.paymentMethod }}
+                    </span>
+
+                  </td>
+
+                  <td>
+
+                    {{ payment.paymentDate | date:'dd MMM yyyy, h:mm a' }}
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      } @else {
+
+        <div class="empty-section">
+
+          <div class="empty-icon">
+            💰
+          </div>
+
+          <h3>
+            No Payments Yet
+          </h3>
+
+          <p>
+            No payment records are available for this customer.
+          </p>
+
+        </div>
+
+      }
+
+    </section>
+
+  }
+
+</div>

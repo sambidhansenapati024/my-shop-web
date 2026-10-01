@@ -39,6 +39,9 @@ export class OrderDetailsComponent implements OnInit {
 
   customerInitial = 'C';
 
+  isBillViewerOpen = false;
+isDownloadingBill = false;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -82,6 +85,79 @@ export class OrderDetailsComponent implements OnInit {
     }
 
   }
+
+  openBillViewer(): void {
+  this.isBillViewerOpen = true;
+}
+
+closeBillViewer(): void {
+  this.isBillViewerOpen = false;
+}
+
+downloadBill(): void {
+
+  if (!this.order?.id) {
+    return;
+  }
+
+  this.isDownloadingBill = true;
+
+  this.orderService
+    .downloadBillPdf(this.order.id)
+    .subscribe({
+
+      next: (blob) => {
+
+        const url =
+          window.URL.createObjectURL(blob);
+
+        const link =
+          document.createElement('a');
+
+        link.href = url;
+
+        link.download =
+          `bill-${this.order?.orderNumber || this.order?.id}.pdf`;
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        document.body.removeChild(link);
+
+        window.URL.revokeObjectURL(url);
+
+        this.isDownloadingBill = false;
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to download bill:',
+          error
+        );
+
+        this.isDownloadingBill = false;
+
+        alert(
+          'Unable to download the bill. Please try again.'
+        );
+      }
+
+    });
+}
+
+  verifyBill(): void {
+
+  if (!this.order?.verificationCode) {
+    return;
+  }
+
+  this.router.navigate([
+    '/verify',
+    this.order.verificationCode
+  ]);
+}
 
 
   // =====================================================
@@ -253,51 +329,48 @@ export class OrderDetailsComponent implements OnInit {
   // =====================================================
 
   isStatusAtLeast(
-    requiredStatus: string
-  ): boolean {
+  requiredStatus: string
+): boolean {
 
-    if (!this.order) {
-      return false;
-    }
-
-
-    const status =
-      this.order.status?.toUpperCase();
-
-
-    const statusOrder: string[] = [
-      'RECEIVED',
-      'PREPARING',
-      'PACKING',
-      'READY',
-      'BILLED',
-      'COMPLETED'
-    ];
-
-
-    const currentIndex =
-      statusOrder.indexOf(status);
-
-
-    const requiredIndex =
-      statusOrder.indexOf(
-        requiredStatus.toUpperCase()
-      );
-
-
-    if (
-      currentIndex === -1 ||
-      requiredIndex === -1
-    ) {
-
-      return false;
-
-    }
-
-
-    return currentIndex >= requiredIndex;
-
+  if (!this.order) {
+    return false;
   }
+
+  let currentStatus =
+    this.order.status?.toUpperCase();
+
+  const required =
+    requiredStatus.toUpperCase();
+
+  // BILL_MODIFIED is still part of the billed stage.
+  if (currentStatus === 'BILL_MODIFIED') {
+    currentStatus = 'BILLED';
+  }
+
+  const statusOrder: string[] = [
+    'RECEIVED',
+    'PREPARING',
+    'PACKING',
+    'READY',
+    'BILLED',
+    'COMPLETED'
+  ];
+
+  const currentIndex =
+    statusOrder.indexOf(currentStatus);
+
+  const requiredIndex =
+    statusOrder.indexOf(required);
+
+  if (
+    currentIndex === -1 ||
+    requiredIndex === -1
+  ) {
+    return false;
+  }
+
+  return currentIndex >= requiredIndex;
+}
 
 
   // =====================================================

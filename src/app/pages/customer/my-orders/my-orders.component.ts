@@ -155,6 +155,9 @@ export class MyOrdersComponent implements OnInit {
 
       case 'BILLED':
         return 'Bill Generated';
+       
+      case 'BILL_MODIFIED':
+        return 'Bill Updated';  
 
       case 'COMPLETED':
         return 'Completed';
@@ -194,6 +197,9 @@ export class MyOrdersComponent implements OnInit {
 
       case 'BILLED':
         return 'billed';
+
+      case 'BILL_MODIFIED':
+        return 'billed';  
 
       case 'COMPLETED':
         return 'completed';

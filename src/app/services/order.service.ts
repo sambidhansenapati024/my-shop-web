@@ -40,6 +40,8 @@ paidAmount?: number | null;
 
 remainingAmount?: number | null;
 
+verificationCode: string | null;
+
 }
 
 
@@ -153,5 +155,14 @@ export class OrderService {
     );
 
   }
+
+  downloadBillPdf(orderId: number): Observable<Blob> {
+  return this.http.get(
+    `${this.API_URL}/${orderId}/bill-pdf`,
+    {
+      responseType: 'blob'
+    }
+  );
+}
 
 }

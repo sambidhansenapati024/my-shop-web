@@ -2248,22 +2248,84 @@
 
 }
 
-/* PAYMENT SUMMARY */
+/* =========================================================
+   PAYMENT SUMMARY
+========================================================= */
 
 .payment-summary {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  background: #f5f7fa;
+  margin: 10px 15px 0;
+  padding: 11px 12px;
+
+  border: 1px solid #e8edf3;
+  border-radius: 9px;
+
+  background: #f8fafc;
 }
+
+
+.payment-summary-title {
+  margin-bottom: 7px;
+
+  color: #94a0b2;
+
+  font-size: 7px;
+  font-weight: 800;
+
+  letter-spacing: 0.7px;
+}
+
 
 .payment-summary-row {
   display: flex;
-  justify-content: space-between;
+
   align-items: center;
+  justify-content: space-between;
+
   gap: 12px;
+
+  padding: 4px 0;
+
+  color: #7b879a;
+
+  font-size: 8px;
 }
 
+
 .payment-summary-row strong {
-  font-weight: 600;
+  color: #344054;
+
+  font-size: 9px;
+  font-weight: 700;
+}
+
+
+.payment-summary-row .paid-amount {
+  color: #059669;
+}
+
+
+.payment-summary-row .remaining-due {
+  color: #dc2626;
+}
+
+
+.payment-summary-row .remaining-clear {
+  color: #059669;
+}
+
+
+.payment-status-row {
+  margin-top: 5px;
+
+  padding-top: 7px;
+
+  border-top: 1px solid #e8edf3;
+}
+
+
+.payment-status-row strong {
+  color: #2563eb;
+
+  font-size: 8px;
+  font-weight: 800;
 }

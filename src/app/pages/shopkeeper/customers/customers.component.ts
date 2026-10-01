@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  OnInit
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
-interface Customer {
-  id: number;
-  name: string;
-  mobileNumber: string;
-  email: string;
-  totalOrders: number;
-  outstandingAmount: number;
-}
+import {
+  CustomerService,
+  Customer
+} from '../../../services/customer.service';
 
 @Component({
   selector: 'app-customers',
@@ -22,7 +22,8 @@ interface Customer {
   templateUrl: './customers.component.html',
   styleUrl: './customers.component.css'
 })
-export class CustomersComponent {
+export class CustomersComponent
+  implements OnInit {
 
   searchText = '';
 
@@ -32,55 +33,89 @@ export class CustomersComponent {
 
   errorMessage = '';
 
-
   constructor(
-    private router: Router
+    private router: Router,
+    private customerService: CustomerService
   ) {}
 
+  ngOnInit(): void {
+    this.loadCustomers();
+  }
+
+  loadCustomers(): void {
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.customerService
+      .getAllCustomers()
+      .subscribe({
+
+        next: (response) => {
+
+          this.customers =
+            response?.data || [];
+
+          this.isLoading = false;
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Failed to load customers:',
+            error
+          );
+
+          this.isLoading = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to load customers. Please try again.';
+        }
+
+      });
+  }
 
   get filteredCustomers(): Customer[] {
 
     const search =
-      this.searchText.trim().toLowerCase();
+      this.searchText
+        .trim()
+        .toLowerCase();
 
     if (!search) {
       return this.customers;
     }
 
-    return this.customers.filter(customer =>
-      customer.name.toLowerCase().includes(search) ||
-      customer.mobileNumber.includes(search) ||
-      customer.email.toLowerCase().includes(search)
+    return this.customers.filter(
+      customer =>
+        customer.name
+          .toLowerCase()
+          .includes(search) ||
+
+        customer.mobileNumber
+          .includes(search) ||
+
+        customer.email
+          .toLowerCase()
+          .includes(search)
     );
   }
-
 
   clearSearch(): void {
     this.searchText = '';
   }
 
-
   openCustomer(customer: Customer): void {
 
-    /*
-     * Customer details page will be added later.
-     */
-
-    console.log(
-      'Open customer:',
-      customer.id
-    );
-  }
-
+  this.router.navigate([
+    '/admin/customers',
+    customer.id
+  ]);
+}
 
   retry(): void {
-
-    /*
-     * Backend customer API will be connected later.
-     */
-
-    this.errorMessage = '';
-
+    this.loadCustomers();
   }
-
 }

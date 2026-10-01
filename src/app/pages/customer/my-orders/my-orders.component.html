@@ -481,16 +481,59 @@
 
               <!-- PAYMENT SUMMARY -->
 
-@if (order.paymentStatus) {
+@if (
+  order.paymentStatus ||
+  order.totalAmount !== null ||
+  order.paidAmount ||
+  order.remainingAmount
+) {
 
   <div class="payment-summary">
 
+    <div class="payment-summary-title">
+      <span>PAYMENT</span>
+    </div>
+
     <div class="payment-summary-row">
 
-      <span>Payment Status</span>
+      <span>Total Amount</span>
 
       <strong>
-        {{ order.paymentStatus }}
+        ₹{{ order.totalAmount || 0 | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+    <div class="payment-summary-row">
+
+      <span>Paid Amount</span>
+
+      <strong class="paid-amount">
+        ₹{{ order.paidAmount || 0 | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+    <div class="payment-summary-row">
+
+      <span>Remaining</span>
+
+      <strong
+        [class.remaining-due]="(order.remainingAmount || 0) > 0"
+        [class.remaining-clear]="(order.remainingAmount || 0) === 0">
+
+        ₹{{ order.remainingAmount || 0 | number:'1.2-2' }}
+
+      </strong>
+
+    </div>
+
+    <div class="payment-summary-row payment-status-row">
+
+      <span>Status</span>
+
+      <strong>
+        {{ order.paymentStatus || 'UNPAID' }}
       </strong>
 
     </div>

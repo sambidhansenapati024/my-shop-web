@@ -39,14 +39,34 @@
         </p>
       </div>
 
-      <a
-        routerLink="/admin/orders"
-        class="view-orders-button">
+      <div class="orders-header-actions">
 
-        <span>📦</span>
-        View Orders
+  <button
+    type="button"
+    class="refresh-button"
+    (click)="loadDashboard()"
+    [disabled]="loading">
 
-      </a>
+    <span
+      [class.refresh-spinning]="loading">
+      ↻
+    </span>
+
+    Refresh
+
+  </button>
+
+  <a
+    routerLink="/admin/orders"
+    class="card-link">
+
+    View all
+
+    <span>→</span>
+
+  </a>
+
+</div>
 
     </section>
 
@@ -71,7 +91,7 @@
 
         <div class="stat-bottom">
 
-          <strong>0</strong>
+          <strong>{{ newOrdersCount }}</strong>
 
           <span class="stat-description">
             Waiting for action
@@ -99,7 +119,7 @@
 
         <div class="stat-bottom">
 
-          <strong>0</strong>
+          <strong>{{ preparingCount }}</strong>
 
           <span class="stat-description">
             Orders being packed
@@ -127,7 +147,7 @@
 
         <div class="stat-bottom">
 
-          <strong>0</strong>
+          <strong>{{ readyCount }}</strong>
 
           <span class="stat-description">
             Ready for pickup
@@ -155,7 +175,7 @@
 
         <div class="stat-bottom">
 
-          <strong>0</strong>
+         <strong>{{ completedCount }}</strong>
 
           <span class="stat-description">
             Completed orders
@@ -197,20 +217,137 @@
         </div>
 
 
-        <!-- Empty State -->
-        <div class="empty-orders">
+       <!-- Loading -->
+<div
+  class="empty-orders"
+  *ngIf="loading">
 
-          <div class="empty-icon">
-            📦
-          </div>
+  <div class="empty-icon">⏳</div>
 
-          <h3>No orders yet</h3>
+  <h3>Loading orders...</h3>
 
-          <p>
-            New customer orders will appear here.
-          </p>
+  <p>
+    Please wait while we fetch the latest orders.
+  </p>
 
-        </div>
+</div>
+
+
+<!-- Error -->
+<div
+  class="empty-orders"
+  *ngIf="!loading && error">
+
+  <div class="empty-icon">⚠️</div>
+
+  <h3>Unable to load orders</h3>
+
+  <p>
+    Please refresh the page and try again.
+  </p>
+
+</div>
+
+
+<!-- No Orders -->
+<div
+  class="empty-orders"
+  *ngIf="
+    !loading &&
+    !error &&
+    orders.length === 0
+  ">
+
+  <div class="empty-icon">📦</div>
+
+  <h3>No orders yet</h3>
+
+  <p>
+    New customer orders will appear here.
+  </p>
+
+</div>
+
+
+<!-- Recent Orders -->
+<div
+  class="recent-orders"
+  *ngIf="
+    !loading &&
+    !error &&
+    orders.length > 0
+  ">
+
+  <a
+    class="recent-order"
+    *ngFor="
+      let order of orders | slice:0:5
+    "
+    [routerLink]="['/admin/orders', order.id]">
+
+    <!-- Order Icon -->
+    <div class="recent-order-icon">
+      📦
+    </div>
+
+
+    <!-- Order Information -->
+    <div class="recent-order-info">
+
+  <strong>
+    {{ order.orderNumber }}
+  </strong>
+
+  <span>
+    {{ order.customerName }}
+    •
+    {{ order.itemCount }}
+    {{ order.itemCount === 1 ? 'item' : 'items' }}
+    •
+    {{ order.createdAt | date:'h:mm a' }}
+  </span>
+
+</div>
+
+
+    <!-- Order Status -->
+    <div
+      class="recent-order-status"
+      [ngClass]="{
+        'status-received':
+          order.status === 'RECEIVED',
+
+        'status-packing':
+          order.status === 'PACKING',
+
+        'status-ready':
+          order.status === 'READY',
+
+        'status-billed':
+          order.status === 'BILLED',
+
+        'status-modified':
+          order.status === 'BILL_MODIFIED',
+
+        'status-completed':
+          order.status === 'COMPLETED'
+      }">
+
+      {{ getOrderStatusLabel(order.status) }}
+
+    </div>
+
+    <div
+  class="recent-order-amount"
+  *ngIf="order.totalAmount !== null">
+
+  ₹{{ order.totalAmount | number:'1.2-2' }}
+
+</div>
+
+  </a>
+
+</div>
 
       </div>
 
@@ -263,57 +400,47 @@
           <div class="action-divider"></div>
 
 
-          <div class="quick-action disabled-action">
+          <a
+  routerLink="/admin/customers"
+  class="quick-action">
 
-            <div class="quick-icon green-action">
-              👥
-            </div>
+  <div class="quick-icon green-action">
+    👥
+  </div>
 
-            <div class="quick-content">
+  <div class="quick-content">
+    <strong>Customers</strong>
+    <span>Customer management</span>
+  </div>
 
-              <strong>
-                Customers
-              </strong>
+  <span class="quick-arrow">
+    →
+  </span>
 
-              <span>
-                Customer management
-              </span>
-
-            </div>
-
-            <span class="coming-soon">
-              Soon
-            </span>
-
-          </div>
+</a>
 
 
           <div class="action-divider"></div>
 
 
-          <div class="quick-action disabled-action">
+          <a
+  routerLink="/admin/bills"
+  class="quick-action">
 
-            <div class="quick-icon purple-action">
-              📄
-            </div>
+  <div class="quick-icon purple-action">
+    📄
+  </div>
 
-            <div class="quick-content">
+  <div class="quick-content">
+    <strong>Bills</strong>
+    <span>View generated bills</span>
+  </div>
 
-              <strong>
-                Bills
-              </strong>
+  <span class="quick-arrow">
+    →
+  </span>
 
-              <span>
-                View generated bills
-              </span>
-
-            </div>
-
-            <span class="coming-soon">
-              Soon
-            </span>
-
-          </div>
+</a>
 
         </div>
 
@@ -356,7 +483,7 @@
             <span>Customer orders received today</span>
           </div>
 
-          <b>0</b>
+         <b>{{ todayOrdersCount }}</b>
 
         </div>
 
@@ -372,7 +499,7 @@
             <span>Orders waiting for customers</span>
           </div>
 
-          <b>0</b>
+          <b>{{ todayReadyCount }}</b>
 
         </div>
 
@@ -385,10 +512,10 @@
 
           <div>
             <strong>Payments</strong>
-            <span>Payment tracking will appear here</span>
+            <span>Total payments received today</span>
           </div>
 
-          <b>—</b>
+          <b>₹{{ todayPayments | number:'1.2-2' }}</b>
 
         </div>
 

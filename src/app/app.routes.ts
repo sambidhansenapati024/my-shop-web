@@ -37,6 +37,7 @@ import { BillsComponent } from './pages/shopkeeper/bills/bills.component';
 import { PaymentsComponent } from './pages/shopkeeper/payments/payments.component';
 import { BillViewComponent } from './pages/shopkeeper/bill-view/bill-view.component';
 import { VerifyComponent } from './pages/customer-verify/verify/verify.component';
+import { CustomerDetailsComponent } from './pages/shopkeeper/customer-details/customer-details.component';
 
 
 export const routes: Routes = [
@@ -169,7 +170,7 @@ export const routes: Routes = [
   {
     path: 'admin',
     component: AdminLayoutComponent,
-    //canActivate: [adminGuard],
+    canActivate: [adminGuard],
 
     children: [
 
@@ -204,6 +205,10 @@ export const routes: Routes = [
        {
         path: 'customers',
         component: CustomersComponent
+      },
+      {
+        path: 'customers/:id',
+        component: CustomerDetailsComponent
       },
        {
         path: 'bills',
