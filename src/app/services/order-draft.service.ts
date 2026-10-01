@@ -44,19 +44,26 @@ export class OrderDraftService {
 }
 
   savePhotoOrder(
-    photo: File,
-    photoPreview: string,
-    photoNote: string
-  ): void {
+  photo: File,
+  photoPreview: string,
+  photoNote: string,
+  items: OrderItem[]
+): void {
 
-    this.draft = {
-      orderType: 'photo',
-      items: [],
-      photo: photo,
-      photoPreview: photoPreview,
-      photoNote: photoNote
-    };
-  }
+  this.draft = {
+    orderType: 'photo',
+
+    items: items.map(item => ({
+      itemName: item.itemName,
+      quantity: item.quantity,
+      unit: item.unit
+    })),
+
+    photo: photo,
+    photoPreview: photoPreview,
+    photoNote: photoNote
+  };
+}
 
   clearDraft(): void {
     this.draft = {

@@ -1921,3 +1921,210 @@
   }
 
 }
+
+/* =========================================================
+   DETECTED ITEMS - PHOTO ORDER
+========================================================= */
+
+.detected-review-section {
+  margin-top: 12px;
+  padding: 12px;
+
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f8fbff,
+      #f4fcf8
+    );
+
+  animation:
+    fadeUp 0.4s ease both;
+}
+
+
+.detected-review-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 9px;
+}
+
+
+.detected-review-header h3 {
+  margin: 0;
+
+  color: #344054;
+
+  font-size: 11px;
+  font-weight: 750;
+}
+
+
+.detected-review-header p {
+  margin: 3px 0 0;
+
+  color: #8994a6;
+
+  font-size: 8px;
+}
+
+
+.detected-review-count {
+  flex-shrink: 0;
+
+  padding: 5px 8px;
+
+  border-radius: 20px;
+
+  background: #ecfdf5;
+
+  color: #059669;
+
+  font-size: 7px;
+  font-weight: 800;
+}
+
+
+.detected-review-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+
+.detected-review-item {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  padding: 7px 8px;
+
+  border:
+    1px solid
+    #e5eaf0;
+
+  border-radius: 7px;
+
+  background: #ffffff;
+}
+
+
+.detected-review-number {
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #e8f8f2
+    );
+
+  color: #2563eb;
+
+  font-size: 7px;
+
+  font-weight: 800;
+}
+
+
+.detected-review-info {
+  min-width: 0;
+
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 2px;
+}
+
+
+.detected-review-info strong {
+  overflow: hidden;
+
+  color: #344054;
+
+  font-size: 9px;
+
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+.detected-review-info span {
+  color: #a0a9b8;
+
+  font-size: 7px;
+}
+
+
+.detected-review-quantity {
+  min-width: 55px;
+
+  display: flex;
+
+  align-items: baseline;
+
+  justify-content: flex-end;
+
+  gap: 3px;
+}
+
+
+.detected-review-quantity strong {
+  color: #273247;
+
+  font-size: 9px;
+
+  font-weight: 800;
+}
+
+
+.detected-review-quantity span {
+  color: #7b879a;
+
+  font-size: 7px;
+
+  font-weight: 650;
+}
+
+
+@media (max-width: 450px) {
+
+  .detected-review-section {
+    padding: 10px;
+  }
+
+  .detected-review-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 6px;
+  }
+
+}

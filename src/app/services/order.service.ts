@@ -65,7 +65,17 @@ export interface MyOrdersResponse {
   data: Order[];
 
 }
+export interface OcrDetectedItem {
+  itemName: string;
+  quantity: number;
+  unit: string;
+}
 
+export interface OcrScanResponse {
+  success: boolean;
+  text: string;
+  items: OcrDetectedItem[];
+}
 
 @Injectable({
   providedIn: 'root'
@@ -89,19 +99,21 @@ export class OrderService {
   const formData = new FormData();
 
   const orderData = {
-  orderType: draft.orderType === 'manual' ? 'MANUAL' : 'PHOTO',
+  orderType:
+    draft.orderType === 'manual'
+      ? 'MANUAL'
+      : 'PHOTO',
 
-  items: draft.orderType === 'manual'
-    ? draft.items.map(item => ({
-        itemName: item.itemName,
-        quantity: item.quantity,
-        unit: item.unit
-      }))
-    : [],
+  items: draft.items.map(item => ({
+    itemName: item.itemName,
+    quantity: item.quantity,
+    unit: item.unit
+  })),
 
-  photoNote: draft.orderType === 'photo'
-    ? draft.photoNote
-    : null
+  photoNote:
+    draft.orderType === 'photo'
+      ? draft.photoNote
+      : null
 };
   const orderBlob = new Blob(
     [JSON.stringify(orderData)],
@@ -162,6 +174,23 @@ export class OrderService {
     {
       responseType: 'blob'
     }
+  );
+}
+
+scanGroceryPhoto(
+  photo: File
+): Observable<OcrScanResponse> {
+
+  const formData = new FormData();
+
+  formData.append(
+    'image',
+    photo
+  );
+
+  return this.http.post<OcrScanResponse>(
+    'http://localhost:2003/api/ocr/scan',
+    formData
   );
 }
 

@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { OrderItem } from '../../../models/order-item.model';
 import { OrderDraftService } from '../../../services/order-draft.service';
+import { OrderService } from '../../../services/order.service';
 
 @Component({
   selector: 'app-create-order',
@@ -60,15 +61,26 @@ export class CreateOrderComponent {
 
   photoNote = '';
 
+  // ==========================================
+// PHOTO SCANNING
+// ==========================================
+
+isScanningPhoto = false;
+
+scanCompleted = false;
+
+detectedItems: OrderItem[] = [];
+
 
   // ==========================================
   // CONSTRUCTOR
   // ==========================================
 
   constructor(
-    private orderDraftService: OrderDraftService,
-    private router: Router
-  ) {}
+  private orderDraftService: OrderDraftService,
+  private orderService: OrderService,
+  private router: Router
+) {}
 
 
   // ==========================================
@@ -214,31 +226,158 @@ export class CreateOrderComponent {
 
   }
 
+  scanPhoto(): void {
+
+  if (
+    !this.selectedPhoto ||
+    !this.photoPreview
+  ) {
+    alert(
+      'Please upload a grocery list photo.'
+    );
+    return;
+  }
+
+  this.isScanningPhoto = true;
+  this.scanCompleted = false;
+  this.detectedItems = [];
+
+  this.orderService
+    .scanGroceryPhoto(
+      this.selectedPhoto
+    )
+    .subscribe({
+
+      next: (response) => {
+
+        console.log(
+          'OCR response:',
+          response
+        );
+
+        this.detectedItems =
+          response.items.map(item => ({
+            itemName: item.itemName,
+            quantity: item.quantity,
+            unit: item.unit
+          }));
+
+        this.isScanningPhoto = false;
+        this.scanCompleted = true;
+
+        if (
+          this.detectedItems.length === 0
+        ) {
+
+          alert(
+            'No grocery items could be detected. Please try a clearer photo.'
+          );
+        }
+      },
+
+      error: (error) => {
+
+        console.error(
+          'OCR scanning failed:',
+          error
+        );
+
+        this.isScanningPhoto = false;
+        this.scanCompleted = false;
+
+        alert(
+          'Unable to scan the grocery list. Please try again.'
+        );
+      }
+
+    });
+}
+
+hasInvalidDetectedItems(): boolean {
+
+  if (
+    !this.detectedItems ||
+    this.detectedItems.length === 0
+  ) {
+    return true;
+  }
+
+  return this.detectedItems.some(item =>
+    !item.itemName ||
+    item.itemName.trim() === '' ||
+    item.quantity === null ||
+    item.quantity === undefined ||
+    item.quantity <= 0 ||
+    !item.unit ||
+    item.unit.trim() === ''
+  );
+}
+
+isDetectedItemInvalid(index: number): boolean {
+
+  const item =
+    this.detectedItems[index];
+
+  if (!item) {
+    return true;
+  }
+
+  return (
+    !item.itemName ||
+    item.itemName.trim() === '' ||
+    item.quantity === null ||
+    item.quantity === undefined ||
+    item.quantity <= 0 ||
+    !item.unit ||
+    item.unit.trim() === ''
+  );
+}
+
+removeDetectedItem(index: number): void {
+
+  this.detectedItems.splice(index, 1);
+
+}
+
 
   continueWithPhoto(): void {
 
-    if (
-      !this.selectedPhoto ||
-      !this.photoPreview
-    ) {
-
-      alert(
-        'Please upload a grocery list photo.'
-      );
-
-      return;
-    }
-
-    this.orderDraftService.savePhotoOrder(
-      this.selectedPhoto,
-      this.photoPreview,
-      this.photoNote
+  if (
+    !this.selectedPhoto ||
+    !this.photoPreview
+  ) {
+    alert(
+      'Please upload a grocery list photo.'
     );
-
-    this.router.navigate([
-      '/app/order-review'
-    ]);
-
+    return;
   }
+
+  if (
+    this.detectedItems.length === 0
+  ) {
+    alert(
+      'No grocery items were detected. Please scan the photo again.'
+    );
+    return;
+  }
+
+  if (this.hasInvalidDetectedItems()) {
+    alert(
+      'Please check all detected items before continuing.'
+    );
+    return;
+  }
+
+  this.orderDraftService.savePhotoOrder(
+    this.selectedPhoto,
+    this.photoPreview,
+    this.photoNote,
+    this.detectedItems
+  );
+
+  this.router.navigate([
+    '/app/order-review'
+  ]);
+}
 
 }

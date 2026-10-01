@@ -1,1 +1,145 @@
-<p>khata works!</p>
+<div class="khata-container">
+
+  <div class="khata-header">
+    <h1>📖 My Khata</h1>
+    <p>Your personal digital ledger</p>
+  </div>
+
+  <div class="book-wrapper">
+
+    <div class="book">
+
+      <!-- Cover Page -->
+      <div class="book-page cover-page" *ngIf="isCoverPage()">
+
+        <div class="cover-decoration">✦ ✦ ✦</div>
+
+        <div class="book-icon">📖</div>
+
+        <h1>MY KHATA</h1>
+        <p class="subtitle">Personal Account Book</p>
+
+        <div class="customer-details">
+          <p><strong>Customer Name</strong></p>
+          <h2>{{ customerName }}</h2>
+
+          <p><strong>Customer ID</strong></p>
+          <h3>{{ customerId }}</h3>
+        </div>
+
+        <div class="cover-decoration bottom">✦ ✦ ✦</div>
+
+        <p class="shop-name">My Shop</p>
+
+      </div>
+
+      <!-- Summary Page -->
+      <div class="book-page summary-page" *ngIf="isSummaryPage()">
+
+        <h2>Account Summary</h2>
+
+        <div class="summary-card">
+          <span>Total Bills</span>
+          <strong>{{ khataRecords.length }}</strong>
+        </div>
+
+        <div class="summary-card">
+          <span>Total Amount</span>
+          <strong>₹{{ totalAmount }}</strong>
+        </div>
+
+        <div class="summary-card paid">
+          <span>Total Paid</span>
+          <strong>₹{{ totalPaid }}</strong>
+        </div>
+
+        <div class="summary-card due">
+          <span>Total Due</span>
+          <strong>₹{{ totalDue }}</strong>
+        </div>
+
+        <p class="summary-note">
+          Thank you for shopping with us!
+        </p>
+
+      </div>
+
+      <!-- Records Pages -->
+      <div class="book-page records-page" *ngIf="isRecordsPage()">
+
+        <h2>Transaction Records</h2>
+
+        <div
+          class="record"
+          *ngFor="let record of khataRecords; let i = index">
+
+          <div class="record-header">
+            <strong>{{ record.billNumber }}</strong>
+            <span>{{ record.date }}</span>
+          </div>
+
+          <p>{{ record.description }}</p>
+
+          <div class="record-row">
+            <span>Total Amount</span>
+            <strong>₹{{ record.amount }}</strong>
+          </div>
+
+          <div class="record-row">
+            <span>Paid</span>
+            <strong class="paid-text">
+              ₹{{ record.paidAmount }}
+            </strong>
+          </div>
+
+          <div class="record-row">
+            <span>Remaining</span>
+            <strong class="due-text">
+              ₹{{ record.remainingAmount }}
+            </strong>
+          </div>
+
+          <hr>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Page Navigation -->
+  <div class="page-navigation">
+
+    <button
+      type="button"
+      (click)="previousPage()"
+      [disabled]="currentPage === 0">
+      ◀ Previous
+    </button>
+
+    <div class="page-numbers">
+      <button
+        type="button"
+        *ngFor="let page of [0, 1, 2, 3]"
+        [class.active]="currentPage === page"
+        (click)="goToPage(page)">
+        {{ page + 1 }}
+      </button>
+    </div>
+
+    <button
+      type="button"
+      (click)="nextPage()"
+      [disabled]="currentPage === totalPages - 1">
+      Next ▶
+    </button>
+
+  </div>
+
+  <p class="page-indicator">
+    Page {{ currentPage + 1 }} of {{ totalPages }}
+  </p>
+
+</div>

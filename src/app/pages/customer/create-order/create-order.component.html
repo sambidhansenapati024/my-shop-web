@@ -636,6 +636,166 @@
 
       <ng-container *ngIf="photoPreview">
 
+        <div
+    class="photo-scanning"
+    *ngIf="isScanningPhoto">
+
+    <div class="scanning-icon">
+      🔍
+    </div>
+
+    <h3>
+      Scanning your grocery list...
+    </h3>
+
+    <p>
+      We are reading the items from your photo.
+    </p>
+
+    <div class="scanning-loader">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+
+  </div>
+
+  <!-- DETECTED GROCERY ITEMS -->
+
+<div
+  class="detected-items-section"
+  *ngIf="scanCompleted && detectedItems.length > 0">
+
+  <div class="detected-items-header">
+
+    <div>
+      <span class="panel-label green-label">
+        SCAN COMPLETE
+      </span>
+
+      <h2>
+        Detected grocery items
+      </h2>
+
+      <p>
+        Please check the detected items before continuing.
+      </p>
+    </div>
+
+    <span class="detected-count">
+      {{ detectedItems.length }}
+      {{ detectedItems.length === 1 ? 'item' : 'items' }}
+    </span>
+
+  </div>
+
+
+  <div class="detected-items-list">
+
+    <div
+  class="detected-item"
+  *ngFor="let item of detectedItems; let i = index"
+   [class.invalid-detected-item]="isDetectedItemInvalid(i)">
+
+  <div class="detected-number">
+    {{ i + 1 }}
+  </div>
+
+  <!-- ITEM NAME -->
+  <div class="detected-field">
+
+    <label>
+      Item
+    </label>
+
+    <input
+      type="text"
+      [(ngModel)]="item.itemName"
+      placeholder="Item name" />
+
+  </div>
+
+  <div
+  class="detected-item-error"
+  *ngIf="isDetectedItemInvalid(i)">
+
+  Please enter a valid item name, quantity and unit.
+
+</div>
+
+
+  <!-- QUANTITY -->
+  <div class="detected-field quantity">
+
+    <label>
+      Quantity
+    </label>
+
+    <input
+      type="number"
+      [(ngModel)]="item.quantity"
+      min="0"
+      step="0.01"
+      placeholder="0" />
+
+  </div>
+
+
+  <!-- UNIT -->
+  <div class="detected-field unit">
+
+    <label>
+      Unit
+    </label>
+
+    <select [(ngModel)]="item.unit">
+
+      <option
+        *ngFor="let unit of units"
+        [value]="unit">
+
+        {{ unit }}
+
+      </option>
+
+    </select>
+
+  </div>
+
+  <div
+  class="detected-item-error"
+  *ngIf="isDetectedItemInvalid(i)">
+
+  Please enter a valid item name, quantity and unit.
+
+</div>
+
+  <div
+  class="detected-item-error"
+  *ngIf="isDetectedItemInvalid(i)">
+
+  Please enter a valid item name, quantity and unit.
+
+</div>
+
+
+  <!-- REMOVE -->
+  <button
+    type="button"
+    class="detected-remove"
+    (click)="removeDetectedItem(i)"
+    title="Remove item">
+
+    ×
+
+  </button>
+
+</div>
+
+  </div>
+
+</div>
+
         <div class="photo-preview-section">
 
           <!-- HEADER -->
@@ -740,10 +900,10 @@
             <button
               type="button"
               class="photo-continue-button"
-              (click)="continueWithPhoto()">
+              (click)="scanCompleted ? continueWithPhoto() : scanPhoto()">
 
               <span>
-                Continue
+                 {{ scanCompleted ? 'Confirm Items' : 'Scan & Continue' }}
               </span>
 
               <svg viewBox="0 0 24 24" fill="none">

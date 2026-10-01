@@ -273,6 +273,80 @@
             </div>
 
           }
+                    <!-- DETECTED ITEMS -->
+
+          @if (draft.items && draft.items.length > 0) {
+
+            <div class="detected-review-section">
+
+              <div class="detected-review-header">
+
+                <div>
+                  <span class="section-label">
+                    DETECTED ITEMS
+                  </span>
+
+                  <h3>
+                    Grocery items found
+                  </h3>
+
+                  <p>
+                    These items were detected from your photo.
+                  </p>
+                </div>
+
+                <span class="detected-review-count">
+                  {{ draft.items.length }}
+                  {{ draft.items.length === 1 ? 'item' : 'items' }}
+                </span>
+
+              </div>
+
+
+              <div class="detected-review-list">
+
+                @for (item of draft.items; track $index) {
+
+                  <div
+                    class="detected-review-item">
+
+                    <div class="detected-review-number">
+                      {{ $index + 1 }}
+                    </div>
+
+                    <div class="detected-review-info">
+
+                      <strong>
+                        {{ item.itemName }}
+                      </strong>
+
+                      <span>
+                        Grocery item
+                      </span>
+
+                    </div>
+
+                    <div class="detected-review-quantity">
+
+                      <strong>
+                        {{ item.quantity }}
+                      </strong>
+
+                      <span>
+                        {{ item.unit }}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
 
 
           @if (draft.photoNote) {
