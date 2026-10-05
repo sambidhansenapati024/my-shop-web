@@ -38,6 +38,7 @@ import { PaymentsComponent } from './pages/shopkeeper/payments/payments.componen
 import { BillViewComponent } from './pages/shopkeeper/bill-view/bill-view.component';
 import { VerifyComponent } from './pages/customer-verify/verify/verify.component';
 import { CustomerDetailsComponent } from './pages/shopkeeper/customer-details/customer-details.component';
+import { InventoryComponent } from './pages/shopkeeper/inventory/inventory.component';
 
 
 export const routes: Routes = [
@@ -187,6 +188,11 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         component: ShopkeeperDashboardComponent
+      },
+
+      {
+        path: 'inventory',
+        component: InventoryComponent
       },
 
 

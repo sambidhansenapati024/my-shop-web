@@ -105,6 +105,11 @@ export class SidebarComponent
           label: 'Payments',
           icon: '💰',
           route: '/admin/payments'
+        },
+        {
+          label: 'Inventory',
+          icon: '🏭',
+          route: '/admin/inventory'
         }
 
       ];

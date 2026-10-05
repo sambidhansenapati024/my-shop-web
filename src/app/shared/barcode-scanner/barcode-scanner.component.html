@@ -1,0 +1,111 @@
+<div class="scanner-overlay">
+
+  <div class="scanner-card">
+
+    <!-- Header -->
+
+    <div class="scanner-header">
+
+      <div>
+        <h2>Scan Barcode</h2>
+
+        <p>
+          Point your camera at the product barcode.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="close()"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- Camera -->
+
+    <div
+      id="barcode-scanner-reader"
+      class="scanner-reader"
+    ></div>
+
+
+    <!-- Starting -->
+
+    <div
+      class="scanner-message"
+      *ngIf="isStarting"
+    >
+      <div class="spinner"></div>
+
+      <p>
+        Starting camera...
+      </p>
+    </div>
+
+
+    <!-- Error -->
+
+    <div
+      class="scanner-error"
+      *ngIf="hasError"
+    >
+
+      <div class="error-icon">
+        ⚠️
+      </div>
+
+      <h3>
+        Camera unavailable
+      </h3>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="button"
+        class="retry-btn"
+        (click)="startScanner()"
+      >
+        Try Again
+      </button>
+
+    </div>
+
+
+    <!-- Instructions -->
+
+    <div class="scanner-instructions">
+
+      <span class="scan-icon">
+        ▣
+      </span>
+
+      <span>
+        Keep the barcode inside the scanning box.
+      </span>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <div class="scanner-footer">
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
