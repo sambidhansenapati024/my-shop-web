@@ -75,6 +75,20 @@ export interface PaymentResponse {
   data: AdminOrder;
 }
 
+export interface BillManagement {
+  id: number;
+  billNumber: string;
+  customerName: string;
+  customerMobile: string | null;
+  orderNumber: string | null;
+  billType: 'ORDER' | 'MANUAL';
+  totalAmount: number;
+  paidAmount: number;
+  remainingAmount: number;
+  paymentStatus: 'UNPAID' | 'PARTIAL' | 'PAID';
+  billedAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -158,6 +172,12 @@ export class AdminOrderService {
 getAllBills(): Observable<BillResponseWrapper> {
   return this.http.get<BillResponseWrapper>(
     `${this.API_URL}/bills`
+  );
+}
+
+getAllBillManagement(): Observable<any> {
+  return this.http.get<any>(
+    `${this.API_URL}/bill-management`
   );
 }
 

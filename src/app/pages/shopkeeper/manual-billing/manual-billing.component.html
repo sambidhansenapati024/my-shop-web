@@ -1,0 +1,869 @@
+<div class="billing-page">
+
+  <!-- ========================= -->
+  <!-- OPEN BILLS -->
+  <!-- ========================= -->
+
+  <div
+    class="open-bills-bar"
+    *ngIf="openBills.length > 0"
+  >
+
+    <div class="open-bills-header">
+
+      <div>
+        <span class="open-bills-title">
+          Open Bills
+        </span>
+
+        <span class="open-bills-count">
+          {{ openBills.length }}
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="new-bill-tab-button"
+        (click)="startNewBill()"
+      >
+        + New Bill
+      </button>
+
+    </div>
+
+    <div class="open-bills-tabs">
+
+      <button
+        type="button"
+        class="bill-tab"
+        *ngFor="let bill of openBills"
+        [class.active]="isActiveBill(bill)"
+        (click)="switchBill(bill)"
+      >
+
+        <div class="bill-tab-main">
+
+          <span class="bill-tab-number">
+            {{ bill.billNumber }}
+          </span>
+
+          <span class="bill-tab-customer">
+            {{ bill.customerName || 'Walk-in Customer' }}
+          </span>
+
+        </div>
+
+        <div class="bill-tab-right">
+
+          <span class="bill-tab-total">
+            ₹{{ bill.totalAmount | number:'1.2-2' }}
+          </span>
+
+          <span
+            class="bill-tab-status"
+            [class.unpaid]="bill.paymentStatus === 'UNPAID'"
+            [class.partial]="bill.paymentStatus === 'PARTIAL'"
+            [class.paid]="bill.paymentStatus === 'PAID'"
+          >
+            {{ bill.paymentStatus }}
+          </span>
+
+        </div>
+
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- HEADER -->
+  <!-- ========================= -->
+
+  <div class="billing-header">
+
+    <div>
+      <h1>Manual Billing</h1>
+      <p>Create a bill by selecting products or scanning barcodes.</p>
+    </div>
+
+    <button
+      *ngIf="currentBill"
+      class="new-bill-btn"
+      type="button"
+      (click)="startNewBill()"
+    >
+      + New Bill
+    </button>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- CREATE BILL -->
+  <!-- ========================= -->
+
+  <div
+    class="customer-card"
+    *ngIf="!currentBill"
+  >
+
+    <div class="section-title">
+      <h2>New Bill</h2>
+      <p>Customer details are optional.</p>
+    </div>
+
+    <form
+      [formGroup]="customerForm"
+      (ngSubmit)="createBill()"
+      class="customer-form"
+    >
+
+      <div class="form-group">
+
+        <label for="customerName">
+          Customer Name
+        </label>
+
+        <input
+          id="customerName"
+          type="text"
+          formControlName="customerName"
+          placeholder="Enter customer name"
+        />
+
+      </div>
+
+
+      <div class="form-group">
+
+        <label for="customerMobile">
+          Mobile Number
+        </label>
+
+        <input
+          id="customerMobile"
+          type="text"
+          formControlName="customerMobile"
+          placeholder="Enter mobile number"
+        />
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="create-bill-btn"
+        [disabled]="isCreatingBill"
+      >
+
+        <span *ngIf="!isCreatingBill">
+          Create Bill
+        </span>
+
+        <span *ngIf="isCreatingBill">
+          Creating...
+        </span>
+
+      </button>
+
+    </form>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- BILLING WORKSPACE -->
+  <!-- ========================= -->
+
+  <div
+    class="billing-workspace"
+    *ngIf="currentBill"
+  >
+
+    <!-- ========================= -->
+    <!-- LEFT SIDE - PRODUCTS -->
+    <!-- ========================= -->
+
+    <div class="product-panel">
+
+      <div class="panel-header">
+
+        <div>
+          <h2>Add Products</h2>
+          <p>Select a product manually or scan its barcode.</p>
+        </div>
+
+        <button
+          type="button"
+          class="scan-btn"
+          (click)="openBarcodeScanner()"
+          [disabled]="currentBill.billedAt"
+        >
+          📷 Scan
+        </button>
+
+      </div>
+
+
+      <!-- Product List -->
+
+      <div class="product-section">
+
+        <h3>Products</h3>
+
+        <div
+          *ngIf="isLoadingProducts"
+          class="loading-message"
+        >
+          Loading products...
+        </div>
+
+        <div
+          *ngIf="!isLoadingProducts && products.length === 0"
+          class="empty-message"
+        >
+          No products found in inventory.
+        </div>
+
+        <div
+          class="product-grid"
+          *ngIf="!isLoadingProducts && products.length > 0"
+        >
+
+          <button
+            type="button"
+            class="product-card"
+            *ngFor="let product of products"
+            [class.selected]="selectedProduct?.id === product.id"
+            (click)="selectProduct(product)"
+            [disabled]="currentBill.billedAt"
+          >
+
+            <div class="product-name">
+              {{ product.productName }}
+            </div>
+
+            <div class="product-meta">
+              {{ product.unit }}
+            </div>
+
+            <div
+              class="product-barcode"
+              *ngIf="product.barcode"
+            >
+              {{ product.barcode }}
+            </div>
+
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- Selected Product -->
+
+      <div
+        class="selected-product-section"
+        *ngIf="selectedProduct"
+      >
+
+        <div class="selected-product-header">
+
+          <div>
+            <span class="label">
+              Selected Product
+            </span>
+
+            <h3>
+              {{ selectedProduct.productName }}
+            </h3>
+          </div>
+
+          <span class="unit-badge">
+            {{ selectedProduct.unit }}
+          </span>
+
+        </div>
+
+
+        <!-- Loading Batches -->
+
+        <div
+          *ngIf="isLoadingBatches"
+          class="loading-message"
+        >
+          Loading available batches...
+        </div>
+
+
+        <!-- No Batches -->
+
+        <div
+          *ngIf="
+            !isLoadingBatches &&
+            batches.length === 0
+          "
+          class="empty-message"
+        >
+          No stock available for this product.
+        </div>
+
+
+        <!-- Batches -->
+
+        <div
+          class="batch-list"
+          *ngIf="
+            !isLoadingBatches &&
+            batches.length > 0
+          "
+        >
+
+          <h4>Select Batch</h4>
+
+          <button
+            type="button"
+            class="batch-card"
+            *ngFor="let batch of batches"
+            [class.selected]="selectedBatch?.id === batch.id"
+            (click)="selectBatch(batch)"
+            [disabled]="currentBill.billedAt"
+          >
+
+            <div class="batch-top">
+
+              <strong>
+                Batch: {{ batch.batchNumber }}
+              </strong>
+
+              <span class="batch-price">
+                ₹{{ batch.sellingPrice | number:'1.2-2' }}
+              </span>
+
+            </div>
+
+            <div class="batch-details">
+
+              <span>
+                Stock:
+                {{ batch.quantity }}
+                {{ selectedProduct.unit }}
+              </span>
+
+              <span *ngIf="batch.expiryDate">
+                Exp:
+                {{ batch.expiryDate | date:'dd MMM yyyy' }}
+              </span>
+
+            </div>
+
+          </button>
+
+        </div>
+
+
+        <!-- Quantity -->
+
+        <div
+          class="quantity-section"
+          *ngIf="selectedBatch"
+        >
+
+          <label>
+            Quantity
+          </label>
+
+          <div class="quantity-control">
+
+            <button
+              type="button"
+              (click)="decreaseQuantity()"
+              [disabled]="quantity <= 1 || currentBill.billedAt"
+            >
+              −
+            </button>
+
+            <input
+              type="number"
+              min="1"
+              [max]="selectedBatch.quantity"
+              [value]="quantity"
+              (input)="quantity = +$any($event.target).value"
+              [disabled]="currentBill.billedAt"
+            />
+
+            <button
+              type="button"
+              (click)="increaseQuantity()"
+              [disabled]="
+                quantity >= selectedBatch.quantity ||
+                currentBill.billedAt
+              "
+            >
+              +
+            </button>
+
+          </div>
+
+          <div class="stock-info">
+
+            Available:
+            <strong>
+              {{ selectedBatch.quantity }}
+              {{ selectedProduct.unit }}
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- Add To Bill -->
+
+        <button
+          type="button"
+          class="add-item-btn"
+          *ngIf="selectedBatch"
+          [disabled]="isAddingItem || currentBill.billedAt"
+          (click)="addItem()"
+        >
+
+          <span *ngIf="!isAddingItem">
+            + Add to Bill
+          </span>
+
+          <span *ngIf="isAddingItem">
+            Adding...
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- RIGHT SIDE - BILL -->
+    <!-- ========================= -->
+
+    <div class="bill-panel">
+
+      <!-- Bill Header -->
+
+      <div class="bill-header">
+
+        <div>
+
+          <span class="bill-label">
+            BILL
+          </span>
+
+          <h2>
+            {{ currentBill.billNumber }}
+          </h2>
+
+        </div>
+
+        <div class="payment-status">
+
+          <span
+            [class.unpaid]="currentBill.paymentStatus === 'UNPAID'"
+            [class.partial]="currentBill.paymentStatus === 'PARTIAL'"
+            [class.paid]="currentBill.paymentStatus === 'PAID'"
+          >
+            {{ currentBill.paymentStatus }}
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Customer -->
+
+      <div class="bill-customer">
+
+        <div>
+
+          <span>Customer</span>
+
+          <strong>
+            {{ currentBill.customerName || 'Walk-in Customer' }}
+          </strong>
+
+        </div>
+
+        <div *ngIf="currentBill.customerMobile">
+
+          <span>Mobile</span>
+
+          <strong>
+            {{ currentBill.customerMobile }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- Bill Items -->
+
+      <div class="bill-items">
+
+        <div class="bill-items-header">
+          <span>Item</span>
+          <span>Qty</span>
+          <span>Price</span>
+          <span>Total</span>
+          <span></span>
+        </div>
+
+
+        <div
+          class="bill-item"
+          *ngFor="let item of currentBill.items"
+        >
+
+          <div class="item-name">
+
+            <strong>
+              {{ item.itemName }}
+            </strong>
+
+            <small>
+              {{ item.unit }}
+            </small>
+
+          </div>
+
+          <div>
+            {{ item.quantity }}
+          </div>
+
+          <div>
+            ₹{{ item.unitPrice | number:'1.2-2' }}
+          </div>
+
+          <div class="item-total">
+            ₹{{ item.totalPrice | number:'1.2-2' }}
+          </div>
+
+          <button
+            type="button"
+            class="remove-item-btn"
+            (click)="removeItem(item.id)"
+            title="Remove item"
+            *ngIf="!currentBill.billedAt"
+          >
+            ×
+          </button>
+
+        </div>
+
+
+        <!-- Empty Bill -->
+
+        <div
+          class="empty-bill"
+          *ngIf="currentBill.items.length === 0"
+        >
+
+          <div class="empty-icon">
+            🧾
+          </div>
+
+          <h3>
+            No items yet
+          </h3>
+
+          <p>
+            Select a product or scan a barcode to add items.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- Bill Summary -->
+
+      <div class="bill-summary">
+
+        <div class="summary-row">
+
+          <span>
+            Subtotal
+          </span>
+
+          <strong>
+            ₹{{ currentBill.subtotal | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row total-row">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            ₹{{ currentBill.totalAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+          <span>
+            Paid
+          </span>
+
+          <strong>
+            ₹{{ currentBill.paidAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div class="summary-row remaining-row">
+
+          <span>
+            Remaining
+          </span>
+
+          <strong>
+            ₹{{ currentBill.remainingAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- GENERATE BILL -->
+      <!-- ========================= -->
+
+      <div
+        class="generate-bill-section"
+        *ngIf="
+          currentBill &&
+          !currentBill.billedAt &&
+          currentBill.items.length > 0
+        "
+      >
+
+        <button
+          type="button"
+          class="generate-bill-btn"
+          (click)="generateBill()"
+          [disabled]="isGeneratingBill"
+        >
+
+          <span *ngIf="!isGeneratingBill">
+            🧾 Generate Bill
+          </span>
+
+          <span *ngIf="isGeneratingBill">
+            Generating Bill...
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- GENERATED BILL -->
+      <!-- ========================= -->
+
+      <div
+        class="generated-bill-info"
+        *ngIf="currentBill.billedAt"
+      >
+
+        <span class="generated-bill-icon">
+          ✓
+        </span>
+
+        <div>
+          <strong>Bill Generated</strong>
+
+          <small>
+            {{ currentBill.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+          </small>
+        </div>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- PAYMENT -->
+      <!-- ========================= -->
+
+      <div
+        class="payment-section"
+        *ngIf="currentBill.billedAt"
+      >
+
+        <div class="payment-title">
+
+          <div>
+            <h3>Payment</h3>
+            <p>Enter the amount received from the customer.</p>
+          </div>
+
+        </div>
+
+
+        <div class="payment-input-row">
+
+          <div class="payment-input-wrapper">
+
+            <span class="currency-symbol">
+              ₹
+            </span>
+
+            <input
+              type="number"
+              min="0"
+              [max]="currentBill.remainingAmount"
+              step="0.01"
+              [(ngModel)]="paidAmount"
+              placeholder="0.00"
+              [disabled]="
+                isProcessingPayment ||
+                currentBill.paymentStatus === 'PAID'
+              "
+            />
+
+          </div>
+
+
+          <button
+            type="button"
+            class="payment-btn"
+            [disabled]="
+              isProcessingPayment ||
+              currentBill.paymentStatus === 'PAID' ||
+              currentBill.items.length === 0
+            "
+            (click)="processPayment()"
+          >
+
+            <span *ngIf="!isProcessingPayment">
+              Complete Payment
+            </span>
+
+            <span *ngIf="isProcessingPayment">
+              Processing...
+            </span>
+
+          </button>
+
+        </div>
+
+
+        <div
+          class="payment-hint"
+          *ngIf="currentBill.paymentStatus !== 'PAID'"
+        >
+
+          Remaining:
+          <strong>
+            ₹{{ currentBill.remainingAmount | number:'1.2-2' }}
+          </strong>
+
+        </div>
+
+
+        <div
+          class="payment-completed"
+          *ngIf="currentBill.paymentStatus === 'PAID'"
+        >
+          ✓ Payment completed
+        </div>
+
+
+        <div
+          class="bill-locked-message"
+          *ngIf="currentBill.paymentStatus === 'PAID'"
+        >
+          🔒 This bill is completed and locked.
+        </div>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- CURRENT STATUS -->
+      <!-- ========================= -->
+
+      <div class="bill-footer">
+
+        <span>
+          Items:
+          <strong>{{ getItemCount() }}</strong>
+        </span>
+
+        <span>
+          Total:
+          <strong>
+            ₹{{ getGrandTotal() | number:'1.2-2' }}
+          </strong>
+        </span>
+
+      </div>
+
+
+      <!-- ========================= -->
+      <!-- DOWNLOAD / PRINT -->
+      <!-- ========================= -->
+
+      <div
+        class="bill-pdf-action"
+        *ngIf="currentBill.billedAt"
+      >
+
+        <button
+          type="button"
+          class="download-bill-btn"
+          (click)="downloadBillPdf()"
+        >
+          ⬇ Download Bill PDF
+        </button>
+
+        <button
+          type="button"
+          class="print-bill-btn"
+          (click)="printBill()"
+        >
+          🖨 Print Bill
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- BARCODE SCANNER -->
+  <!-- ========================= -->
+
+  <app-barcode-scanner
+    *ngIf="showBarcodeScanner"
+    (scanned)="onBarcodeScanned($event)"
+    (closed)="closeBarcodeScanner()"
+  >
+  </app-barcode-scanner>
+
+</div>

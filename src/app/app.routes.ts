@@ -39,6 +39,8 @@ import { BillViewComponent } from './pages/shopkeeper/bill-view/bill-view.compon
 import { VerifyComponent } from './pages/customer-verify/verify/verify.component';
 import { CustomerDetailsComponent } from './pages/shopkeeper/customer-details/customer-details.component';
 import { InventoryComponent } from './pages/shopkeeper/inventory/inventory.component';
+import { ManualBillingComponent } from './pages/shopkeeper/manual-billing/manual-billing.component';
+import { ManualBillViewComponent } from './pages/shopkeeper/manual-bill-view/manual-bill-view.component';
 
 
 export const routes: Routes = [
@@ -194,6 +196,10 @@ export const routes: Routes = [
         path: 'inventory',
         component: InventoryComponent
       },
+       {
+        path: 'mn-billing',
+        component: ManualBillingComponent
+      },
 
 
       // /admin/orders
@@ -225,6 +231,11 @@ export const routes: Routes = [
         path: 'payments',
         component: PaymentsComponent
       },
+      {
+        path: 'bills/manual/:id',
+        component: ManualBillViewComponent
+      },
+
       {
         path: 'bills/:id',
         component: BillViewComponent

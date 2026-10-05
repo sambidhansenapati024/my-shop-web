@@ -1,0 +1,600 @@
+<div class="manual-bill-view-page">
+
+  <!-- Header -->
+  <section class="page-header">
+
+    <div class="header-top">
+
+      <button
+        type="button"
+        class="back-button"
+        (click)="goBack()">
+        ← Back to Bills
+      </button>
+
+      <div class="header-actions">
+
+        <button
+          type="button"
+          class="action-button secondary"
+          (click)="printBill()"
+          [disabled]="isPrinting || isLoading || !bill">
+
+          <span *ngIf="!isPrinting">
+            🖨️ Print
+          </span>
+
+          <span *ngIf="isPrinting">
+            Printing...
+          </span>
+
+        </button>
+
+        <button
+          type="button"
+          class="action-button primary"
+          (click)="downloadBill()"
+          [disabled]="isDownloading || isLoading || !bill">
+
+          <span *ngIf="!isDownloading">
+            ↓ Download PDF
+          </span>
+
+          <span *ngIf="isDownloading">
+            Downloading...
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <div class="page-title">
+
+      <div>
+        <span class="eyebrow">
+          MANUAL BILL
+        </span>
+
+        <h1>Bill Details</h1>
+
+        <p>
+          View manual bill information and payment details
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- Loading -->
+  <section
+    class="status-card"
+    *ngIf="isLoading">
+
+    <div class="loading-spinner"></div>
+
+    <p>
+      Loading bill details...
+    </p>
+
+  </section>
+
+
+  <!-- Error -->
+  <section
+    class="error-card"
+    *ngIf="!isLoading && errorMessage">
+
+    <div class="error-icon">
+      !
+    </div>
+
+    <div>
+      <h3>
+        Unable to load bill
+      </h3>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="retry-button"
+      (click)="loadBillDetails()">
+
+      Retry
+
+    </button>
+
+  </section>
+
+
+  <!-- Bill -->
+  <main
+    class="bill-container"
+    *ngIf="!isLoading && !errorMessage && bill">
+
+    <!-- Bill Header Card -->
+    <section class="bill-card">
+
+      <div class="bill-card-header">
+
+        <div>
+
+          <span class="bill-label">
+            BILL
+          </span>
+
+          <h2>
+            {{ bill.billNumber }}
+          </h2>
+
+          <p class="bill-date">
+            Generated on
+            {{ bill.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+          </p>
+
+        </div>
+
+
+        <div class="bill-type-section">
+
+          <span class="manual-badge">
+            MANUAL
+          </span>
+
+          <span
+            class="payment-status"
+            [ngClass]="
+              getPaymentStatusClass(bill.paymentStatus)
+            ">
+
+            {{ getPaymentStatusLabel(bill.paymentStatus) }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Customer Information -->
+      <div class="section-block">
+
+        <div class="section-heading">
+          <span class="section-icon">
+            👤
+          </span>
+
+          <h3>
+            Customer Information
+          </h3>
+        </div>
+
+
+        <div class="info-grid">
+
+          <div class="info-item">
+
+            <span class="info-label">
+              Customer Name
+            </span>
+
+            <strong>
+              {{ bill.customerName || 'Walk-in Customer' }}
+            </strong>
+
+          </div>
+
+
+          <div class="info-item">
+
+            <span class="info-label">
+              Mobile Number
+            </span>
+
+            <strong>
+              {{ bill.customerMobile || 'Not provided' }}
+            </strong>
+
+          </div>
+
+
+          <div class="info-item">
+
+            <span class="info-label">
+              Bill Number
+            </span>
+
+            <strong>
+              {{ bill.billNumber }}
+            </strong>
+
+          </div>
+
+
+          <div class="info-item">
+
+            <span class="info-label">
+              Bill Date
+            </span>
+
+            <strong>
+              {{ bill.billedAt | date:'dd MMM yyyy, hh:mm a' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Items -->
+      <div class="section-block">
+
+        <div class="section-heading">
+
+          <span class="section-icon">
+            🛒
+          </span>
+
+          <h3>
+            Bill Items
+          </h3>
+
+          <span class="item-count">
+            {{ bill.items.length }}
+            {{ bill.items.length === 1 ? 'item' : 'items' }}
+          </span>
+
+        </div>
+
+
+        <div class="items-table-wrapper">
+
+          <table class="items-table">
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  #
+                </th>
+
+                <th>
+                  Item
+                </th>
+
+                <th>
+                  Quantity
+                </th>
+
+                <th>
+                  Unit Price
+                </th>
+
+                <th>
+                  Total
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+              <tr
+                *ngFor="
+                  let item of bill.items;
+                  let i = index
+                ">
+
+                <td class="item-number">
+                  {{ i + 1 }}
+                </td>
+
+                <td>
+
+                  <div class="item-name">
+                    {{ item.itemName }}
+                  </div>
+
+                </td>
+
+                <td>
+
+                  <span class="quantity-value">
+                    {{ item.quantity }}
+                    {{ item.unit }}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  ₹{{ item.unitPrice | number:'1.2-2' }}
+
+                </td>
+
+                <td class="item-total">
+
+                  ₹{{ item.totalPrice | number:'1.2-2' }}
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <!-- Bill Summary -->
+      <div class="summary-section">
+
+        <div class="summary-content">
+
+          <div class="summary-row">
+
+            <span>
+              Subtotal
+            </span>
+
+            <strong>
+              ₹{{ bill.subtotal | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+
+          <div class="summary-row total-row">
+
+            <span>
+              Total Amount
+            </span>
+
+            <strong>
+              ₹{{ bill.totalAmount | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Payment Information -->
+      <div class="section-block payment-section">
+
+        <div class="section-heading">
+
+          <span class="section-icon">
+            💰
+          </span>
+
+          <h3>
+            Payment Information
+          </h3>
+
+        </div>
+
+
+        <div class="payment-summary">
+
+          <div class="payment-box">
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+              ₹{{ bill.totalAmount | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+
+          <div class="payment-box paid">
+
+            <span>
+              Paid
+            </span>
+
+            <strong>
+              ₹{{ bill.paidAmount | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+
+          <div
+            class="payment-box remaining"
+            [class.zero]="bill.remainingAmount === 0">
+
+            <span>
+              Remaining
+            </span>
+
+            <strong>
+              ₹{{ bill.remainingAmount | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+        </div>
+
+        <!-- Payment History -->
+<section class="payment-history-section">
+
+  <div class="section-header">
+    <div>
+      <h3>Payment History</h3>
+      <p>All payments received for this bill</p>
+    </div>
+
+    <span class="payment-count" *ngIf="payments.length > 0">
+      {{ payments.length }}
+      {{ payments.length === 1 ? 'Payment' : 'Payments' }}
+    </span>
+  </div>
+
+  <!-- Loading -->
+  <div
+    class="payment-history-loading"
+    *ngIf="isLoadingPayments"
+  >
+    <span class="small-spinner"></span>
+    <span>Loading payment history...</span>
+  </div>
+
+  <!-- Error -->
+  <div
+    class="payment-history-error"
+    *ngIf="!isLoadingPayments && paymentHistoryMessage"
+  >
+    {{ paymentHistoryMessage }}
+  </div>
+
+  <!-- No payments -->
+  <div
+    class="no-payments"
+    *ngIf="
+      !isLoadingPayments &&
+      !paymentHistoryMessage &&
+      payments.length === 0
+    "
+  >
+    <div class="no-payments-icon">₹</div>
+    <div>
+      <strong>No payments recorded</strong>
+      <p>No payment transactions have been made for this bill yet.</p>
+    </div>
+  </div>
+
+  <!-- Payment list -->
+  <div
+    class="payment-history-table-wrapper"
+    *ngIf="
+      !isLoadingPayments &&
+      !paymentHistoryMessage &&
+      payments.length > 0
+    "
+  >
+    <table class="payment-history-table">
+
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Payment Date</th>
+          <th>Payment Method</th>
+          <th class="amount-column">Amount</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr
+          *ngFor="let payment of payments; let i = index"
+        >
+          <td class="payment-number">
+            {{ i + 1 }}
+          </td>
+
+          <td>
+            <div class="payment-date">
+              {{ payment.paidAt | date:'dd MMM yyyy' }}
+            </div>
+
+            <div class="payment-time">
+              {{ payment.paidAt | date:'hh:mm a' }}
+            </div>
+          </td>
+
+          <td>
+            <span class="payment-method">
+              {{ payment.paymentMethod }}
+            </span>
+          </td>
+
+          <td class="amount-column payment-amount">
+            ₹{{ payment.amount | number:'1.2-2' }}
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+  <!-- Total payments -->
+  <div
+    class="payment-history-total"
+    *ngIf="
+      !isLoadingPayments &&
+      !paymentHistoryMessage &&
+      payments.length > 0
+    "
+  >
+    <span>Total Payments</span>
+
+    <strong>
+      ₹{{ bill.paidAmount | number:'1.2-2' }}
+    </strong>
+  </div>
+
+</section>
+
+
+        <div class="payment-status-row">
+
+          <span>
+            Payment Status
+          </span>
+
+          <span
+            class="payment-status"
+            [ngClass]="
+              getPaymentStatusClass(bill.paymentStatus)
+            ">
+
+            {{ getPaymentStatusLabel(bill.paymentStatus) }}
+
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Footer -->
+      <div class="bill-footer">
+
+        <div class="footer-line"></div>
+
+        <p>
+          Thank you for shopping with
+          <strong>MY SHOP</strong>
+        </p>
+
+        <span>
+          Grocery & Daily Needs
+        </span>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

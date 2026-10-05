@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminOrder } from '../../../models/admin-order';
-import { AdminOrderService } from '../../../services/admin-order.service';
+import { AdminOrderService, BillManagement } from '../../../services/admin-order.service';
 import { Router } from '@angular/router';
 import { BillResponse } from '../../../models/bill-response';
 
@@ -28,7 +28,7 @@ export class BillsComponent implements OnInit {
 
   searchText = '';
 
-  bills: BillResponse[] = [];
+  bills: BillManagement[] = [];
 
   isLoading = false;
 
@@ -44,59 +44,75 @@ export class BillsComponent implements OnInit {
   }
 
   loadBills(): void {
+  this.isLoading = true;
+  this.errorMessage = '';
 
-    this.isLoading = true;
-    this.errorMessage = '';
+  this.adminOrderService.getAllBillManagement().subscribe({
+    next: (response) => {
 
-    this.adminOrderService.getAllBills().subscribe({
+      this.bills = response.data || [];
 
-      next: (response) => {
+      this.isLoading = false;
+    },
 
-        this.bills = (response.data || [])
-          .filter(order => order.billedAt !== null &&
-                           order.billedAt !== undefined);
+    error: (error) => {
 
-        this.isLoading = false;
-      },
+      console.error(
+        'Failed to load bill management:',
+        error
+      );
 
-      error: (error) => {
+      this.errorMessage =
+        'Unable to load bills.';
 
-        console.error('Failed to load bills:', error);
+      this.isLoading = false;
+    }
+  });
+}
 
-        this.errorMessage = 'Unable to load bills.';
+  get filteredBills(): BillManagement[] {
 
-        this.isLoading = false;
-      }
+  let result = this.bills;
 
+  // Payment status filter
+  if (this.selectedFilter !== 'ALL') {
+    result = result.filter(
+      bill =>
+        bill.paymentStatus === this.selectedFilter
+    );
+  }
+
+  // Search
+  const search =
+    this.searchText.trim().toLowerCase();
+
+  if (search) {
+
+    result = result.filter(bill => {
+
+      const billNumber =
+        bill.billNumber?.toLowerCase() || '';
+
+      const customerName =
+        bill.customerName?.toLowerCase() || '';
+
+      const orderNumber =
+        bill.orderNumber?.toLowerCase() || '';
+
+      const id =
+        String(bill.id);
+
+      return (
+        billNumber.includes(search) ||
+        customerName.includes(search) ||
+        orderNumber.includes(search) ||
+        id.includes(search)
+      );
     });
   }
 
-  get filteredBills(): BillResponse[] {
-
-    let result = this.bills;
-
-    if (this.selectedFilter !== 'ALL') {
-
-      result = result.filter(
-        bill => bill.paymentStatus === this.selectedFilter
-      );
-
-    }
-
-    const search = this.searchText.trim().toLowerCase();
-
-    if (search) {
-
-      result = result.filter(bill =>
-        bill.orderNumber.toLowerCase().includes(search) ||
-        bill.customerName.toLowerCase().includes(search) ||
-        String(bill.id).includes(search)
-      );
-
-    }
-
-    return result;
-  }
+  return result;
+}
 
   setFilter(
     filter: 'ALL' | 'UNPAID' | 'PARTIAL' | 'PAID'
@@ -146,8 +162,21 @@ export class BillsComponent implements OnInit {
     this.searchText = '';
   }
 
-  viewBill(bill: BillResponse): void {
-  this.router.navigate(['/admin/bills', bill.id]);
+  viewBill(bill: BillManagement): void {
+
+  if (bill.billType === 'MANUAL') {
+    this.router.navigate([
+      '/admin/bills/manual',
+      bill.id
+    ]);
+
+    return;
+  }
+
+  this.router.navigate([
+    '/admin/bills',
+    bill.id
+  ]);
 }
 
   retry(): void {

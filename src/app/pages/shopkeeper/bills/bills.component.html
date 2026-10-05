@@ -150,6 +150,7 @@
             <tr>
               <th>BILL</th>
               <th>CUSTOMER</th>
+              <th>TYPE</th>
               <th>ORDER</th>
               <th>TOTAL</th>
               <th>PAID</th>
@@ -172,7 +173,7 @@
                   <div class="bill-number">
 
                     <strong>
-                      BILL-{{ bill.id }}
+                      {{ bill.billNumber }}
                     </strong>
 
                     <span>
@@ -200,7 +201,16 @@
                   <span class="order-number">
                     {{ bill.orderNumber }}
                   </span>
+                  <span *ngIf="bill.billType === 'MANUAL'" class="manual-order-label">
+                    Manual Bill
+                  </span>
 
+                </td>
+
+                <td>
+                  <span class="bill-type-badge" [class.manual]="bill.billType === 'MANUAL'" [class.order]="bill.billType === 'ORDER'">
+                    {{ bill.billType }}
+                  </span>
                 </td>
 
 
@@ -327,7 +337,7 @@
         </h2>
 
         <p>
-          Generated bills will appear here after orders are billed.
+          Generated bills will appear here after orders or manual bills are generated.
         </p>
 
       }

@@ -110,6 +110,11 @@ export class SidebarComponent
           label: 'Inventory',
           icon: '🏭',
           route: '/admin/inventory'
+        },
+        {
+          label: 'Manual Billing',
+          icon: '🧾',
+          route: '/admin/mn-billing'
         }
 
       ];
