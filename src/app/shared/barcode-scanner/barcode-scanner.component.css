@@ -1,291 +1,215 @@
+/* =========================================================
+   TOKENS (same palette as the inventory page)
+========================================================= */
+:host {
+  --ink: #0e1a2b;
+  --ink-2: #4a5568;
+  --ink-3: #8792a4;
+  --line: #e6eaf0;
+  --line-soft: #f0f3f7;
+  --navy: #0b1736;
+  --brand: #2563eb;
+  --brand-2: #10b981;
+}
+
+.scanner-overlay,
+.scanner-overlay * { box-sizing: border-box; }
+
 .scanner-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
   padding: 20px;
-
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(11, 23, 54, 0.6);
+  backdrop-filter: blur(4px);
+  animation: overlayIn 0.2s ease-out;
 }
 
 .scanner-card {
-  width: 100%;
-  max-width: 560px;
-
-  overflow: hidden;
-
-  background: white;
-  border-radius: 14px;
-
-  box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.25);
+  width: 100%; max-width: 520px; max-height: 96vh;
+  display: flex; flex-direction: column;
+  overflow: hidden; overflow-y: auto;
+  border-radius: 22px;
+  background: #fff; color: var(--ink);
+  box-shadow: 0 30px 80px rgba(11, 23, 54, 0.35);
+  animation: cardIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-
-/* Header */
-
-.scanner-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-
-  padding: 18px 20px;
-
-  border-bottom: 1px solid #e5e7eb;
+.icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  fill: none; stroke: currentColor;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
 
-.scanner-header h2 {
-  margin: 0;
-
-  font-size: 18px;
-  font-weight: 700;
-
-  color: #111827;
-}
-
-.scanner-header p {
-  margin: 5px 0 0;
-
-  font-size: 13px;
-
-  color: #6b7280;
-}
+/* =========================================================
+   HEADER
+========================================================= */
+.scanner-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 22px 22px 16px; }
+.scanner-header h2 { margin: 0; font-size: 20px; font-weight: 750; letter-spacing: -0.015em; }
+.scanner-header p { margin: 5px 0 0; color: var(--ink-2); font-size: 14px; }
 
 .close-btn {
-  width: 32px;
-  height: 32px;
+  width: 34px; height: 34px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  border: 0; border-radius: 10px; background: var(--line-soft); color: var(--ink-2); cursor: pointer;
+  transition: background 0.16s ease;
+}
+.close-btn:hover { background: #e3e8f0; }
+.close-btn .icon { width: 17px; height: 17px; }
 
-  border: none;
-  border-radius: 7px;
-
-  background: #f3f4f6;
-
-  color: #6b7280;
-
-  font-size: 22px;
-
-  cursor: pointer;
+/* =========================================================
+   CAMERA STAGE
+========================================================= */
+.scanner-stage {
+  position: relative; width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: #050a19;
 }
 
-.close-btn:hover {
-  background: #e5e7eb;
-}
+.scanner-reader { position: absolute; inset: 0; border: 0 !important; padding: 0 !important; background: transparent; }
 
+/* html5-qrcode builds these elements itself, so they need ::ng-deep */
+.scanner-reader ::ng-deep video { width: 100% !important; height: 100% !important; object-fit: cover; display: block; }
+.scanner-reader ::ng-deep canvas { display: none; }
+.scanner-reader ::ng-deep #qr-shaded-region { display: none !important; }
 
-/* Scanner */
-
-.scanner-reader {
-  position: relative;
-
-  width: 100%;
-
-  min-height: 300px;
-
-  background: #111827;
-}
-
-
-/*
- * html5-qrcode creates the actual
- * video/camera elements inside here.
- */
-
-.scanner-reader video {
-  width: 100% !important;
-  height: auto !important;
-
-  display: block;
-}
-
-
-/* Starting */
-
-.scanner-message {
-  position: absolute;
-
-  top: 50%;
-  left: 50%;
-
+/* ---------- viewfinder (keep 280 x 160 in sync with qrbox in the .ts) ---------- */
+.viewfinder {
+  position: absolute; top: 50%; left: 50%;
+  width: 280px; max-width: 86%; height: 160px; max-height: 80%;
   transform: translate(-50%, -50%);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  color: white;
-
+  border-radius: 18px;
+  /* darkens everything outside the frame */
+  box-shadow: 0 0 0 100vmax rgba(5, 10, 25, 0.58);
   pointer-events: none;
+  transition: background 0.2s ease;
+}
+.viewfinder.success { background: rgba(16, 185, 129, 0.2); }
+
+.corner { position: absolute; width: 30px; height: 30px; border: 0 solid #fff; transition: border-color 0.2s ease; }
+.corner.tl { top: 0; left: 0; border-top-width: 4px; border-left-width: 4px; border-top-left-radius: 18px; }
+.corner.tr { top: 0; right: 0; border-top-width: 4px; border-right-width: 4px; border-top-right-radius: 18px; }
+.corner.bl { bottom: 0; left: 0; border-bottom-width: 4px; border-left-width: 4px; border-bottom-left-radius: 18px; }
+.corner.br { bottom: 0; right: 0; border-bottom-width: 4px; border-right-width: 4px; border-bottom-right-radius: 18px; }
+.viewfinder.success .corner { border-color: #34d399; }
+
+.laser {
+  position: absolute; left: 12px; right: 12px; top: 10%;
+  height: 2px; border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #34d399 25%, #34d399 75%, transparent);
+  box-shadow: 0 0 14px 2px rgba(52, 211, 153, 0.6);
+  animation: laser 1.8s ease-in-out infinite alternate;
 }
 
-.scanner-message p {
-  margin: 10px 0 0;
-
-  font-size: 13px;
+.tick {
+  position: absolute; top: 50%; left: 50%;
+  width: 58px; height: 58px; margin: -29px 0 0 -29px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: #10b981;
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.5);
+  animation: pop 0.35s cubic-bezier(0.2, 1.4, 0.4, 1) both;
 }
+.tick svg { width: 30px; height: 30px; fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
 
-.spinner {
-  width: 28px;
-  height: 28px;
-
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-top-color: white;
-
-  border-radius: 50%;
-
-  animation: spin 0.8s linear infinite;
+/* ---------- starting ---------- */
+.stage-status {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 14px; border-radius: 999px;
+  background: rgba(11, 23, 54, 0.72); backdrop-filter: blur(6px);
+  color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap;
 }
+.spinner { width: 15px; height: 15px; border: 2px solid rgba(255, 255, 255, 0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+/* ---------- flashlight ---------- */
+.torch-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 50%;
+  background: rgba(11, 23, 54, 0.55); backdrop-filter: blur(6px);
+  color: #fff; cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
 }
+.torch-btn:hover { background: rgba(11, 23, 54, 0.75); }
+.torch-btn.on { background: #fbbf24; border-color: #fbbf24; color: #3b2a00; }
 
-
-/* Error */
-
-.scanner-error {
-  padding: 30px 20px;
-
-  text-align: center;
+/* ---------- error ---------- */
+.stage-error {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 20px; text-align: center;
+  background: linear-gradient(135deg, var(--navy), #14316b);
+  color: #fff;
 }
+.error-icon { width: 46px; height: 46px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
+.error-icon .icon { width: 24px; height: 24px; }
+.stage-error h3 { margin: 0 0 4px; font-size: 16px; font-weight: 700; }
+.stage-error p { max-width: 360px; margin: 0 0 14px; color: rgba(255, 255, 255, 0.72); font-size: 13px; line-height: 1.5; }
 
-.error-icon {
-  font-size: 32px;
+/* =========================================================
+   HINT / MANUAL / FOOTER
+========================================================= */
+.scanner-hint { padding: 14px 22px 0; color: var(--ink-3); font-size: 13px; text-align: center; transition: color 0.2s ease; }
+.scanner-hint.success { color: #0f8a5f; font-weight: 650; }
+
+.manual { margin: 16px 22px 0; padding-top: 16px; border-top: 1px solid var(--line); }
+.manual label { display: block; margin-bottom: 7px; color: #263246; font-size: 13px; font-weight: 600; }
+.manual-row { display: flex; gap: 8px; }
+.manual-row input {
+  flex: 1; min-width: 0; height: 44px; padding: 0 13px;
+  border: 1px solid #d5dbe5; border-radius: 11px;
+  background: #fff; color: var(--ink);
+  font-family: inherit; font-size: 14px;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
 }
+.manual-row input::placeholder { color: #a3adbd; }
+.manual-row input:focus { outline: none; border-color: var(--brand); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.14); }
 
-.scanner-error h3 {
-  margin: 10px 0 5px;
+.scanner-footer { display: flex; justify-content: flex-end; padding: 14px 22px 20px; }
 
-  font-size: 17px;
-
-  color: #374151;
+/* =========================================================
+   BUTTONS
+========================================================= */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 16px;
+  border: 1px solid transparent; border-radius: 11px;
+  font-family: inherit; font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
 }
+.btn:focus-visible,
+.close-btn:focus-visible,
+.torch-btn:focus-visible { outline: 3px solid rgba(37, 99, 235, 0.4); outline-offset: 2px; }
+.btn-primary { background: linear-gradient(135deg, var(--brand), #1f9d8a 70%, var(--brand-2)); color: #fff; box-shadow: 0 8px 18px rgba(37, 99, 235, 0.22); }
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--ink-2); }
+.btn-ghost:hover { background: var(--line-soft); }
+.btn-light { min-height: 40px; background: #fff; color: var(--navy); }
+.btn-light:hover { background: #eef4ff; }
 
-.scanner-error p {
-  margin: 0 auto 18px;
+/* =========================================================
+   MOTION
+========================================================= */
+@keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes cardIn { from { opacity: 0; transform: translateY(14px) scale(0.97); } to { opacity: 1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes laser { from { top: 10%; } to { top: calc(90% - 2px); } }
+@keyframes pop { from { opacity: 0; transform: scale(0.4); } to { opacity: 1; transform: scale(1); } }
 
-  max-width: 400px;
-
-  font-size: 13px;
-
-  line-height: 1.5;
-
-  color: #6b7280;
-}
-
-.retry-btn {
-  padding: 9px 18px;
-
-  border: none;
-  border-radius: 7px;
-
-  background: #2563eb;
-
-  color: white;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.retry-btn:hover {
-  background: #1d4ed8;
-}
-
-
-/* Instructions */
-
-.scanner-instructions {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 8px;
-
-  padding: 14px 20px;
-
-  font-size: 12px;
-
-  color: #6b7280;
-
-  background: #f9fafb;
-
-  border-top: 1px solid #e5e7eb;
-}
-
-.scan-icon {
-  font-size: 18px;
-
-  color: #2563eb;
-}
-
-
-/* Footer */
-
-.scanner-footer {
-  display: flex;
-  justify-content: flex-end;
-
-  padding: 14px 20px;
-
-  border-top: 1px solid #e5e7eb;
-}
-
-.cancel-btn {
-  padding: 9px 18px;
-
-  border: 1px solid #d1d5db;
-  border-radius: 7px;
-
-  background: white;
-
-  color: #374151;
-
-  font-size: 13px;
-  font-weight: 600;
-
-  cursor: pointer;
-}
-
-.cancel-btn:hover {
-  background: #f9fafb;
-}
-
-
-/* Mobile */
-
+/* =========================================================
+   MOBILE: slides up from the bottom
+========================================================= */
 @media (max-width: 600px) {
+  .scanner-overlay { align-items: flex-end; padding: 0; }
+  .scanner-card { max-width: none; max-height: 100vh; border-radius: 22px 22px 0 0; }
+  .scanner-header { padding: 18px 18px 14px; }
+  .manual { margin-left: 18px; margin-right: 18px; }
+  .scanner-footer { padding: 12px 18px 22px; }
+  .scanner-footer .btn { width: 100%; }
+}
 
-  .scanner-overlay {
-    padding: 0;
-  }
-
-  .scanner-card {
-    width: 100%;
-    max-width: none;
-
-    height: 100%;
-
-    border-radius: 0;
-
-    display: flex;
-    flex-direction: column;
-  }
-
-  .scanner-reader {
-    flex: 1;
-
-    min-height: 0;
-  }
-
-  .scanner-footer {
-    padding-bottom: 20px;
-  }
-
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .laser { top: 50%; }
 }

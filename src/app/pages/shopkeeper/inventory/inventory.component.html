@@ -1,605 +1,629 @@
 <div class="inventory-page">
+  <div class="inventory-shell">
 
-    <!-- Header -->
-    <div class="inventory-header">
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+    <header class="page-head">
 
-        <div>
-            <h1>Inventory</h1>
-            <p>Manage products, batches and stock.</p>
+      <div class="head-text">
+        <h1>Inventory</h1>
+        <p>Track stock, batches and expiry across your shop.</p>
+      </div>
+
+      <div class="head-actions">
+
+        <button type="button" class="btn btn-outline" (click)="openBarcodeScanner()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M7 8v8M11 8v8M15 8v8M18 8v8"/>
+          </svg>
+          Scan
+        </button>
+
+        <button type="button" class="btn btn-outline" (click)="exportCsv()" [disabled]="products.length === 0">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>
+          </svg>
+          Export
+        </button>
+
+        <button type="button" class="btn btn-primary" (click)="openProductForm()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Add product
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         SUMMARY BAND
+    ====================================================== -->
+    <section class="summary-band">
+
+      <div class="stat">
+        <span class="stat-label">Products</span>
+        <strong class="stat-value">{{ stats.total }}</strong>
+        <span class="stat-sub">
+          <ng-container *ngIf="!isLoadingStock; else statLoading">{{ stats.inStock }} in stock</ng-container>
+        </span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">Stock value</span>
+        <strong class="stat-value">
+          <ng-container *ngIf="!isLoadingStock; else dash">₹{{ stats.value | number:'1.0-0' }}</ng-container>
+        </strong>
+        <span class="stat-sub">At purchase cost</span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">Needs restock</span>
+        <strong class="stat-value" [class.alert]="!isLoadingStock && stats.low + stats.out > 0">
+          <ng-container *ngIf="!isLoadingStock; else dash">{{ stats.low + stats.out }}</ng-container>
+        </strong>
+        <span class="stat-sub">
+          <ng-container *ngIf="!isLoadingStock; else statLoading">{{ stats.out }} out, {{ stats.low }} low</ng-container>
+        </span>
+      </div>
+
+      <div class="stat">
+        <span class="stat-label">Expiry alerts</span>
+        <strong class="stat-value" [class.alert]="!isLoadingStock && stats.expiring > 0">
+          <ng-container *ngIf="!isLoadingStock; else dash">{{ stats.expiring }}</ng-container>
+        </strong>
+        <span class="stat-sub">
+          <ng-container *ngIf="!isLoadingStock; else statLoading">{{ stats.expired }} already expired</ng-container>
+        </span>
+      </div>
+
+    </section>
+
+    <ng-template #dash>—</ng-template>
+    <ng-template #statLoading>Loading...</ng-template>
+
+
+    <!-- =====================================================
+         TOOLBAR
+    ====================================================== -->
+    <section class="toolbar" *ngIf="products.length > 0 || isLoading">
+
+      <div class="search">
+        <svg class="icon search-icon" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m20 20-3.5-3.5"/>
+        </svg>
+
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search by name or barcode"
+          [value]="searchTerm"
+          (input)="onSearch($any($event.target).value)"
+        />
+
+        <button type="button" class="search-clear" *ngIf="searchTerm" (click)="clearSearch()" aria-label="Clear search">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M6 6l12 12M18 6 6 18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="filters">
+        <button
+          type="button"
+          class="filter"
+          *ngFor="let f of filters"
+          [class.active]="statusFilter === f.key"
+          (click)="setFilter(f.key)">
+          {{ f.label }}
+          <span class="filter-count">{{ filterCount(f.key) }}</span>
+        </button>
+      </div>
+
+      <select class="sort" [value]="sortKey" (change)="setSort($any($event.target).value)" aria-label="Sort products">
+        <option value="name">Name (A–Z)</option>
+        <option value="stockAsc">Lowest stock first</option>
+        <option value="stockDesc">Highest stock first</option>
+      </select>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCT TABLE
+    ====================================================== -->
+    <section class="table-card" *ngIf="isLoading || visibleProducts.length > 0">
+
+      <div class="table-scroll">
+
+        <table class="inv-table">
+
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Stock</th>
+              <th class="hide-md">Batches</th>
+              <th class="hide-md">Selling price</th>
+              <th class="hide-sm">Next expiry</th>
+              <th>Status</th>
+              <th class="col-actions"></th>
+            </tr>
+          </thead>
+
+          <!-- loading -->
+          <tbody *ngIf="isLoading">
+            <tr class="skeleton-tr" *ngFor="let s of [1, 2, 3, 4, 5, 6]">
+              <td colspan="7">
+                <span class="skeleton-line"></span>
+              </td>
+            </tr>
+          </tbody>
+
+          <!-- data -->
+          <tbody *ngIf="!isLoading">
+
+            <ng-container *ngFor="let product of visibleProducts; trackBy: trackById">
+
+              <tr
+                *ngIf="info(product) as i"
+                class="product-row"
+                [class.selected]="selectedProduct?.id === product.id"
+                tabindex="0"
+                (click)="selectProduct(product)"
+                (keydown.enter)="selectProduct(product)">
+
+                <!-- product -->
+                <td>
+                  <div class="product-cell">
+                    <span class="avatar" [style.--hue]="avatarHue(product.productName)">
+                      {{ productInitial(product.productName) }}
+                    </span>
+                    <div class="product-text">
+                      <strong>{{ product.productName }}</strong>
+                      <small>{{ product.barcode ? product.barcode : 'No barcode' }}</small>
+                    </div>
+                  </div>
+                </td>
+
+                <!-- stock -->
+                <td>
+                  <ng-container *ngIf="!isLoadingStock; else cellLoading">
+                    <span
+                      class="stock-qty"
+                      [class.low]="i.stockStatus === 'low'"
+                      [class.out]="i.stockStatus === 'out'">
+                      {{ i.stock | number:'1.0-3' }}
+                    </span>
+                    <span class="unit">{{ product.unit }}</span>
+                  </ng-container>
+                </td>
+
+                <!-- batches -->
+                <td class="hide-md">
+                  <ng-container *ngIf="!isLoadingStock; else cellLoading">{{ i.batchCount }}</ng-container>
+                </td>
+
+                <!-- price -->
+                <td class="hide-md">
+                  <ng-container *ngIf="!isLoadingStock; else cellLoading">
+                    <ng-container *ngIf="i.minPrice !== null; else noValue">
+                      <ng-container *ngIf="i.minPrice === i.maxPrice; else priceRange">
+                        ₹{{ i.minPrice | number:'1.0-2' }}
+                      </ng-container>
+                      <ng-template #priceRange>
+                        ₹{{ i.minPrice | number:'1.0-2' }} – ₹{{ i.maxPrice | number:'1.0-2' }}
+                      </ng-template>
+                    </ng-container>
+                  </ng-container>
+                </td>
+
+                <!-- expiry -->
+                <td class="hide-sm">
+                  <ng-container *ngIf="!isLoadingStock; else cellLoading">
+                    <span class="expiry-cell" *ngIf="i.nextExpiry; else noValue">
+                      {{ i.nextExpiry | date:'dd MMM yyyy' }}
+                      <span class="pill pill-bad" *ngIf="i.expiryStatus === 'expired'">Expired</span>
+                      <span class="pill pill-warn" *ngIf="i.expiryStatus === 'soon'">Soon</span>
+                    </span>
+                  </ng-container>
+                </td>
+
+                <!-- status -->
+                <td>
+                  <ng-container *ngIf="!isLoadingStock; else cellLoading">
+                    <span
+                      class="status"
+                      [class.status-in]="i.stockStatus === 'in'"
+                      [class.status-low]="i.stockStatus === 'low'"
+                      [class.status-out]="i.stockStatus === 'out'">
+                      <span class="status-dot"></span>
+                      {{ stockLabel(i.stockStatus) }}
+                    </span>
+                  </ng-container>
+                </td>
+
+                <!-- actions -->
+                <td class="col-actions">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="Add batch"
+                    aria-label="Add batch"
+                    (click)="quickAddBatch(product, $event)">
+                    <svg class="icon" viewBox="0 0 24 24">
+                      <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                  </button>
+                </td>
+
+              </tr>
+
+            </ng-container>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <ng-template #cellLoading><span class="cell-skeleton"></span></ng-template>
+    <ng-template #noValue><span class="muted">—</span></ng-template>
+
+
+    <!-- nothing added yet -->
+    <section class="empty-card" *ngIf="!isLoading && products.length === 0">
+      <div class="empty-icon">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M21 8 12 3 3 8v8l9 5 9-5z"/>
+          <path d="m3 8 9 5 9-5M12 13v8"/>
+        </svg>
+      </div>
+      <h3>No products yet</h3>
+      <p>Add your first product, then add batches to start tracking stock.</p>
+      <button type="button" class="btn btn-primary" (click)="openProductForm()">Add product</button>
+    </section>
+
+    <!-- filters found nothing -->
+    <section class="empty-card compact" *ngIf="!isLoading && products.length > 0 && visibleProducts.length === 0">
+      <h3>No products match</h3>
+      <p>Try a different search or filter.</p>
+      <button type="button" class="btn btn-outline" (click)="resetFilters()">Clear filters</button>
+    </section>
+
+  </div>
+</div>
+
+
+<!-- =========================================================
+     PRODUCT DRAWER (slides in from the right)
+========================================================== -->
+<div class="drawer-overlay" *ngIf="selectedProduct" (click)="closeDrawer()">
+
+  <aside
+    class="drawer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Product details"
+    (click)="$event.stopPropagation()">
+
+    <div class="drawer-header">
+
+      <div class="drawer-title">
+        <span class="avatar large" [style.--hue]="avatarHue(selectedProduct.productName)">
+          {{ productInitial(selectedProduct.productName) }}
+        </span>
+        <div class="drawer-title-text">
+          <h2>{{ selectedProduct.productName }}</h2>
+          <div class="chips">
+            <span class="chip">{{ selectedProduct.unit }}</span>
+            <span class="chip mono" *ngIf="selectedProduct.barcode">{{ selectedProduct.barcode }}</span>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="close-btn" (click)="closeDrawer()" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+
+    </div>
+
+
+    <div class="drawer-body">
+
+      <!-- summary -->
+      <div class="tile-grid">
+
+        <div class="tile">
+          <span class="tile-label">Stock on hand</span>
+          <strong class="tile-value">
+            {{ totalStock | number:'1.0-3' }}
+            <small>{{ selectedProduct.unit }}</small>
+          </strong>
         </div>
 
-        <div class="header-actions">
+        <div class="tile">
+          <span class="tile-label">Value at cost</span>
+          <strong class="tile-value">₹{{ stockValue | number:'1.0-2' }}</strong>
+        </div>
 
-  <button
-    type="button"
-    class="scan-product-btn"
-    (click)="openBarcodeScanner()"
-  >
-    📷 Scan Product
-  </button>
+        <div class="tile">
+          <span class="tile-label">Batches</span>
+          <strong class="tile-value">{{ selectedProductBatches.length }}</strong>
+        </div>
 
-  <button
-    type="button"
-    class="add-product-btn"
-    (click)="openProductForm()"
-  >
-    + Add Product
-  </button>
+        <div class="tile">
+          <span class="tile-label">Expiry watch</span>
+          <strong class="tile-value tone" [ngClass]="'tone-' + expiryWatch.tone">{{ expiryWatch.text }}</strong>
+        </div>
+
+      </div>
+
+
+      <!-- batches -->
+      <div class="batches-head">
+        <h3>Batches</h3>
+        <button type="button" class="btn btn-primary small" (click)="openBatchForm()">
+          <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 5v14M5 12h14"/>
+          </svg>
+          Add batch
+        </button>
+      </div>
+
+      <div class="batch-list" *ngIf="isLoadingBatches && selectedProductBatches.length === 0">
+        <div class="batch-skeleton" *ngFor="let s of [1, 2, 3]"></div>
+      </div>
+
+      <div class="drawer-empty" *ngIf="!isLoadingBatches && selectedProductBatches.length === 0">
+        <h4>No batches yet</h4>
+        <p>Add a batch to start tracking stock for this product.</p>
+      </div>
+
+      <div class="batch-list" *ngIf="selectedProductBatches.length > 0">
+
+        <article class="batch-card" *ngFor="let batch of selectedProductBatches">
+
+          <div class="batch-top">
+
+            <div class="batch-id">
+              <span class="batch-number">{{ batch.batchNumber }}</span>
+              <span class="pill pill-bad" *ngIf="getExpiryStatus(batch) === 'expired'">Expired</span>
+              <span class="pill pill-warn" *ngIf="getExpiryStatus(batch) === 'soon'">{{ getExpiryLabel(batch) }}</span>
+            </div>
+
+            <div class="batch-qty">
+              <strong>{{ batch.quantity }}</strong>
+              <small>{{ selectedProduct.unit }}</small>
+            </div>
+
+          </div>
+
+          <div class="share" [attr.title]="(getShare(batch) | number:'1.0-0') + '% of stock'">
+            <span [style.width.%]="getShare(batch)"></span>
+          </div>
+
+          <dl class="batch-facts">
+
+            <div>
+              <dt>Purchase</dt>
+              <dd>₹{{ batch.purchasePrice | number:'1.2-2' }}</dd>
+            </div>
+
+            <div>
+              <dt>Selling</dt>
+              <dd>
+                ₹{{ batch.sellingPrice | number:'1.2-2' }}
+                <small class="margin" [class.negative]="(getMargin(batch) ?? 0) < 0" *ngIf="getMargin(batch) !== null">
+                  {{ (getMargin(batch) ?? 0) >= 0 ? '+' : '' }}{{ getMargin(batch) | number:'1.0-0' }}%
+                </small>
+              </dd>
+            </div>
+
+            <div>
+              <dt>Expiry</dt>
+              <dd>
+                <ng-container *ngIf="batch.expiryDate; else noValue">
+                  {{ batch.expiryDate | date:'dd MMM yyyy' }}
+                </ng-container>
+              </dd>
+            </div>
+
+          </dl>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </aside>
 
 </div>
 
+
+<!-- =========================================================
+     ADD PRODUCT (modal)
+========================================================== -->
+<div class="modal-overlay" *ngIf="showProductForm" (click)="closeProductForm()">
+
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="product-modal-title"
+    (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div>
+        <h2 id="product-modal-title">Add product</h2>
+        <p>Add a product to your shop inventory.</p>
+      </div>
+
+      <button type="button" class="close-btn" (click)="closeProductForm()" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
     </div>
 
-    <div
-  class="product-form-card"
-  *ngIf="showProductForm"
->
+    <form [formGroup]="productForm" (ngSubmit)="saveProduct()">
 
-  <div class="form-header">
+      <div class="form-grid single">
 
-    <div>
-      <h2>Add Product</h2>
-      <p>
-        Add a product to your shop inventory.
-      </p>
-    </div>
+        <div class="form-field">
+          <label for="productName">Product name</label>
+          <input id="productName" type="text" formControlName="productName" placeholder="e.g. Maggi noodles" />
+          <small class="error" *ngIf="productForm.get('productName')?.touched && productForm.get('productName')?.invalid">
+            Product name is required.
+          </small>
+        </div>
 
-    <button
-      type="button"
-      class="close-btn"
-      (click)="closeProductForm()"
-    >
-      ×
-    </button>
+        <div class="form-field">
+          <label for="barcode">Barcode <span>(optional)</span></label>
+          <div class="barcode-input-row">
+            <input id="barcode" type="text" formControlName="barcode" placeholder="e.g. 8901234567890" />
+            <button type="button" class="btn btn-outline" (click)="openBarcodeScannerForProduct()">
+              <svg class="icon" viewBox="0 0 24 24">
+                <path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M7 8v8M11 8v8M15 8v8M18 8v8"/>
+              </svg>
+              Scan
+            </button>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="unit">Unit</label>
+          <select id="unit" formControlName="unit">
+            <option value="piece">Piece</option>
+            <option value="packet">Packet</option>
+            <option value="kg">Kilogram (kg)</option>
+            <option value="gm">Gram (gm)</option>
+            <option value="litre">Litre</option>
+            <option value="ml">Millilitre (ml)</option>
+            <option value="box">Box</option>
+            <option value="dozen">Dozen</option>
+          </select>
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeProductForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSavingProduct">
+          {{ isSavingProduct ? 'Saving...' : 'Save product' }}
+        </button>
+      </div>
+
+    </form>
 
   </div>
 
+</div>
 
-  <form
-    [formGroup]="productForm"
-    (ngSubmit)="saveProduct()"
-  >
 
-    <div class="form-grid">
+<!-- =========================================================
+     ADD BATCH (modal)
+========================================================== -->
+<div class="modal-overlay" *ngIf="showBatchForm && selectedProduct" (click)="closeBatchForm()">
 
-      <!-- Product Name -->
+  <div
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="batch-modal-title"
+    (click)="$event.stopPropagation()">
 
-      <div class="form-field">
+    <div class="modal-header">
+      <div>
+        <h2 id="batch-modal-title">Add batch</h2>
+        <p>Add stock for {{ selectedProduct.productName }}.</p>
+      </div>
 
-        <label>
-          Product Name
-        </label>
+      <button type="button" class="close-btn" (click)="closeBatchForm()" aria-label="Close">
+        <svg class="icon" viewBox="0 0 24 24">
+          <path d="M6 6l12 12M18 6 6 18"/>
+        </svg>
+      </button>
+    </div>
 
-        <input
-          type="text"
-          formControlName="productName"
-          placeholder="e.g. Maggi"
-        />
+    <form [formGroup]="batchForm" (ngSubmit)="saveBatch()">
 
-        <small
-          class="error"
-          *ngIf="
-            productForm.get('productName')?.touched &&
-            productForm.get('productName')?.invalid
-          "
-        >
-          Product name is required.
-        </small>
+      <div class="form-grid">
+
+        <div class="form-field full">
+          <label for="batchNumber">Batch number</label>
+          <input id="batchNumber" type="text" formControlName="batchNumber" placeholder="e.g. M2026A" />
+          <small class="error" *ngIf="batchForm.get('batchNumber')?.touched && batchForm.get('batchNumber')?.invalid">
+            Batch number is required.
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="purchasePrice">Purchase price</label>
+          <div class="input-affix">
+            <span class="affix">₹</span>
+            <input id="purchasePrice" type="number" formControlName="purchasePrice" min="0" step="0.01" placeholder="0.00" />
+          </div>
+          <small class="error" *ngIf="batchForm.get('purchasePrice')?.touched && batchForm.get('purchasePrice')?.invalid">
+            Enter a valid purchase price.
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="sellingPrice">Selling price</label>
+          <div class="input-affix">
+            <span class="affix">₹</span>
+            <input id="sellingPrice" type="number" formControlName="sellingPrice" min="0" step="0.01" placeholder="0.00" />
+          </div>
+          <small class="error" *ngIf="batchForm.get('sellingPrice')?.touched && batchForm.get('sellingPrice')?.invalid">
+            Enter a valid selling price.
+          </small>
+        </div>
+
+        <div class="margin-hint full" *ngIf="batchFormMargin !== null" [class.negative]="batchFormMargin < 0">
+          {{ batchFormMargin < 0 ? 'Selling below cost' : 'Margin' }}:
+          <strong>{{ batchFormMargin | number:'1.0-1' }}%</strong>
+        </div>
+
+        <div class="form-field">
+          <label for="quantity">Quantity</label>
+          <div class="input-affix has-end">
+            <input id="quantity" type="number" formControlName="quantity" min="0.001" step="0.001" placeholder="0" />
+            <span class="affix end">{{ selectedProduct.unit }}</span>
+          </div>
+          <small class="error" *ngIf="batchForm.get('quantity')?.touched && batchForm.get('quantity')?.invalid">
+            Quantity must be greater than zero.
+          </small>
+        </div>
+
+        <div class="form-field">
+          <label for="expiryDate">Expiry date <span>(optional)</span></label>
+          <input id="expiryDate" type="date" formControlName="expiryDate" />
+        </div>
 
       </div>
 
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" (click)="closeBatchForm()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSavingBatch">
+          {{ isSavingBatch ? 'Saving...' : 'Save batch' }}
+        </button>
+      </div>
 
-      <!-- Barcode -->
-
-      <div class="form-field">
-
-  <label>
-    Barcode
-    <span>(optional)</span>
-  </label>
-
-  <div class="barcode-input-row">
-
-    <input
-      type="text"
-      formControlName="barcode"
-      placeholder="e.g. 8901234567890"
-    />
-
-    <button
-      type="button"
-      class="small-scan-btn"
-      (click)="openBarcodeScannerForProduct()"
-    >
-      📷 Scan
-    </button>
+    </form>
 
   </div>
 
 </div>
 
-
-      <!-- Unit -->
-
-      <div class="form-field">
-
-        <label>
-          Unit
-        </label>
-
-        <select formControlName="unit">
-
-          <option value="piece">
-            Piece
-          </option>
-
-          <option value="packet">
-            Packet
-          </option>
-
-          <option value="kg">
-            Kilogram (kg)
-          </option>
-
-          <option value="gm">
-            Gram (gm)
-          </option>
-
-          <option value="litre">
-            Litre
-          </option>
-
-          <option value="ml">
-            Millilitre (ml)
-          </option>
-
-          <option value="box">
-            Box
-          </option>
-
-          <option value="dozen">
-            Dozen
-          </option>
-
-        </select>
-
-      </div>
-
-    </div>
-
-
-    <div class="form-actions">
-
-      <button
-        type="button"
-        class="cancel-btn"
-        (click)="closeProductForm()"
-      >
-        Cancel
-      </button>
-
-      <button
-        type="submit"
-        class="save-btn"
-        [disabled]="isSavingProduct"
-      >
-
-        {{
-          isSavingProduct
-            ? 'Saving...'
-            : 'Save Product'
-        }}
-
-      </button>
-
-    </div>
-
-  </form>
-
-</div>
-
-
-    <!-- Main Content -->
-    <div class="inventory-content">
-
-        <!-- Product List -->
-        <section class="products-section">
-
-            <div class="section-header">
-                <h2>Products</h2>
-
-                <span class="product-count">
-                    {{ products.length }} products
-                </span>
-            </div>
-
-
-            <!-- Loading -->
-            <div class="loading-state" *ngIf="isLoading">
-                Loading products...
-            </div>
-
-
-            <!-- Empty -->
-            <div class="empty-state" *ngIf="!isLoading && products.length === 0">
-                <div class="empty-icon">
-                    📦
-                </div>
-
-                <h3>No products yet</h3>
-
-                <p>
-                    Add your first product to start managing inventory.
-                </p>
-            </div>
-
-
-            <!-- Products -->
-            <div class="product-list" *ngIf="!isLoading && products.length > 0">
-
-                <button type="button" class="product-card" *ngFor="let product of products" [class.selected]="
-            selectedProduct?.id === product.id
-          " (click)="selectProduct(product)">
-
-                    <div class="product-icon">
-                        📦
-                    </div>
-
-                    <div class="product-info">
-
-                        <h3>
-                            {{ product.productName }}
-                        </h3>
-
-                        <p>
-                            Unit: {{ product.unit }}
-                        </p>
-
-                        <p *ngIf="product.barcode" class="barcode">
-                            Barcode: {{ product.barcode }}
-                        </p>
-
-                    </div>
-
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- Batch Details -->
-        <section class="batches-section">
-
-            <div class="no-product-selected" *ngIf="!selectedProduct">
-
-                <div class="large-icon">
-                    📋
-                </div>
-
-                <h2>Select a product</h2>
-
-                <p>
-                    Select a product from the left to view
-                    its batches and stock.
-                </p>
-
-            </div>
-
-
-            <div *ngIf="selectedProduct" class="batch-container">
-
-                <!-- Batch Header -->
-                <div class="batch-header">
-
-                    <div>
-                        <span class="small-label">
-                            Selected Product
-                        </span>
-
-                        <h2>
-                            {{ selectedProduct.productName }}
-                        </h2>
-
-                        <p>
-                            Unit: {{ selectedProduct.unit }}
-                        </p>
-                    </div>
-
-                    <button type="button" class="add-batch-btn" (click)="openBatchForm()">
-                        + Add Batch
-                    </button>
-
-                </div>
-
-                <div
-  class="batch-form-card"
-  *ngIf="showBatchForm"
->
-
-  <div class="form-header">
-
-    <div>
-      <h2>Add Batch</h2>
-
-      <p>
-        Add stock information for
-        {{ selectedProduct?.productName }}.
-      </p>
-    </div>
-
-    <button
-      type="button"
-      class="close-btn"
-      (click)="closeBatchForm()"
-    >
-      ×
-    </button>
-
-  </div>
-
-
-  <form
-    [formGroup]="batchForm"
-    (ngSubmit)="saveBatch()"
-  >
-
-    <div class="form-grid batch-form-grid">
-
-      <!-- Batch Number -->
-
-      <div class="form-field">
-
-        <label>
-          Batch Number
-        </label>
-
-        <input
-          type="text"
-          formControlName="batchNumber"
-          placeholder="e.g. M2026A"
-        />
-
-        <small
-          class="error"
-          *ngIf="
-            batchForm.get('batchNumber')?.touched &&
-            batchForm.get('batchNumber')?.invalid
-          "
-        >
-          Batch number is required.
-        </small>
-
-      </div>
-
-
-      <!-- Purchase Price -->
-
-      <div class="form-field">
-
-        <label>
-          Purchase Price
-        </label>
-
-        <input
-          type="number"
-          formControlName="purchasePrice"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-        />
-
-        <small
-          class="error"
-          *ngIf="
-            batchForm.get('purchasePrice')?.touched &&
-            batchForm.get('purchasePrice')?.invalid
-          "
-        >
-          Enter a valid purchase price.
-        </small>
-
-      </div>
-
-
-      <!-- Selling Price -->
-
-      <div class="form-field">
-
-        <label>
-          Selling Price
-        </label>
-
-        <input
-          type="number"
-          formControlName="sellingPrice"
-          min="0"
-          step="0.01"
-          placeholder="0.00"
-        />
-
-        <small
-          class="error"
-          *ngIf="
-            batchForm.get('sellingPrice')?.touched &&
-            batchForm.get('sellingPrice')?.invalid
-          "
-        >
-          Enter a valid selling price.
-        </small>
-
-      </div>
-
-
-      <!-- Quantity -->
-
-      <div class="form-field">
-
-        <label>
-          Quantity
-          ({{ selectedProduct?.unit }})
-        </label>
-
-        <input
-          type="number"
-          formControlName="quantity"
-          min="0.001"
-          step="0.001"
-          placeholder="0"
-        />
-
-        <small
-          class="error"
-          *ngIf="
-            batchForm.get('quantity')?.touched &&
-            batchForm.get('quantity')?.invalid
-          "
-        >
-          Quantity must be greater than zero.
-        </small>
-
-      </div>
-
-
-      <!-- Expiry Date -->
-
-      <div class="form-field">
-
-        <label>
-          Expiry Date
-          <span>(optional)</span>
-        </label>
-
-        <input
-          type="date"
-          formControlName="expiryDate"
-        />
-
-      </div>
-
-    </div>
-
-
-    <div class="form-actions">
-
-      <button
-        type="button"
-        class="cancel-btn"
-        (click)="closeBatchForm()"
-      >
-        Cancel
-      </button>
-
-      <button
-        type="submit"
-        class="save-btn"
-        [disabled]="isSavingBatch"
-      >
-
-        {{
-          isSavingBatch
-            ? 'Saving...'
-            : 'Save Batch'
-        }}
-
-      </button>
-
-    </div>
-
-  </form>
-
-</div>
-
-
-                <!-- Loading Batches -->
-                <div class="loading-state" *ngIf="isLoadingBatches">
-                    Loading batches...
-                </div>
-
-
-                <!-- No Batches -->
-                <div class="empty-state" *ngIf="
-            !isLoadingBatches &&
-            selectedProductBatches.length === 0
-          ">
-
-                    <div class="empty-icon">
-                        📦
-                    </div>
-
-                    <h3>No batches found</h3>
-
-                    <p>
-                        Add a batch to start tracking stock.
-                    </p>
-
-                </div>
-
-
-                <!-- Batch Table -->
-                <div class="batch-table-wrapper" *ngIf="
-            !isLoadingBatches &&
-            selectedProductBatches.length > 0
-          ">
-
-                    <table class="batch-table">
-
-                        <thead>
-                            <tr>
-                                <th>Batch No.</th>
-                                <th>Purchase</th>
-                                <th>Selling</th>
-                                <th>Quantity</th>
-                                <th>Expiry</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            <tr *ngFor="
-                  let batch of selectedProductBatches
-                ">
-
-                                <td>
-                                    {{ batch.batchNumber }}
-                                </td>
-
-                                <td>
-                                    ₹{{ batch.purchasePrice }}
-                                </td>
-
-                                <td>
-                                    ₹{{ batch.sellingPrice }}
-                                </td>
-
-                                <td>
-                                    {{ batch.quantity }}
-                                    {{ selectedProduct.unit }}
-                                </td>
-
-                                <td>
-                                    {{
-                                    batch.expiryDate
-                                    ? batch.expiryDate
-                                    : '—'
-                                    }}
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </div>
-
-</div>
 
 <app-barcode-scanner
   *ngIf="showBarcodeScanner"

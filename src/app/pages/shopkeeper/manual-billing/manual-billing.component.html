@@ -38,8 +38,16 @@
         class="bill-tab"
         *ngFor="let bill of openBills"
         [class.active]="isActiveBill(bill)"
+        [class.paid]="bill.paymentStatus === 'PAID'"
         (click)="switchBill(bill)"
       >
+
+      <span
+  class="bill-paid-icon"
+  *ngIf="bill.paymentStatus === 'PAID'"
+>
+  ✓
+</span>
 
         <div class="bill-tab-main">
 
@@ -50,6 +58,11 @@
           <span class="bill-tab-customer">
             {{ bill.customerName || 'Walk-in Customer' }}
           </span>
+
+        <button type="button" class="close-bill-tab" title="Close bill tab"
+            (click)="$event.stopPropagation(); closeBillTab(bill)">
+            ×
+        </button>
 
         </div>
 

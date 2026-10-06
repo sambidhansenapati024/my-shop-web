@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   EventEmitter,
+  HostListener,
   OnDestroy,
   Output
 } from '@angular/core';
@@ -19,7 +21,7 @@ import {
   styleUrl: './barcode-scanner.component.css'
 })
 export class BarcodeScannerComponent
-  implements OnDestroy {
+  implements AfterViewInit, OnDestroy {
 
   @Output()
   scanned = new EventEmitter<string>();
@@ -33,6 +35,17 @@ export class BarcodeScannerComponent
   hasError = false;
   errorMessage = '';
 
+  /** true for a moment after a barcode is read (shows the green tick) */
+  isSuccess = false;
+
+  /** flashlight (only on phones whose camera supports it) */
+  torchSupported = false;
+  torchOn = false;
+
+  private audioContext: AudioContext | null = null;
+  private hasScanned = false;
+  private successTimer: ReturnType<typeof setTimeout> | null = null;
+
   private readonly scannerId =
     'barcode-scanner-reader';
 
@@ -40,11 +53,28 @@ export class BarcodeScannerComponent
     this.startScanner();
   }
 
+  /* =========================================================
+     KEYBOARD
+  ========================================================= */
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.close();
+  }
+
+  /* =========================================================
+     START
+  ========================================================= */
+
   async startScanner(): Promise<void> {
 
     this.isStarting = true;
     this.hasError = false;
     this.errorMessage = '';
+    this.hasScanned = false;
+    this.isSuccess = false;
+    this.torchSupported = false;
+    this.torchOn = false;
 
     try {
 
@@ -54,6 +84,7 @@ export class BarcodeScannerComponent
       const config = {
         fps: 10,
 
+        // keep these numbers in sync with .viewfinder in the CSS
         qrbox: {
           width: 280,
           height: 160
@@ -82,16 +113,7 @@ export class BarcodeScannerComponent
         config,
 
         (decodedText) => {
-
-          console.log(
-            'Barcode scanned:',
-            decodedText
-          );
-
-          this.scanned.emit(decodedText);
-
-          this.stopScanner();
-
+          this.onDecoded(decodedText);
         },
 
         () => {
@@ -102,6 +124,7 @@ export class BarcodeScannerComponent
       );
 
       this.isStarting = false;
+      this.detectTorch();
 
     } catch (error) {
 
@@ -114,9 +137,104 @@ export class BarcodeScannerComponent
       this.hasError = true;
 
       this.errorMessage =
-        'Unable to access the camera. Please allow camera permission and try again.';
+        'Unable to access the camera. Allow camera permission and try again, or type the barcode below.';
     }
   }
+
+  /* =========================================================
+     RESULT
+  ========================================================= */
+
+  private onDecoded(decodedText: string): void {
+
+    // Prevent multiple beeps for the same barcode
+    if (this.hasScanned) {
+      return;
+    }
+
+    this.hasScanned = true;
+
+    console.log(
+      'Barcode scanned:',
+      decodedText
+    );
+
+    this.playBeep();
+
+    // Freeze the picture and show the green tick for a moment,
+    // then hand the barcode to the page.
+    this.isSuccess = true;
+
+    try {
+      this.scanner?.pause(true);
+    } catch {
+      // not important
+    }
+
+    this.successTimer = setTimeout(() => {
+      this.scanned.emit(decodedText);
+      this.stopScanner();
+    }, 450);
+  }
+
+  /** Used when the barcode is typed instead of scanned. */
+  submitManual(value: string): void {
+
+    const code = (value || '').trim();
+
+    if (!code || this.hasScanned) {
+      return;
+    }
+
+    this.hasScanned = true;
+
+    this.playBeep();
+
+    this.scanned.emit(code);
+
+    this.stopScanner();
+  }
+
+  /* =========================================================
+     FLASHLIGHT
+  ========================================================= */
+
+  private detectTorch(): void {
+    try {
+      const capabilities: any =
+        this.scanner?.getRunningTrackCapabilities();
+
+      this.torchSupported = !!capabilities?.torch;
+
+    } catch {
+      this.torchSupported = false;
+    }
+  }
+
+  async toggleTorch(): Promise<void> {
+
+    if (!this.scanner) {
+      return;
+    }
+
+    const next = !this.torchOn;
+
+    try {
+      await this.scanner.applyVideoConstraints({
+        advanced: [{ torch: next } as any]
+      });
+
+      this.torchOn = next;
+
+    } catch (error) {
+      console.warn('Flashlight is not available:', error);
+      this.torchSupported = false;
+    }
+  }
+
+  /* =========================================================
+     STOP / CLOSE
+  ========================================================= */
 
   async stopScanner(): Promise<void> {
 
@@ -124,11 +242,14 @@ export class BarcodeScannerComponent
       return;
     }
 
+    const scanner = this.scanner;
+    this.scanner = null;
+
     try {
 
-      await this.scanner.stop();
+      await scanner.stop();
 
-      this.scanner.clear();
+      scanner.clear();
 
     } catch (error) {
 
@@ -136,13 +257,15 @@ export class BarcodeScannerComponent
         'Failed to stop barcode scanner:',
         error
       );
-    } finally {
-
-      this.scanner = null;
     }
   }
 
   async close(): Promise<void> {
+
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+      this.successTimer = null;
+    }
 
     await this.stopScanner();
 
@@ -151,6 +274,59 @@ export class BarcodeScannerComponent
 
   async ngOnDestroy(): Promise<void> {
 
+    if (this.successTimer) {
+      clearTimeout(this.successTimer);
+    }
+
     await this.stopScanner();
+  }
+
+  /* =========================================================
+     BEEP
+  ========================================================= */
+
+  private playBeep(): void {
+
+    try {
+      if (!this.audioContext) {
+        this.audioContext = new AudioContext();
+      }
+
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume();
+      }
+
+      const oscillator =
+        this.audioContext.createOscillator();
+
+      const gainNode =
+        this.audioContext.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(
+        1000,
+        this.audioContext.currentTime
+      );
+
+      gainNode.gain.setValueAtTime(
+        0.15,
+        this.audioContext.currentTime
+      );
+
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+
+      oscillator.start();
+
+      oscillator.stop(
+        this.audioContext.currentTime + 0.12
+      );
+
+    } catch (error) {
+      console.warn(
+        'Unable to play barcode scanner beep:',
+        error
+      );
+    }
   }
 }

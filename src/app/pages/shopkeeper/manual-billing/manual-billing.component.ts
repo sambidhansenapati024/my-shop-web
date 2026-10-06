@@ -309,6 +309,11 @@ private readonly OPEN_BILLS_STORAGE_KEY = 'myshop_open_bill_ids';
       return;
     }
 
+    if (this.currentBill.paymentStatus === 'PAID') {
+      alert('This bill is already paid and cannot be modified.');
+      return;
+    }
+
     if (!this.selectedProduct) {
       alert('Please select a product.');
       return;
@@ -388,6 +393,11 @@ private readonly OPEN_BILLS_STORAGE_KEY = 'myshop_open_bill_ids';
     if (!this.currentBill) {
       return;
     }
+
+    if (this.currentBill.paymentStatus === 'PAID') {
+  alert('This bill is already paid and cannot be modified.');
+  return;
+}
 
     this.manualBillingService
       .removeItem(
@@ -570,10 +580,6 @@ private restoreOpenBills(): void {
       .subscribe({
         next: (bill) => {
 
-          if (bill.paymentStatus === 'PAID') {
-            return;
-          }
-
           this.openBills.push(bill);
           validOpenBillIds.push(bill.id);
 
@@ -594,6 +600,44 @@ private restoreOpenBills(): void {
       });
 
   });
+}
+
+closeBillTab(bill: ManualBill): void {
+
+  const wasActive = this.activeBillId === bill.id;
+
+  // Remove only from the manual billing tabs
+  this.openBills = this.openBills.filter(
+    openBill => openBill.id !== bill.id
+  );
+
+  // Update localStorage
+  this.saveOpenBillIds();
+
+  // If the closed bill was active,
+  // switch to another available bill
+  if (wasActive) {
+
+    if (this.openBills.length > 0) {
+
+      const nextBill =
+        this.openBills[this.openBills.length - 1];
+
+      this.currentBill = nextBill;
+      this.activeBillId = nextBill.id;
+
+    } else {
+
+      this.currentBill = null;
+      this.activeBillId = null;
+
+      this.selectedProduct = null;
+      this.selectedBatch = null;
+      this.batches = [];
+      this.quantity = 1;
+      this.paidAmount = 0;
+    }
+  }
 }
 
 private saveRestoredBillIds(billIds: number[]): void {
@@ -634,6 +678,11 @@ private saveRestoredBillIds(billIds: number[]): void {
     return;
   }
 
+  if (this.currentBill.paymentStatus === 'PAID') {
+  alert('This bill is already paid.');
+  return;
+}
+
   const remainingAmount =
     this.currentBill.remainingAmount || 0;
 
@@ -662,27 +711,24 @@ private saveRestoredBillIds(billIds: number[]): void {
     .subscribe({
       next: (bill) => {
 
-        this.currentBill = bill;
+  this.currentBill = bill;
 
-        // Clear input after successful payment
-        this.paidAmount = 0;
-
-        this.isProcessingPayment = false;
-        if (bill.paymentStatus === 'PAID') {
-  this.openBills = this.openBills.filter(
-    openBill => openBill.id !== bill.id
+  // Update the bill inside the open bill tabs
+  this.openBills = this.openBills.map(
+    openBill =>
+      openBill.id === bill.id
+        ? bill
+        : openBill
   );
+
+  // Keep the bill tab after payment
   this.saveOpenBillIds();
 
-  this.currentBill = null;
-  this.activeBillId = null;
+  // Clear payment input
+  this.paidAmount = 0;
 
-  this.selectedProduct = null;
-  this.selectedBatch = null;
-  this.batches = [];
-  this.quantity = 1;
-}
-      },
+  this.isProcessingPayment = false;
+},
 
       error: (error) => {
 
@@ -833,6 +879,10 @@ printBill(): void {
       );
     }
   });
+}
+
+isCurrentBillPaid(): boolean {
+  return this.currentBill?.paymentStatus === 'PAID';
 }
 
 
