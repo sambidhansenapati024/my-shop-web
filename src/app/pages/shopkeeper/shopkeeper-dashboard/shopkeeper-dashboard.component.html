@@ -1,100 +1,579 @@
-<div class="dashboard-page">
+<div class="shop-dashboard">
 
-  <!-- Animated Background -->
-  <div class="page-background">
-    <div class="background-grid"></div>
+  @if (loading) {
+    <div class="dashboard-loading">
+      <div class="loading-spinner"></div>
+      <h3>Loading dashboard...</h3>
+      <p>Fetching your shop's latest sales and billing data.</p>
+    </div>
+  }
 
-    <div class="background-glow glow-blue"></div>
-    <div class="background-glow glow-green"></div>
+  @if (!loading && error) {
+    <div class="dashboard-error">
+      <div class="error-icon">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
 
-    <span class="background-dot dot-1"></span>
-    <span class="background-dot dot-2"></span>
-    <span class="background-dot dot-3"></span>
-    <span class="background-dot dot-4"></span>
+      <div class="error-content">
+        <h3>Unable to load dashboard</h3>
+        <p>Something went wrong while fetching your shop data.</p>
+      </div>
 
-    <span class="floating-icon icon-1">🛒</span>
-    <span class="floating-icon icon-2">📦</span>
-    <span class="floating-icon icon-3">🥛</span>
-    <span class="floating-icon icon-4">🍚</span>
+      <button type="button" class="refresh-button" (click)="refreshDashboard()">
+        <i class="pi pi-refresh"></i>
+        Try Again
+      </button>
+    </div>
+  }
+
+  @if (!loading && !error && dashboard) {
+    <main class="dashboard-content">
+
+      <!-- HEADER -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <div class="dashboard-icon">
+            <i class="pi pi-chart-line"></i>
+          </div>
+
+          <div>
+            <span class="header-label">SHOP OVERVIEW</span>
+            <h1>Dashboard</h1>
+            <p>Monitor sales, collections, inventory and shop performance.</p>
+          </div>
+        </div>
+
+        <div class="header-right">
+          @if (lastUpdated) {
+            <div class="last-updated">
+              <span class="live-dot"></span>
+              <div>
+                <span>Live data</span>
+                <small>Updated {{ lastUpdated | date:'hh:mm a' }}</small>
+              </div>
+            </div>
+          }
+
+          <button type="button" class="refresh-button" (click)="refreshDashboard()">
+            <i class="pi pi-refresh"></i>
+            Refresh
+          </button>
+        </div>
+      </header>
+
+      <!-- KPI CARDS -->
+      
+      <section class="stats-grid">
+        <div class="stat-card today-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-calendar"></i></div>
+            <span class="stat-tag">TODAY</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Today's Sales</span>
+            <strong class="stat-value">₹{{ todaySales | number:'1.2-2' }}</strong>
+            <span class="stat-description">Sales billed today</span>
+          </div>
+        </div>
+
+        <div class="stat-card month-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-chart-bar"></i></div>
+            <span class="stat-tag">THIS MONTH</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Monthly Sales</span>
+            <strong class="stat-value">₹{{ monthSales | number:'1.2-2' }}</strong>
+            <span class="stat-description">Current month's sales</span>
+          </div>
+        </div>
+
+        <div class="stat-card sales-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-wallet"></i></div>
+            <span class="stat-tag">ALL TIME</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Sales</span>
+            <strong class="stat-value">₹{{ totalSales | number:'1.2-2' }}</strong>
+            <span class="stat-description">{{ billCount }} total bills</span>
+          </div>
+        </div>
+
+        <div class="stat-card paid-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-check-circle"></i></div>
+            <span class="stat-tag">COLLECTED</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Total Paid</span>
+            <strong class="stat-value">₹{{ totalPaid | number:'1.2-2' }}</strong>
+            <span class="stat-description">Amount collected</span>
+          </div>
+        </div>
+
+        <div class="stat-card remaining-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-clock"></i></div>
+            <span class="stat-tag">DUE</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Remaining</span>
+            <strong class="stat-value">₹{{ totalRemaining | number:'1.2-2' }}</strong>
+            <span class="stat-description">Amount yet to collect</span>
+          </div>
+        </div>
+
+        <div class="stat-card average-card">
+          <div class="stat-card-top">
+            <div class="stat-icon"><i class="pi pi-receipt"></i></div>
+            <span class="stat-tag">AVERAGE</span>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Average Bill</span>
+            <strong class="stat-value">₹{{ averageBillValue | number:'1.2-2' }}</strong>
+            <span class="stat-description">Average value per bill</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DAILY SALES -->
+      <section class="dashboard-card daily-sales-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <span class="card-kicker">
+        SALES TREND
+      </span>
+
+      <h2>
+        Daily Sales
+      </h2>
+
+      <p>
+        Sales performance for the last 7 days.
+      </p>
+
+    </div>
+
+    <div class="daily-sales-period">
+      Last 7 days
+    </div>
+
   </div>
 
 
-  <main class="dashboard-content">
+  <!-- Empty State -->
 
-    <!-- Heading -->
-    <section class="page-heading">
+  <div
+    class="daily-sales-empty"
+    *ngIf="dailySales.length === 0"
+  >
 
-      <div>
-        <span class="heading-badge">
-          <span class="badge-dot"></span>
-          SHOPKEEPER PANEL
-        </span>
+    <div class="daily-sales-empty-icon">
+      📊
+    </div>
 
-        <h1>
-          Shop <span>Dashboard</span>
-        </h1>
+    <strong>
+      No sales data available
+    </strong>
 
-        <p>
-          Manage today's orders and keep your shop running smoothly.
-        </p>
-      </div>
-
-      <div class="orders-header-actions">
-
-  <button
-    type="button"
-    class="refresh-button"
-    (click)="loadDashboard()"
-    [disabled]="loading">
-
-    <span
-      [class.refresh-spinning]="loading">
-      ↻
+    <span>
+      Sales will appear here once bills are generated.
     </span>
 
-    Refresh
-
-  </button>
-
-  <a
-    routerLink="/admin/orders"
-    class="card-link">
-
-    View all
-
-    <span>→</span>
-
-  </a>
-
-</div>
-
-    </section>
+  </div>
 
 
-    <!-- Quick Stats -->
-    <section class="stats-grid">
+  <!-- Chart -->
 
-      <!-- New Orders -->
-      <div class="stat-card blue-card">
+  <div
+    class="daily-sales-chart"
+    *ngIf="dailySales.length > 0"
+  >
 
-        <div class="stat-top">
+    <!-- Y Axis -->
 
-          <div class="stat-icon">
-            📥
+    <div class="daily-sales-y-axis">
+
+      <span>
+        ₹{{ maxDailySales | number:'1.0-0' }}
+      </span>
+
+      <span>
+        ₹{{ (maxDailySales * 0.75) | number:'1.0-0' }}
+      </span>
+
+      <span>
+        ₹{{ (maxDailySales * 0.50) | number:'1.0-0' }}
+      </span>
+
+      <span>
+        ₹{{ (maxDailySales * 0.25) | number:'1.0-0' }}
+      </span>
+
+      <span>
+        ₹0
+      </span>
+
+    </div>
+
+
+    <!-- Graph Area -->
+
+    <div class="daily-sales-graph">
+
+      <!-- Grid -->
+
+      <div class="daily-sales-grid">
+
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+
+      </div>
+
+
+      <!-- Bars -->
+
+      <div class="daily-sales-bars">
+
+        <div
+          class="daily-sales-bar-column"
+          *ngFor="let day of dailySales"
+        >
+
+          <!-- Amount -->
+
+          <div
+            class="daily-sales-tooltip"
+            [class.visible]="day.salesAmount > 0"
+          >
+
+            ₹{{ day.salesAmount | number:'1.0-0' }}
+
           </div>
 
-          <span class="stat-label">
-            NEW ORDERS
+
+          <!-- Bar -->
+
+          <div class="daily-sales-bar-wrapper">
+
+            <div
+              class="daily-sales-bar"
+              [style.height.%]="getDailySalesBarHeight(day.salesAmount)"
+              [class.zero]="day.salesAmount === 0"
+            ></div>
+
+          </div>
+
+
+          <!-- Day -->
+
+          <div class="daily-sales-day">
+
+            <strong>
+              {{ formatDayLabel(day.date) }}
+            </strong>
+
+            <span>
+              {{ formatChartDate(day.date) }}
+            </span>
+
+          </div>
+
+
+          <!-- Bills -->
+
+          <div class="daily-sales-bills">
+
+            {{ day.billCount }}
+            {{ day.billCount === 1 ? 'bill' : 'bills' }}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- Summary -->
+
+  <div
+    class="daily-sales-summary"
+    *ngIf="dailySales.length > 0"
+  >
+
+    <div class="daily-sales-summary-item">
+
+      <span>
+        7-Day Sales
+      </span>
+
+      <strong>
+        ₹{{ dailySalesTotal | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+
+    <div class="daily-sales-summary-item">
+
+      <span>
+        Paid
+      </span>
+
+      <strong>
+        ₹{{ dailySalesPaid | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+
+    <div class="daily-sales-summary-item">
+
+      <span>
+        Remaining
+      </span>
+
+      <strong>
+        ₹{{ dailySalesRemaining | number:'1.2-2' }}
+      </strong>
+
+    </div>
+
+
+    <div class="daily-sales-summary-item">
+
+      <span>
+        Bills
+      </span>
+
+      <strong>
+        {{ dailySalesBillCount }}
+      </strong>
+
+    </div>
+
+  </div>
+
+</section>
+
+      <!-- MONTHLY SALES + PAYMENT -->
+      <section class="dashboard-grid analytics-grid">
+        <div class="dashboard-card sales-chart-card">
+
+          <div class="card-header">
+
+            <div>
+
+              <span class="section-label">
+                SALES PERFORMANCE
+              </span>
+
+              <h2>
+                Monthly Sales
+              </h2>
+
+              <p>
+                Sales performance over the last 12 months
+              </p>
+
+            </div>
+
+            <div class="card-header-value">
+
+              <span>
+                This month
+              </span>
+
+              <strong>
+                ₹{{ monthSales | number:'1.2-2' }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div class="sales-chart">
+
+            @for (
+              month of monthlySales;
+              track month.year + '-' + month.month
+            ) {
+
+              <div class="chart-column">
+
+                <div class="chart-value">
+
+                  @if (month.salesAmount > 0) {
+
+                    ₹{{ month.salesAmount | number:'1.0-0' }}
+
+                  }
+
+                </div>
+
+
+                <div class="bar-area">
+
+                  <div
+                    class="sales-bar"
+                    [style.height.%]="getMonthlySalesBarHeight(month.salesAmount)"
+                    [class.current-month]="
+                      month.year === monthlySales[monthlySales.length - 1]?.year
+                      &&
+                      month.month === monthlySales[monthlySales.length - 1]?.month
+                    ">
+
+                  </div>
+
+                </div>
+
+
+                <div class="chart-label">
+
+                  <span>
+                    {{ month.month }}
+                  </span>
+
+                  <small>
+                    {{ month.year }}
+                  </small>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+
+          <div class="chart-footer">
+
+            <div class="chart-legend">
+
+              <span class="legend-dot"></span>
+
+              <span>
+                Sales
+              </span>
+
+            </div>
+
+            <span>
+              {{ billCount }} bills overall
+            </span>
+
+          </div>
+
+        </div>
+        <section class="dashboard-card payment-visual-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <span class="card-kicker">
+        PAYMENT ANALYTICS
+      </span>
+
+      <h2>
+        Payment Status & Collection
+      </h2>
+
+      <p>
+        Overview of paid, partial and unpaid bills.
+      </p>
+
+    </div>
+
+    <div class="payment-total-badge">
+
+      {{ totalPaymentStatusBills }}
+
+      {{ totalPaymentStatusBills === 1 ? 'Bill' : 'Bills' }}
+
+    </div>
+
+  </div>
+
+
+  <div class="payment-visual-content">
+
+
+    <!-- ================================
+         DONUT
+    ================================= -->
+
+    <div class="payment-donut-area">
+
+      <div
+        class="payment-donut"
+        [style.background]="paymentStatusChartStyle">
+
+        <div class="payment-donut-center">
+
+          <strong>
+            {{ paidBillPercentage | number:'1.0-0' }}%
+          </strong>
+
+          <span>
+            Paid Bills
           </span>
 
         </div>
 
-        <div class="stat-bottom">
+      </div>
 
-          <strong>{{ newOrdersCount }}</strong>
+    </div>
 
-          <span class="stat-description">
-            Waiting for action
+
+    <!-- ================================
+         STATUS DETAILS
+    ================================= -->
+
+    <div class="payment-status-details">
+
+
+      <div class="payment-status-row">
+
+        <div class="payment-status-label">
+
+          <span class="payment-status-dot paid"></span>
+
+          <div>
+
+            <strong>
+              Paid
+            </strong>
+
+            <small>
+              Fully paid bills
+            </small>
+
+          </div>
+
+        </div>
+
+        <div class="payment-status-value">
+
+          <strong>
+            {{ paidBillCount }}
+          </strong>
+
+          <span>
+            {{ paidBillPercentage | number:'1.0-0' }}%
           </span>
 
         </div>
@@ -102,428 +581,1487 @@
       </div>
 
 
-      <!-- Preparing -->
-      <div class="stat-card orange-card">
+      <div class="payment-status-row">
 
-        <div class="stat-top">
+        <div class="payment-status-label">
 
-          <div class="stat-icon">
-            🛍️
+          <span class="payment-status-dot partial"></span>
+
+          <div>
+
+            <strong>
+              Partial
+            </strong>
+
+            <small>
+              Partially paid bills
+            </small>
+
           </div>
 
-          <span class="stat-label">
-            PREPARING
+        </div>
+
+        <div class="payment-status-value">
+
+          <strong>
+            {{ partialBillCount }}
+          </strong>
+
+          <span>
+            {{ partialBillPercentage | number:'1.0-0' }}%
           </span>
 
         </div>
 
-        <div class="stat-bottom">
+      </div>
 
-          <strong>{{ preparingCount }}</strong>
 
-          <span class="stat-description">
-            Orders being packed
+      <div class="payment-status-row">
+
+        <div class="payment-status-label">
+
+          <span class="payment-status-dot unpaid"></span>
+
+          <div>
+
+            <strong>
+              Unpaid
+            </strong>
+
+            <small>
+              No payment received
+            </small>
+
+          </div>
+
+        </div>
+
+        <div class="payment-status-value">
+
+          <strong>
+            {{ unpaidBillCount }}
+          </strong>
+
+          <span>
+            {{ unpaidBillPercentage | number:'1.0-0' }}%
           </span>
 
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================
+       MONEY COLLECTION
+  ================================= -->
+
+  <div class="collection-section">
+
+    <div class="collection-header">
+
+      <div>
+
+        <span>
+          MONEY COLLECTION
+        </span>
+
+        <strong>
+          ₹{{ paidAmount | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+      <div class="collection-remaining">
+
+        <span>
+          Remaining
+        </span>
+
+        <strong>
+          ₹{{ remainingAmount | number:'1.2-2' }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <div class="collection-progress">
+
+      <div
+        class="collection-progress-fill"
+        [style.width.%]="collectionPercentage">
+      </div>
+
+    </div>
+
+
+    <div class="collection-footer">
+
+      <span>
+        {{ collectionPercentage | number:'1.0-0' }}% collected
+      </span>
+
+      <span>
+        {{ 100 - collectionPercentage | number:'1.0-0' }}% remaining
+      </span>
+
+    </div>
+
+  </div>
+
+</section>
+      </section>
+
+      <!-- TOP SELLING ITEMS -->
+      <section class="dashboard-card top-selling-card">
+
+  <div class="card-header">
+
+    <div>
+
+      <span class="card-kicker">
+        PRODUCT PERFORMANCE
+      </span>
+
+      <h2>
+        Top Selling Items
+      </h2>
+
+      <p>
+        Products generating the highest sales.
+      </p>
+
+    </div>
+
+    <div class="top-selling-limit">
+      TOP {{ topSellingItems.length }}
+    </div>
+
+  </div>
+
+
+  @if (topSellingItems.length === 0) {
+
+    <div class="top-selling-empty">
+
+      <div class="top-selling-empty-icon">
+        📦
+      </div>
+
+      <strong>
+        No sales data available
+      </strong>
+
+      <span>
+        Product sales will appear here after bills are generated.
+      </span>
+
+    </div>
+
+  } @else {
+
+    <div class="top-selling-list">
+
+      @for (
+        item of topSellingItems;
+        track item.itemName + '-' + item.unit;
+        let index = $index
+      ) {
+
+        <div class="top-selling-item">
+
+
+          <!-- RANK -->
+
+          <div class="top-selling-rank">
+
+            @if (index === 0) {
+              <span class="rank-badge first">
+                1
+              </span>
+            } @else if (index === 1) {
+              <span class="rank-badge second">
+                2
+              </span>
+            } @else if (index === 2) {
+              <span class="rank-badge third">
+                3
+              </span>
+            } @else {
+              <span class="rank-number">
+                {{ index + 1 }}
+              </span>
+            }
+
+          </div>
+
+
+          <!-- PRODUCT -->
+
+          <div class="top-selling-product">
+
+            <div class="top-selling-product-header">
+
+              <div>
+
+                <strong>
+                  {{ item.itemName }}
+                </strong>
+
+                <span>
+                  {{ item.unit }}
+                </span>
+
+              </div>
+
+              <strong class="top-selling-amount">
+                ₹{{ item.salesAmount | number:'1.2-2' }}
+              </strong>
+
+            </div>
+
+
+            <!-- SALES BAR -->
+
+            <div class="top-selling-bar">
+
+              <div
+                class="top-selling-bar-fill"
+                [style.width.%]="
+                  getTopSellingBarWidth(item.salesAmount)
+                ">
+              </div>
+
+            </div>
+
+
+            <!-- DETAILS -->
+
+            <div class="top-selling-details">
+
+              <span>
+                {{ item.quantitySold | number:'1.0-3' }}
+                {{ item.unit }} sold
+              </span>
+
+              <span>
+                {{ item.numberOfBills }}
+                {{ item.numberOfBills === 1 ? 'bill' : 'bills' }}
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  }
+
+</section>
+
+      <!-- ORDER & BILL ANALYSIS -->
+      <section class="dashboard-card order-analysis-card">
+
+  <div class="card-header">
+    <div>
+      <span class="card-kicker">ORDER & BILL ANALYSIS</span>
+      <h2>Orders & Bills</h2>
+      <p>Overview of customer orders and shopkeeper bills.</p>
+    </div>
+
+    <div class="order-analysis-total">
+      <strong>{{ totalBills }}</strong>
+      <span>Total Bills</span>
+    </div>
+  </div>
+
+  <!-- Order Source -->
+  <div class="order-source-grid">
+
+    <div class="order-source-card customer-orders">
+      <div class="order-source-icon">
+        🛒
+      </div>
+
+      <div class="order-source-content">
+        <span>Customer Orders</span>
+        <strong>{{ customerOrders }}</strong>
+
+        <div class="order-source-progress">
+          <div
+            class="order-source-progress-fill customer-fill"
+            [style.width.%]="customerOrderPercentage">
+          </div>
+        </div>
+
+        <small>
+          {{ customerOrderPercentage | number:'1.0-0' }}% of total bills
+        </small>
+      </div>
+    </div>
+
+    <div class="order-source-card manual-bills">
+      <div class="order-source-icon">
+        🧾
+      </div>
+
+      <div class="order-source-content">
+        <span>Manual Bills</span>
+        <strong>{{ manualBills }}</strong>
+
+        <div class="order-source-progress">
+          <div
+            class="order-source-progress-fill manual-fill"
+            [style.width.%]="manualBillPercentage">
+          </div>
+        </div>
+
+        <small>
+          {{ manualBillPercentage | number:'1.0-0' }}% of total bills
+        </small>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- Order Pipeline -->
+  <div class="order-pipeline">
+
+    <div class="order-pipeline-header">
+      <div>
+        <strong>Customer Order Pipeline</strong>
+        <span>Current status of customer orders</span>
+      </div>
+
+      <div class="pipeline-total">
+        {{ orderPipelineTotal }} orders
+      </div>
+    </div>
+
+
+    <div class="pipeline-list">
+
+      <!-- Received -->
+      <div class="pipeline-item">
+
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot received"></span>
+            <span>Received</span>
+          </div>
+
+          <strong>{{ newOrdersCount }}</strong>
+        </div>
+
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill received-fill"
+            [style.width.%]="getOrderStatusPercentage(newOrdersCount)">
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Packing -->
+      <div class="pipeline-item">
+
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot packing"></span>
+            <span>Packing</span>
+          </div>
+
+          <strong>{{ preparingCount }}</strong>
+        </div>
+
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill packing-fill"
+            [style.width.%]="getOrderStatusPercentage(preparingCount)">
+          </div>
         </div>
 
       </div>
 
 
       <!-- Ready -->
-      <div class="stat-card green-card">
+      <div class="pipeline-item">
 
-        <div class="stat-top">
-
-          <div class="stat-icon">
-            ✅
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot ready"></span>
+            <span>Ready</span>
           </div>
 
-          <span class="stat-label">
-            READY
-          </span>
-
+          <strong>{{ readyCount }}</strong>
         </div>
 
-        <div class="stat-bottom">
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill ready-fill"
+            [style.width.%]="getOrderStatusPercentage(readyCount)">
+          </div>
+        </div>
 
-          <strong>{{ readyCount }}</strong>
+      </div>
 
-          <span class="stat-description">
-            Ready for pickup
-          </span>
 
+      <!-- Billed -->
+      <div class="pipeline-item">
+
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot billed"></span>
+            <span>Billed</span>
+          </div>
+
+          <strong>{{ billedCount }}</strong>
+        </div>
+
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill billed-fill"
+            [style.width.%]="getOrderStatusPercentage(billedCount)">
+          </div>
+        </div>
+
+      </div>
+
+
+      <!-- Bill Modified -->
+      <div class="pipeline-item">
+
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot modified"></span>
+            <span>Bill Modified</span>
+          </div>
+
+          <strong>{{ billModifiedCount }}</strong>
+        </div>
+
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill modified-fill"
+            [style.width.%]="getOrderStatusPercentage(billModifiedCount)">
+          </div>
         </div>
 
       </div>
 
 
       <!-- Completed -->
-      <div class="stat-card purple-card">
+      <div class="pipeline-item">
 
-        <div class="stat-top">
-
-          <div class="stat-icon">
-            ✓
+        <div class="pipeline-item-top">
+          <div class="pipeline-label">
+            <span class="pipeline-dot completed"></span>
+            <span>Completed</span>
           </div>
 
-          <span class="stat-label">
-            COMPLETED
-          </span>
-
+          <strong>{{ completedCount }}</strong>
         </div>
 
-        <div class="stat-bottom">
-
-         <strong>{{ completedCount }}</strong>
-
-          <span class="stat-description">
-            Completed orders
-          </span>
-
+        <div class="pipeline-bar">
+          <div
+            class="pipeline-fill completed-fill"
+            [style.width.%]="getOrderStatusPercentage(completedCount)">
+          </div>
         </div>
 
       </div>
-
-    </section>
-
-
-    <!-- Main Dashboard Grid -->
-    <section class="dashboard-grid">
-
-
-      <!-- Recent Orders -->
-      <div class="dashboard-card orders-card">
-
-        <div class="card-header">
-
-          <div>
-            <span class="card-label">
-              ORDERS
-            </span>
-
-            <h2>Recent Orders</h2>
-          </div>
-
-          <a
-            routerLink="/admin/orders"
-            class="card-link">
-
-            View all
-            <span>→</span>
-
-          </a>
-
-        </div>
-
-
-       <!-- Loading -->
-<div
-  class="empty-orders"
-  *ngIf="loading">
-
-  <div class="empty-icon">⏳</div>
-
-  <h3>Loading orders...</h3>
-
-  <p>
-    Please wait while we fetch the latest orders.
-  </p>
-
-</div>
-
-
-<!-- Error -->
-<div
-  class="empty-orders"
-  *ngIf="!loading && error">
-
-  <div class="empty-icon">⚠️</div>
-
-  <h3>Unable to load orders</h3>
-
-  <p>
-    Please refresh the page and try again.
-  </p>
-
-</div>
-
-
-<!-- No Orders -->
-<div
-  class="empty-orders"
-  *ngIf="
-    !loading &&
-    !error &&
-    orders.length === 0
-  ">
-
-  <div class="empty-icon">📦</div>
-
-  <h3>No orders yet</h3>
-
-  <p>
-    New customer orders will appear here.
-  </p>
-
-</div>
-
-
-<!-- Recent Orders -->
-<div
-  class="recent-orders"
-  *ngIf="
-    !loading &&
-    !error &&
-    orders.length > 0
-  ">
-
-  <a
-    class="recent-order"
-    *ngFor="
-      let order of orders | slice:0:5
-    "
-    [routerLink]="['/admin/orders', order.id]">
-
-    <!-- Order Icon -->
-    <div class="recent-order-icon">
-      📦
-    </div>
-
-
-    <!-- Order Information -->
-    <div class="recent-order-info">
-
-  <strong>
-    {{ order.orderNumber }}
-  </strong>
-
-  <span>
-    {{ order.customerName }}
-    •
-    {{ order.itemCount }}
-    {{ order.itemCount === 1 ? 'item' : 'items' }}
-    •
-    {{ order.createdAt | date:'h:mm a' }}
-  </span>
-
-</div>
-
-
-    <!-- Order Status -->
-    <div
-      class="recent-order-status"
-      [ngClass]="{
-        'status-received':
-          order.status === 'RECEIVED',
-
-        'status-packing':
-          order.status === 'PACKING',
-
-        'status-ready':
-          order.status === 'READY',
-
-        'status-billed':
-          order.status === 'BILLED',
-
-        'status-modified':
-          order.status === 'BILL_MODIFIED',
-
-        'status-completed':
-          order.status === 'COMPLETED'
-      }">
-
-      {{ getOrderStatusLabel(order.status) }}
 
     </div>
 
+  </div>
+
+</section>
+
+      <!-- INVENTORY -->
+      <section class="dashboard-section inventory-section">
+
+  <div class="section-heading">
+    <div>
+      <span class="section-kicker">INVENTORY</span>
+      <h2>Inventory Analytics</h2>
+      <p>Monitor stock levels and expiry alerts.</p>
+    </div>
+  </div>
+
+
+  <!-- Inventory Summary Cards -->
+  <div class="inventory-summary-grid">
+
+    <!-- Total Products -->
+    <div class="inventory-stat-card">
+
+      <div class="inventory-stat-icon products-icon">
+        📦
+      </div>
+
+      <div class="inventory-stat-content">
+
+        <span class="inventory-stat-label">
+          Total Products
+        </span>
+
+        <strong>
+          {{ totalProducts }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- Total Batches -->
+    <div class="inventory-stat-card">
+
+      <div class="inventory-stat-icon batches-icon">
+        🗃️
+      </div>
+
+      <div class="inventory-stat-content">
+
+        <span class="inventory-stat-label">
+          Total Batches
+        </span>
+
+        <strong>
+          {{ totalBatches }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- Low Stock -->
     <div
-  class="recent-order-amount"
-  *ngIf="order.totalAmount !== null">
+      class="inventory-stat-card warning"
+      [class.has-alert]="lowStockProductsCount > 0"
+    >
 
-  ₹{{ order.totalAmount | number:'1.2-2' }}
+      <div class="inventory-stat-icon low-stock-icon">
+        ⚠️
+      </div>
 
-</div>
+      <div class="inventory-stat-content">
 
-  </a>
+        <span class="inventory-stat-label">
+          Low Stock
+        </span>
 
-</div>
+        <strong>
+          {{ lowStockProductsCount }}
+        </strong>
 
       </div>
 
-
-      <!-- Quick Actions -->
-      <div class="dashboard-card actions-card">
-
-        <div class="card-header">
-
-          <div>
-            <span class="card-label">
-              QUICK ACCESS
-            </span>
-
-            <h2>Quick Actions</h2>
-          </div>
-
-        </div>
+    </div>
 
 
-        <div class="quick-actions">
+    <!-- Out Of Stock -->
+    <div
+      class="inventory-stat-card danger"
+      [class.has-alert]="outOfStockProductsCount > 0"
+    >
 
-          <a
-            routerLink="/admin/orders"
-            class="quick-action">
+      <div class="inventory-stat-icon out-stock-icon">
+        🚫
+      </div>
 
-            <div class="quick-icon blue-action">
-              📦
-            </div>
+      <div class="inventory-stat-content">
 
-            <div class="quick-content">
+        <span class="inventory-stat-label">
+          Out of Stock
+        </span>
 
-              <strong>
-                Manage Orders
-              </strong>
-
-              <span>
-                View and process customer orders
-              </span>
-
-            </div>
-
-            <span class="quick-arrow">
-              →
-            </span>
-
-          </a>
-
-
-          <div class="action-divider"></div>
-
-
-          <a
-  routerLink="/admin/customers"
-  class="quick-action">
-
-  <div class="quick-icon green-action">
-    👥
-  </div>
-
-  <div class="quick-content">
-    <strong>Customers</strong>
-    <span>Customer management</span>
-  </div>
-
-  <span class="quick-arrow">
-    →
-  </span>
-
-</a>
-
-
-          <div class="action-divider"></div>
-
-
-          <a
-  routerLink="/admin/bills"
-  class="quick-action">
-
-  <div class="quick-icon purple-action">
-    📄
-  </div>
-
-  <div class="quick-content">
-    <strong>Bills</strong>
-    <span>View generated bills</span>
-  </div>
-
-  <span class="quick-arrow">
-    →
-  </span>
-
-</a>
-
-        </div>
+        <strong>
+          {{ outOfStockProductsCount }}
+        </strong>
 
       </div>
 
-    </section>
+    </div>
 
 
-    <!-- Today's Activity -->
-    <section class="activity-card">
+    <!-- Expiring Soon -->
+    <div
+      class="inventory-stat-card warning"
+      [class.has-alert]="expiringSoonBatchesCount > 0"
+    >
 
-      <div class="activity-header">
+      <div class="inventory-stat-icon expiry-icon">
+        ⏳
+      </div>
+
+      <div class="inventory-stat-content">
+
+        <span class="inventory-stat-label">
+          Expiring Soon
+        </span>
+
+        <strong>
+          {{ expiringSoonBatchesCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+
+    <!-- Expired -->
+    <div
+      class="inventory-stat-card danger"
+      [class.has-alert]="expiredBatchesCount > 0"
+    >
+
+      <div class="inventory-stat-icon expired-icon">
+        ❗
+      </div>
+
+      <div class="inventory-stat-content">
+
+        <span class="inventory-stat-label">
+          Expired
+        </span>
+
+        <strong>
+          {{ expiredBatchesCount }}
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================================
+     INVENTORY VALUE
+========================================================= -->
+
+<div class="inventory-value-card">
+
+  <div class="inventory-value-header">
+
+    <div>
+
+      <span class="inventory-panel-kicker">
+        STOCK VALUE
+      </span>
+
+      <h3>
+        Inventory Value & Potential Margin
+      </h3>
+
+      <p>
+        Estimated value of your currently available stock.
+      </p>
+
+    </div>
+
+    <div class="inventory-value-icon">
+      ₹
+    </div>
+
+  </div>
+
+
+  <div class="inventory-value-grid">
+
+    <!-- Purchase Value -->
+    <div class="inventory-value-item">
+
+      <span class="inventory-value-label">
+        Purchase Value
+      </span>
+
+      <strong>
+        ₹{{ inventoryPurchaseValue | number:'1.2-2' }}
+      </strong>
+
+      <small>
+        Current stock cost
+      </small>
+
+    </div>
+
+
+    <!-- Selling Value -->
+    <div class="inventory-value-item">
+
+      <span class="inventory-value-label">
+        Selling Value
+      </span>
+
+      <strong>
+        ₹{{ inventorySellingValue | number:'1.2-2' }}
+      </strong>
+
+      <small>
+        Expected sales value
+      </small>
+
+    </div>
+
+
+    <!-- Potential Margin -->
+    <div class="inventory-value-item margin-item">
+
+      <span class="inventory-value-label">
+        Potential Margin
+      </span>
+
+      <strong>
+        ₹{{ inventoryPotentialMargin | number:'1.2-2' }}
+      </strong>
+
+      <small>
+        Estimated gross margin
+      </small>
+
+    </div>
+
+
+    <!-- Margin Percentage -->
+    <div class="inventory-value-item percentage-item">
+
+      <span class="inventory-value-label">
+        Margin
+      </span>
+
+      <strong>
+        {{ inventoryMarginPercentage | number:'1.2-2' }}%
+      </strong>
+
+      <small>
+        Based on purchase value
+      </small>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+  <!-- Inventory Loading -->
+  <div
+    class="inventory-loading"
+    *ngIf="inventoryLoading"
+  >
+
+    <div class="inventory-spinner"></div>
+
+    <span>
+      Loading inventory analytics...
+    </span>
+
+  </div>
+
+
+  <!-- Inventory Error -->
+  <div
+    class="inventory-error"
+    *ngIf="inventoryError && !inventoryLoading"
+  >
+
+    <span>
+      Unable to load inventory analytics.
+    </span>
+
+    <button
+      type="button"
+      (click)="loadInventoryDashboard()"
+    >
+      Retry
+    </button>
+
+  </div>
+
+
+  <!-- Inventory Content -->
+  <div
+    class="inventory-content"
+    *ngIf="!inventoryLoading && !inventoryError"
+  >
+
+
+    <!-- =====================================================
+         LOW STOCK
+    ====================================================== -->
+
+    <div class="inventory-panel">
+
+      <div class="inventory-panel-header">
 
         <div>
-          <span class="card-label">
-            TODAY
+
+          <span class="inventory-panel-kicker">
+            STOCK ALERT
           </span>
 
-          <h2>Shop Activity</h2>
+          <h3>
+            Low Stock Products
+          </h3>
+
         </div>
 
-        <div class="live-indicator">
-          <span></span>
-          Live
-        </div>
+        <span
+          class="inventory-count-badge"
+          [class.alert]="lowStockProducts.length > 0"
+        >
+          {{ lowStockProducts.length }}
+        </span>
 
       </div>
 
 
-      <div class="activity-items">
+      <div
+        class="inventory-empty"
+        *ngIf="lowStockProducts.length === 0"
+      >
 
-        <div class="activity-item">
-
-          <div class="activity-icon blue-activity">
-            📥
-          </div>
-
-          <div>
-            <strong>New Orders</strong>
-            <span>Customer orders received today</span>
-          </div>
-
-         <b>{{ todayOrdersCount }}</b>
-
+        <div class="inventory-empty-icon">
+          ✓
         </div>
 
+        <strong>
+          Stock looks good
+        </strong>
 
-        <div class="activity-item">
-
-          <div class="activity-icon green-activity">
-            ✅
-          </div>
-
-          <div>
-            <strong>Ready for Pickup</strong>
-            <span>Orders waiting for customers</span>
-          </div>
-
-          <b>{{ todayReadyCount }}</b>
-
-        </div>
-
-
-        <div class="activity-item">
-
-          <div class="activity-icon purple-activity">
-            💰
-          </div>
-
-          <div>
-            <strong>Payments</strong>
-            <span>Total payments received today</span>
-          </div>
-
-          <b>₹{{ todayPayments | number:'1.2-2' }}</b>
-
-        </div>
+        <span>
+          No products are currently low on stock.
+        </span>
 
       </div>
 
-    </section>
+
+      <div
+        class="inventory-table-wrapper"
+        *ngIf="lowStockProducts.length > 0"
+      >
+
+        <table class="inventory-table">
+
+          <thead>
+
+            <tr>
+              <th>Product</th>
+              <th>Barcode</th>
+              <th>Available</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let product of lowStockProducts"
+            >
+
+              <td>
+
+                <div class="inventory-product-name">
+
+                  <div class="inventory-product-icon">
+                    📦
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      {{ product.productName }}
+                    </strong>
+
+                    <span>
+                      {{ product.unit }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </td>
 
 
-  </main>
+              <td>
+
+                <span class="barcode-text">
+                  {{ product.barcode || '—' }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="stock-quantity low"
+                >
+                  {{ product.availableQuantity | number:'1.0-3' }}
+                  {{ product.unit }}
+                </span>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPIRING SOON
+    ====================================================== -->
+
+    <div class="inventory-panel">
+
+      <div class="inventory-panel-header">
+
+        <div>
+
+          <span class="inventory-panel-kicker">
+            EXPIRY ALERT
+          </span>
+
+          <h3>
+            Expiring Soon
+          </h3>
+
+        </div>
+
+        <span
+          class="inventory-count-badge"
+          [class.alert]="expiringBatches.length > 0"
+        >
+          {{ expiringBatches.length }}
+        </span>
+
+      </div>
+
+
+      <div
+        class="inventory-empty"
+        *ngIf="expiringBatches.length === 0"
+      >
+
+        <div class="inventory-empty-icon">
+          ✓
+        </div>
+
+        <strong>
+          No expiry alerts
+        </strong>
+
+        <span>
+          No stocked batches expire within 30 days.
+        </span>
+
+      </div>
+
+
+      <div
+        class="inventory-table-wrapper"
+        *ngIf="expiringBatches.length > 0"
+      >
+
+        <table class="inventory-table">
+
+          <thead>
+
+            <tr>
+              <th>Product</th>
+              <th>Batch</th>
+              <th>Expiry</th>
+              <th>Remaining</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let batch of expiringBatches"
+            >
+
+              <td>
+
+                <div class="inventory-product-name">
+
+                  <div class="inventory-product-icon">
+                    ⏳
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      {{ batch.productName }}
+                    </strong>
+
+                    <span>
+                      {{ batch.quantity | number:'1.0-3' }}
+                      {{ batch.unit }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <span class="batch-number">
+                  {{ batch.batchNumber }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span class="expiry-date warning">
+                  {{ batch.expiryDate | date:'dd MMM yyyy' }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span class="days-remaining warning">
+                  {{ batch.daysRemaining }} day{{ batch.daysRemaining === 1 ? '' : 's' }}
+                </span>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         EXPIRED
+    ====================================================== -->
+
+    <div
+      class="inventory-panel expired-panel"
+      *ngIf="expiredBatches.length > 0"
+    >
+
+      <div class="inventory-panel-header">
+
+        <div>
+
+          <span class="inventory-panel-kicker danger-text">
+            ACTION REQUIRED
+          </span>
+
+          <h3>
+            Expired Stock
+          </h3>
+
+        </div>
+
+        <span class="inventory-count-badge danger">
+          {{ expiredBatches.length }}
+        </span>
+
+      </div>
+
+
+      <div class="inventory-table-wrapper">
+
+        <table class="inventory-table">
+
+          <thead>
+
+            <tr>
+              <th>Product</th>
+              <th>Batch</th>
+              <th>Quantity</th>
+              <th>Expired On</th>
+            </tr>
+
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let batch of expiredBatches"
+            >
+
+              <td>
+
+                <div class="inventory-product-name">
+
+                  <div class="inventory-product-icon danger-icon">
+                    ❗
+                  </div>
+
+                  <div>
+
+                    <strong>
+                      {{ batch.productName }}
+                    </strong>
+
+                    <span>
+                      {{ batch.unit }}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </td>
+
+
+              <td>
+
+                <span class="batch-number">
+                  {{ batch.batchNumber }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span class="stock-quantity expired">
+                  {{ batch.quantity | number:'1.0-3' }}
+                  {{ batch.unit }}
+                </span>
+
+              </td>
+
+
+              <td>
+
+                <span class="expiry-date expired">
+                  {{ batch.expiryDate | date:'dd MMM yyyy' }}
+                </span>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+      <!-- RECENT BILLS -->
+      <section class="dashboard-card recent-bills-card">
+
+        <div class="card-header">
+
+          <div>
+
+            <span class="section-label">
+              RECENT ACTIVITY
+            </span>
+
+            <h2>
+              Recent Bills
+            </h2>
+
+            <p>
+              Latest generated bills
+            </p>
+
+          </div>
+
+
+          <a
+            routerLink="/admin/bills"
+            class="view-all-link">
+
+            View all
+
+            <i class="pi pi-arrow-right"></i>
+
+          </a>
+
+        </div>
+
+
+        @if (recentBills.length === 0) {
+
+          <div class="empty-state">
+
+            <i class="pi pi-receipt"></i>
+
+            <h3>
+              No bills yet
+            </h3>
+
+            <p>
+              Generated bills will appear here.
+            </p>
+
+          </div>
+
+        }
+
+
+        @if (recentBills.length > 0) {
+
+          <div class="bills-table-wrapper">
+
+            <table class="bills-table">
+
+              <thead>
+
+                <tr>
+
+                  <th>
+                    Bill
+                  </th>
+
+                  <th>
+                    Customer
+                  </th>
+
+                  <th>
+                    Type
+                  </th>
+
+                  <th>
+                    Amount
+                  </th>
+
+                  <th>
+                    Paid
+                  </th>
+
+                  <th>
+                    Due
+                  </th>
+
+                  <th>
+                    Status
+                  </th>
+
+                  <th>
+                    Date
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                @for (
+                  bill of recentBills;
+                  track bill.billType + '-' + bill.id
+                ) {
+
+                  <tr
+                    class="bill-row"
+                    [routerLink]="
+                      bill.billType === 'MANUAL'
+                        ? ['/admin/bills/manual', bill.id]
+                        : ['/admin/bills', bill.id]
+                    ">
+
+
+                    <td>
+
+                      <div class="bill-number">
+
+                        <span class="bill-icon-small">
+
+                          <i
+                            class="pi"
+                            [class.pi-file-edit]="
+                              bill.billType === 'MANUAL'
+                            "
+                            [class.pi-shopping-bag]="
+                              bill.billType === 'ORDER'
+                            ">
+                          </i>
+
+                        </span>
+
+                        <strong>
+                          {{ bill.billNumber }}
+                        </strong>
+
+                      </div>
+
+                    </td>
+
+
+                    <td>
+
+                      <span class="customer-name">
+
+                        {{ bill.customerName || 'Walk-in Customer' }}
+
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <span
+                        class="bill-type-badge"
+                        [class.manual]="bill.billType === 'MANUAL'"
+                        [class.order]="bill.billType === 'ORDER'">
+
+                        {{ getBillTypeLabel(bill.billType) }}
+
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <strong>
+                        ₹{{ bill.totalAmount | number:'1.2-2' }}
+                      </strong>
+
+                    </td>
+
+
+                    <td>
+
+                      <span class="paid-amount">
+                        ₹{{ bill.paidAmount | number:'1.2-2' }}
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <span
+                        [class.due-amount]="bill.remainingAmount > 0"
+                        [class.no-due]="bill.remainingAmount === 0">
+
+                        ₹{{ bill.remainingAmount | number:'1.2-2' }}
+
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <span
+                        class="payment-status"
+                        [class.paid]="bill.paymentStatus === 'PAID'"
+                        [class.partial]="bill.paymentStatus === 'PARTIAL'"
+                        [class.unpaid]="bill.paymentStatus === 'UNPAID'">
+
+                        @if (bill.paymentStatus === 'PAID') {
+
+                          <i class="pi pi-check-circle"></i>
+
+                        }
+
+                        @if (bill.paymentStatus === 'PARTIAL') {
+
+                          <i class="pi pi-clock"></i>
+
+                        }
+
+                        @if (bill.paymentStatus === 'UNPAID') {
+
+                          <i class="pi pi-exclamation-circle"></i>
+
+                        }
+
+                        {{ getPaymentStatusLabel(bill.paymentStatus) }}
+
+                      </span>
+
+                    </td>
+
+
+                    <td>
+
+                      <span class="bill-date">
+
+                        {{ formatDateTime(bill.billedAt) }}
+
+                      </span>
+
+                    </td>
+
+                  </tr>
+
+                }
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        }
+
+      </section>
+
+      <!-- ======================================
+           FOOTER
+      ======================================= -->
+
+      <div class="dashboard-footer">
+
+        <span>
+          My Shop Dashboard
+        </span>
+
+        <span class="footer-separator">
+          •
+        </span>
+
+        <span>
+          Data refreshes automatically every 30 seconds
+        </span>
+
+      </div>
+
+
+    </main>
+  }
 
 </div>
